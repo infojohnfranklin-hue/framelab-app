@@ -57,7 +57,9 @@ useEffect(() => {
 async function generateReel() {
   setLoading(true);
   setResult(null);
-if (credits <= 0) {
+if (isPro) {
+  // Pro users can always generate
+} else if (credits <= 0) {
   try {
     const res = await fetch("/api/create-checkout-session", {
       method: "POST",
