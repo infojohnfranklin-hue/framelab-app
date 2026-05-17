@@ -57,14 +57,23 @@ async function generateReel() {
   setLoading(true);
   setResult(null);
 if (credits <= 0) {
-  const res = await fetch("/api/create-checkout-session", {
-    method: "POST",
-  });
+  try {
+    const res = await fetch("/api/create-checkout-session", {
+      method: "POST",
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (data.url) {
-    window.location.href = data.url;
+    if (data.url) {
+      window.location.href = data.url;
+      return;
+    }
+
+    console.log("Stripe checkout error:", data);
+    alert("Stripe checkout failed. Check Vercel environment variables.");
+  } catch (error) {
+    console.error("Stripe error:", error);
+    alert("Stripe checkout failed.");
   }
 
   setLoading(false);
