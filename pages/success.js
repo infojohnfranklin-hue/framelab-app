@@ -1,20 +1,19 @@
-export default function Success() {
-  return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#000",
-        color: "#fff",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "column",
-        fontFamily: "Arial",
-      }}
-    >
-      <h1>Payment Successful 🎉</h1>
+import { useEffect } from "react";
+import Link from "next/link";
 
-      <p>Welcome to FrameLab Pro.</p>
-    </div>
+export default function Success() {
+  useEffect(() => {
+    localStorage.setItem("credits", "2");
+  }, []);
+
+  return (
+    <main style={{ padding: "40px", fontFamily: "Arial" }}>
+      <h1>Payment successful ✅</h1>
+      <p>Your 2 credits have been unlocked.</p>
+
+      <Link href="/">
+        Back to FrameLab
+      </Link>
+    </main>
   );
 }

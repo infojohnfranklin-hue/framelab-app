@@ -1,51 +1,75 @@
 import { useState, useRef, useEffect } from "react";
 import jsPDF from "jspdf";
+
 export default function Home() {
-const [artist, setArtist] = useState("Velvet Mirage");
-const [track, setTrack] = useState("After Midnight");
-const [loading, setLoading] = useState(false);
-const [copiedAll, setCopiedAll] = useState(false);
-const [genre, setGenre] = useState("Melodic House");
-const [bpm, setBpm] = useState("122");
-const [mood, setMood] = useState("luxury sunset");
-const [style, setStyle] = useState("Miami Afterdark");
-const [result, setResult] = useState(null);
-const [history, setHistory] = useState([]);
-const [creditsUsed, setCreditsUsed] = useState(0);
-const resultRef = useRef(null);
+  const [artist, setArtist] = useState("Velvet Mirage");
+  const [track, setTrack] = useState("After Midnight");
+  const [loading, setLoading] = useState(false);
+  const [copiedAll, setCopiedAll] = useState(false);
+  const [genre, setGenre] = useState("Melodic House");
+  const [bpm, setBpm] = useState("122");
+  const [mood, setMood] = useState("luxury sunset");
+  const [style, setStyle] = useState("Miami Afterdark");
+  const [result, setResult] = useState(null);
+  const [history, setHistory] = useState([]);
+const [credits, setCredits] = useState(2);
 
 useEffect(() => {
-  const savedHistory = localStorage.getItem("framelab_history");
-
-  if (savedHistory) {
-    try {
-      setHistory(JSON.parse(savedHistory));
-    } catch (error) {
-      localStorage.removeItem("framelab_history");
-      setHistory([]);
-    }
+  const saved = localStorage.getItem("credits");
+  if (saved !== null) {
+    setCredits(Number(saved));
   }
 }, []);
+  const [mounted, setMounted] = useState(false);
+
 useEffect(() => {
-  localStorage.setItem(
-    "framelab_history",
-    JSON.stringify(history)
-  );
-}, [history]);
+  setMounted(true);
+
+  const saved = localStorage.getItem("credits");
+
+if (!saved || saved === "0") {
+  setCredits(2);
+  localStorage.setItem("credits", "2");
+} else {
+  setCredits(Number(saved));
+}
+}, []);
+useEffect(() => {
+  if (credits !== null) {
+    localStorage.setItem("credits", String(credits));
+  }
+}, [credits]);
+  const resultRef = useRef(null);
+
+  useEffect(() => {
+    const savedHistory = localStorage.getItem("framelab_history");
+
+    if (savedHistory) {
+      try {
+        setHistory(JSON.parse(savedHistory));
+      } catch (error) {
+        localStorage.removeItem("framelab_history");
+        setHistory([]);
+      }
+    }
+  }, []);
 async function generateReel() {
-  if (creditsUsed >= 2) {
-  const checkoutResponse = await fetch("/api/create-checkout-session", {
+  setLoading(true);
+  setResult(null);
+if (credits <= 0) {
+  const res = await fetch("/api/create-checkout-session", {
     method: "POST",
   });
 
-  const checkoutData = await checkoutResponse.json();
+  const data = await res.json();
 
-  window.location.href = checkoutData.url;
+  if (data.url) {
+    window.location.href = data.url;
+  }
+
+  setLoading(false);
   return;
 }
-  setLoading(true);
-  setResult(null);
-
   try {
     const response = await fetch("/api/generate", {
       method: "POST",
@@ -64,39 +88,40 @@ async function generateReel() {
 
     const data = await response.json();
 
-const newResult = {
-  concept: data.reelConcept,
-  prompt: data.aiVideoPrompt,
-  caption: data.caption,
-  hook: data.hook,
-  hashtags: data.hashtags,
-  viralScore: data.viralScore,
-};
+    const newResult = {
+      concept: data.reelConcept,
+      prompt: data.aiVideoPrompt,
+      caption: data.caption,
+      hook: data.hook,
+      hashtags: data.hashtags,
+      viralScore: data.viralScore,
+    };
 
-setResult(newResult);
-setCreditsUsed((prev) => prev + 1);
-setHistory((prev) => {
-  const updated = [
-    {
-      artist,
-      track,
-      genre,
-      bpm,
-      mood,
-      style,
-      date: new Date().toLocaleString(),
-      result: newResult,
-    },
-    ...prev,
-  ];
+    setResult(newResult);
 
-  return updated.slice(0, 10);
-});
     setTimeout(() => {
-  resultRef.current?.scrollIntoView({
-    behavior: "smooth",
-  });
-}, 100);
+      resultRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+
+const next = Math.max(credits - 1, 0);
+
+setCredits(next);
+localStorage.setItem("credits", String(next));
+
+    setHistory((prev) => [
+      {
+        artist,
+        track,
+        genre,
+        bpm,
+        mood,
+        style,
+        date: new Date().toLocaleString(),
+        result: newResult,
+      },
+      ...prev,
+    ].slice(0, 10));
+
   } catch (error) {
     console.error(error);
     alert("AI generation failed");
@@ -104,8 +129,6 @@ setHistory((prev) => {
 
   setLoading(false);
 }
- 
-
 return (
   <main style={mainStyle}>
     <style>{spinnerStyle}</style>
@@ -232,9 +255,33 @@ return (
     cursor: loading ? "not-allowed" : "pointer",
   }}
   disabled={loading}
-  onClick={generateReel}
+onClick={async () => {
+  if (credits <= 0) {
+    const res = await fetch("/api/create-checkout-session", {
+      method: "POST",
+    });
+
+    const data = await res.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+    }
+
+    return;
+  }
+
+  generateReel();
+}}
 >
-  {loading ? "Generating..." : "Generate Reel — 2 Free Credits, then 19 CHF/month"}
+{mounted && (
+  loading ? (
+    "Generating..."
+  ) : credits === null ? (
+    "Loading..."
+  ) : (
+    `Generate Reel — ${credits} Free Credits left • 19.90 CHF / month`
+  )
+)}
 </button>
 
       {result && (
@@ -620,3 +667,28 @@ const spinnerStyle = `
   }
 }
 `;
+<button
+  style={{
+    background: "black",
+    color: "white",
+    padding: "16px",
+    borderRadius: "12px",
+    marginTop: "30px",
+    width: "100%",
+    cursor: "pointer",
+    fontWeight: "bold",
+  }}
+  onClick={async () => {
+    const res = await fetch("/api/create-checkout-session", {
+      method: "POST",
+    });
+
+    const data = await res.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+    }
+  }}
+>
+{"Upgrade to Pro (19 CHF / month)"}
+</button>
