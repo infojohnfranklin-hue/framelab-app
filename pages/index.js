@@ -1,7 +1,15 @@
 import { useState, useRef, useEffect } from "react";
+import {
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+  useUser,
+} from "@clerk/nextjs";
 import jsPDF from "jspdf";
 
 export default function Home() {
+  const { isSignedIn } = useUser();
   const [artist, setArtist] = useState("Velvet Mirage");
   const [track, setTrack] = useState("After Midnight");
   const [loading, setLoading] = useState(false);
@@ -58,8 +66,8 @@ useEffect(() => {
 async function generateReel() {
   setLoading(true);
   setResult(null);
-if (isPro) {
-  // Pro users can always generate
+if (isSignedIn || isPro) {
+  // Signed-in or Pro users can always generate
 } else if (credits <= 0) {
   try {
     const res = await fetch("/api/create-checkout-session", {
@@ -72,12 +80,8 @@ if (isPro) {
       window.location.href = data.url;
       return;
     }
-
-    console.log("Stripe checkout error:", data);
-    alert("Stripe checkout failed. Check Vercel environment variables.");
-  } catch (error) {
-    console.error("Stripe error:", error);
-    alert("Stripe checkout failed.");
+  } catch (err) {
+    alert("Stripe checkout failed");
   }
 
   setLoading(false);
@@ -116,11 +120,12 @@ if (isPro) {
       resultRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 100);
 
-if (!isPro) {
+if (!isSignedIn && !isPro) {
   const next = Math.max(credits - 1, 0);
   setCredits(next);
   localStorage.setItem("credits", String(next));
-}    setHistory((prev) => [
+}
+   setHistory((prev) => [
       {
         artist,
         track,
@@ -144,6 +149,36 @@ if (!isPro) {
 return (
   <main style={mainStyle}>
     <style>{spinnerStyle}</style>
+<div
+  style={{
+    position: "absolute",
+    top: "30px",
+    right: "30px",
+    zIndex: 999,
+  }}
+>
+    <SignedOut>
+    <SignInButton mode="modal">
+      <button
+        style={{
+          padding: "10px 18px",
+          borderRadius: "12px",
+          border: "none",
+          background: "#b985ff",
+          color: "white",
+          fontWeight: "bold",
+          cursor: "pointer",
+        }}
+      >
+        Login
+      </button>
+    </SignInButton>
+  </SignedOut>
+
+  <SignedIn>
+    <UserButton afterSignOutUrl="/" />
+  </SignedIn>
+</div>
     <section style={{ maxWidth: "1100px", margin: "0 auto" }}>
   <p style={eyebrow}>CINEMATIC AI REEL GENERATOR</p>
 
