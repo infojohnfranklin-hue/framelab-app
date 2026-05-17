@@ -13,13 +13,6 @@ export default function Home() {
   const [result, setResult] = useState(null);
   const [history, setHistory] = useState([]);
 const [credits, setCredits] = useState(2);
-
-useEffect(() => {
-  const saved = localStorage.getItem("credits");
-  if (saved !== null) {
-    setCredits(Number(saved));
-  }
-}, []);
   const [mounted, setMounted] = useState(false);
 
 useEffect(() => {
@@ -27,11 +20,19 @@ useEffect(() => {
 
   const saved = localStorage.getItem("credits");
 
-if (!saved || saved === "0") {
-  setCredits(2);
-  localStorage.setItem("credits", "2");
+const savedPro = localStorage.getItem("isPro");
+
+if (savedPro === "true") {
+  setIsPro(true);
+  setCredits(999);
+  localStorage.setItem("credits", "999");
 } else {
-  setCredits(Number(saved));
+  if (!saved || saved === "0") {
+    setCredits(2);
+    localStorage.setItem("credits", "2");
+  } else {
+    setCredits(Number(saved));
+  }
 }
 }, []);
 useEffect(() => {
