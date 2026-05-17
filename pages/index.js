@@ -13,7 +13,6 @@ export default function Home() {
   const [result, setResult] = useState(null);
   const [history, setHistory] = useState([]);
 const [credits, setCredits] = useState(2);
-const [isPro, setIsPro] = useState(true);
 const [isPro, setIsPro] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -117,11 +116,11 @@ if (isPro) {
       resultRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 100);
 
-const next = Math.max(credits - 1, 0);
-
-setCredits(next);
-localStorage.setItem("credits", String(next));
-    setHistory((prev) => [
+if (!isPro) {
+  const next = Math.max(credits - 1, 0);
+  setCredits(next);
+  localStorage.setItem("credits", String(next));
+}    setHistory((prev) => [
       {
         artist,
         track,
