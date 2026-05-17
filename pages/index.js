@@ -275,7 +275,7 @@ onClick={generateReel}>
     "Loading..."
   ) : (
 credits > 0
-  ? `Generate Reel — ${credits} Free Credits left`
+? "Generate Reel"
   : "Subscribe to Generate Reel • 19.90 CHF / month"  )
 )}
 </button>
