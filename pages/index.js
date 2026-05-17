@@ -13,6 +13,7 @@ export default function Home() {
   const [result, setResult] = useState(null);
   const [history, setHistory] = useState([]);
 const [credits, setCredits] = useState(2);
+const [isPro, setIsPro] = useState(false);
   const [mounted, setMounted] = useState(false);
 
 useEffect(() => {
