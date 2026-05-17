@@ -13,6 +13,7 @@ export default function Home() {
   const [result, setResult] = useState(null);
   const [history, setHistory] = useState([]);
 const [credits, setCredits] = useState(2);
+const [isPro, setIsPro] = useState(true);
 const [isPro, setIsPro] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -279,8 +280,22 @@ credits > 0
   : "Subscribe to Generate Reel • 19.90 CHF / month"  )
 )}
 </button>
-
-      {result && (
+{isPro && (
+  <a
+    href="https://billing.stripe.com/p/login/dRmfZg7omfFtcqD9xjgjC00"
+    target="_blank"
+    rel="noopener noreferrer"
+    style={{
+      display: "inline-block",
+      marginTop: "12px",
+      color: "#fff",
+      textDecoration: "underline",
+      fontSize: "14px",
+    }}
+  >
+    Manage Subscription
+  </a>
+)}      {result && (
 <div ref={resultRef} style={outputBox}>
           <h2 style={{ fontSize: "54px" }}>
             {artist} — {track}
