@@ -1,20 +1,35 @@
 import { useEffect } from "react";
-import Link from "next/link";
+import { useRouter } from "next/router";
 
 export default function Success() {
+  const router = useRouter();
+
   useEffect(() => {
-    localStorage.setItem("credits", "999");
     localStorage.setItem("isPro", "true");
-  }, []);
+    localStorage.setItem("credits", "999");
+
+    setTimeout(() => {
+      router.push("/");
+    }, 1500);
+  }, [router]);
 
   return (
-    <main style={{ padding: "40px", fontFamily: "Arial" }}>
-      <h1>Payment successful ✅</h1>
-      <p>Your Pro access has been unlocked.</p>
-
-      <Link href="/">
-        Back to FrameLab
-      </Link>
+    <main
+      style={{
+        minHeight: "100vh",
+        background: "#05030a",
+        color: "#fff",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: "Inter, sans-serif",
+        textAlign: "center",
+      }}
+    >
+      <div>
+        <h1>Welcome to FrameLab Pro 🚀</h1>
+        <p>Your subscription is active. Redirecting...</p>
+      </div>
     </main>
   );
 }

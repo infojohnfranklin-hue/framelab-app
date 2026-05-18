@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.33.7",
+    "@upstash/redis": "^1.38.0",
     "jspdf": "^4.2.1",
     "next": "^14.2.25",
     "openai": "^6.37.0",

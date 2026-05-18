@@ -7,12 +7,14 @@ import {
   useUser,
 } from "@clerk/nextjs";
 import jsPDF from "jspdf";
-
 export default function Home() {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
+console.log("Signed in:", isSignedIn);
+console.log("User:", user);
   const [artist, setArtist] = useState("Velvet Mirage");
   const [track, setTrack] = useState("After Midnight");
   const [loading, setLoading] = useState(false);
+  const [remainingCredits, setRemainingCredits] = useState(2);
   const [copiedAll, setCopiedAll] = useState(false);
   const [genre, setGenre] = useState("Melodic House");
   const [bpm, setBpm] = useState("122");
@@ -20,13 +22,25 @@ export default function Home() {
   const [style, setStyle] = useState("Miami Afterdark");
   const [result, setResult] = useState(null);
   const [history, setHistory] = useState([]);
-const [credits, setCredits] = useState(2);
-const [isPro, setIsPro] = useState(false);
+  const [credits, setCredits] = useState(2);
+  const [isPro, setIsPro] = useState(false);
   const [mounted, setMounted] = useState(false);
 
 useEffect(() => {
-  setMounted(true);
+  const loadCredits = async () => {
+    try {
+      const res = await fetch("/api/credits");
+      const data = await res.json();
 
+      setRemainingCredits(data.remaining);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  loadCredits();
+
+  setMounted(true);
   const saved = localStorage.getItem("credits");
 
 const savedPro = localStorage.getItem("isPro");
@@ -68,8 +82,8 @@ async function generateReel() {
   setResult(null);
 if (isSignedIn || isPro) {
   // Signed-in or Pro users can always generate
-} else if (credits <= 0) {
-  try {
+} else if (!isSignedIn && !isPro && remainingCredits <= 0) {
+    try {
     const res = await fetch("/api/create-checkout-session", {
       method: "POST",
     });
@@ -104,7 +118,7 @@ if (isSignedIn || isPro) {
     });
 
     const data = await response.json();
-
+console.log("API RESPONSE:", data);
     const newResult = {
       concept: data.reelConcept,
       prompt: data.aiVideoPrompt,
@@ -115,7 +129,7 @@ if (isSignedIn || isPro) {
     };
 
     setResult(newResult);
-
+setRemainingCredits((prev) => Math.max(prev - 1, 0));
     setTimeout(() => {
       resultRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 100);
@@ -141,13 +155,14 @@ if (!isSignedIn && !isPro) {
 
   } catch (error) {
     console.error(error);
-    alert("AI generation failed");
-  }
-
+alert(error.message || "Free limit reached");
+} finally {
   setLoading(false);
 }
+}
+
 return (
-  <main style={mainStyle}>
+    <main style={mainStyle}>
     <style>{spinnerStyle}</style>
 <div
   style={{
@@ -301,19 +316,27 @@ return (
     opacity: loading ? 0.7 : 1,
     cursor: loading ? "not-allowed" : "pointer",
   }}
-  disabled={loading}
+disabled={loading}
 onClick={generateReel}>
 {mounted && (
   loading ? (
     "Generating..."
-  ) : credits === null ? (
+  ) : remainingCredits === null ? (
     "Loading..."
   ) : (
-credits > 0
-? "Generate Reel"
-  : "Subscribe to Generate Reel • 19.90 CHF / month"  )
+isPro
+  ? "Generate Reel · Pro Unlimited"
+  : remainingCredits > 0
+    ? `Generate Reel (${remainingCredits} left)`
+    : "No credits left · Upgrade for CHF 19.90/month"
+      )
 )}
 </button>
+{!isPro && !isSignedIn && (
+  <p style={{ marginTop: "10px", fontSize: "13px", color: "#bda7ff" }}>
+    Guest credits left: {remainingCredits} / 2
+  </p>
+)}
 {isPro && (
   <a
     href="https://billing.stripe.com/p/login/dRmfZg7omfFtcqD9xjgjC00"
@@ -712,28 +735,3 @@ const spinnerStyle = `
   }
 }
 `;
-<button
-  style={{
-    background: "black",
-    color: "white",
-    padding: "16px",
-    borderRadius: "12px",
-    marginTop: "30px",
-    width: "100%",
-    cursor: "pointer",
-    fontWeight: "bold",
-  }}
-  onClick={async () => {
-    const res = await fetch("/api/create-checkout-session", {
-      method: "POST",
-    });
-
-    const data = await res.json();
-
-    if (data.url) {
-      window.location.href = data.url;
-    }
-  }}
->
-{"Upgrade to Pro (19 CHF / month)"}
-</button>
