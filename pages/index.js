@@ -765,14 +765,14 @@ export default function Home() {
     }
 
     if (bpmNumber >= 130) {
-      return `${genre} at ${bpm} BPM creates high-pressure motion shaped by ${mood}.`;
+      return "Creative Assessment: The selected combination rewards relentless kinetic energy. Camera movement should amplify pressure rather than release it.";
     }
 
     if (bpmNumber >= 118) {
-      return `${genre} at ${bpm} BPM creates controlled momentum shaped by ${mood}.`;
+      return "Creative Assessment: The selected combination favors controlled momentum. Build psychological tension through restraint, repetition and disciplined pacing.";
     }
 
-    return `${genre} at ${bpm} BPM creates slower emotional movement shaped by ${mood}.`;
+    return "Creative Assessment: The selected combination benefits from slower emotional progression. Atmosphere should dominate over velocity.";
   })();
 
   const selectedDirector =
