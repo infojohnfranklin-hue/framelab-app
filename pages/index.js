@@ -757,6 +757,24 @@ export default function Home() {
   const creativeBriefComplete =
     creativeBriefCompletedEngines === creativeBriefEngines.length;
 
+  const sonicPressureIntelligence = (() => {
+    const bpmNumber = Number(bpm);
+
+    if (!genre || !bpm || !mood) {
+      return "Waiting for sonic profile.";
+    }
+
+    if (bpmNumber >= 130) {
+      return `${genre} at ${bpm} BPM creates high-pressure motion shaped by ${mood}.`;
+    }
+
+    if (bpmNumber >= 118) {
+      return `${genre} at ${bpm} BPM creates controlled momentum shaped by ${mood}.`;
+    }
+
+    return `${genre} at ${bpm} BPM creates slower emotional movement shaped by ${mood}.`;
+  })();
+
   const selectedDirector =
     directorModes.find((mode) => mode.name === directorMode) ||
     directorModes?.[0];
