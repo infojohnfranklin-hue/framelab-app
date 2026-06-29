@@ -878,6 +878,51 @@ export default function Home() {
     return `Creative Assessment: The visual style should convert ${genreBehavior}, ${sonicBehavior} and ${emotionalBehavior} into material behavior across the reel.`;
   })();
 
+  const directorGrammarIntelligence = (() => {
+    const { directorSignal, styleSignal, genreSignal, moodSignal, bpmNumber } = creativeContext;
+
+    if (!directorMode) {
+      return "Waiting for director grammar.";
+    }
+
+    const cameraEnergy =
+      bpmNumber >= 130
+        ? "pressure-driven movement"
+        : bpmNumber >= 118
+        ? "controlled camera momentum"
+        : "patient observational movement";
+
+    const materialInfluence =
+      styleSignal.includes("chrome") || styleSignal.includes("reflection")
+        ? "reflections should guide framing and reveal timing"
+        : styleSignal.includes("vhs") || styleSignal.includes("analog")
+        ? "camera grammar should allow imperfection, drift and optical memory"
+        : styleSignal.includes("velvet") || styleSignal.includes("dark")
+        ? "framing should protect darkness, negative space and restraint"
+        : "visual material should determine how the camera discovers the subject";
+
+    const sonicInfluence =
+      genreSignal.includes("techno")
+        ? "movement should feel mechanical and disciplined"
+        : genreSignal.includes("house")
+        ? "movement should preserve groove and body rhythm"
+        : "movement should follow the track's internal pressure";
+
+    if (directorSignal.includes("neo noir") || directorSignal.includes("sci-fi") || directorSignal.includes("sci fi")) {
+      return `Creative Assessment: ${directorMode} should make ${cameraEnergy} feel intentional, not random. ${materialInfluence}; ${sonicInfluence}.`;
+    }
+
+    if (directorSignal.includes("analog") || directorSignal.includes("memory")) {
+      return `Creative Assessment: ${directorMode} should treat the camera like a memory device. ${materialInfluence}; pacing must respect ${moodSignal || "the emotional tone"}.`;
+    }
+
+    if (directorSignal.includes("spatial") || directorSignal.includes("architecture")) {
+      return `Creative Assessment: ${directorMode} should prioritize room logic over close-up spectacle. Camera movement must reveal how sound, material and space affect each other.`;
+    }
+
+    return `Creative Assessment: ${directorMode} should translate the sonic and material decisions into camera behavior, framing discipline and reveal timing.`;
+  })();
+
   const selectedDirector =
     directorModes.find((mode) => mode.name === directorMode) ||
     directorModes?.[0];
