@@ -826,29 +826,56 @@ export default function Home() {
   })();
 
   const materialLanguageIntelligence = (() => {
-    const styleSignal = String(style || "").toLowerCase();
+    const { styleSignal, genreSignal, moodSignal, bpmNumber } = creativeContext;
 
     if (!style) {
       return "Waiting for material language.";
     }
 
+    const sonicBehavior =
+      bpmNumber >= 130
+        ? "fast rhythmic pressure"
+        : bpmNumber >= 118
+        ? "controlled forward motion"
+        : "slow atmospheric movement";
+
+    const emotionalBehavior =
+      moodSignal.includes("tense")
+        ? "unresolved tension"
+        : moodSignal.includes("hypnotic")
+        ? "repetition and trance-like continuity"
+        : moodSignal.includes("nocturnal")
+        ? "intimate night pressure"
+        : moodSignal.includes("melancholic")
+        ? "emotional residue"
+        : "the selected emotional tone";
+
+    const genreBehavior =
+      genreSignal.includes("techno")
+        ? "machine persistence"
+        : genreSignal.includes("house")
+        ? "groove continuity"
+        : genreSignal.includes("ambient") || genreSignal.includes("downtempo")
+        ? "spacious drift"
+        : "the track rhythm";
+
     if (styleSignal.includes("vhs") || styleSignal.includes("analog") || styleSignal.includes("dusty")) {
-      return "Creative Assessment: Imperfection should become part of the image logic. Grain, bleed, blur and optical decay must feel physical, not decorative.";
+      return `Creative Assessment: Imperfection should respond to ${genreBehavior}. Grain, bleed and optical decay must carry ${emotionalBehavior}, not sit on top as a filter.`;
     }
 
     if (styleSignal.includes("chrome") || styleSignal.includes("reflection") || styleSignal.includes("glass")) {
-      return "Creative Assessment: Reflective surfaces should carry tension. Highlights, mirrors and compressed light must reveal the world instead of simply making it glossy.";
+      return `Creative Assessment: Reflective surfaces should translate ${sonicBehavior} into light behavior. Highlights and mirrors must reveal rhythm, pressure and ${emotionalBehavior}.`;
     }
 
     if (styleSignal.includes("editorial") || styleSignal.includes("fashion")) {
-      return "Creative Assessment: Light should behave like a decisive editorial gesture. Contrast, pose, reveal and silhouette must feel intentional and campaign-ready.";
+      return `Creative Assessment: Editorial light should turn ${genreBehavior} into decisive visual gestures. Contrast, pose and reveal must feel shaped by ${emotionalBehavior}.`;
     }
 
     if (styleSignal.includes("velvet") || styleSignal.includes("dark")) {
-      return "Creative Assessment: Darkness should absorb the frame. Texture, shadow and negative space must create restraint instead of visual emptiness.";
+      return `Creative Assessment: Darkness should absorb ${sonicBehavior}. Texture, shadow and negative space must hold ${emotionalBehavior} instead of becoming empty atmosphere.`;
     }
 
-    return "Creative Assessment: The visual style should define material behavior, surface response and atmospheric discipline across the reel.";
+    return `Creative Assessment: The visual style should convert ${genreBehavior}, ${sonicBehavior} and ${emotionalBehavior} into material behavior across the reel.`;
   })();
 
   const selectedDirector =
