@@ -778,6 +778,45 @@ export default function Home() {
     purposeSignal: String(reelPurpose || "").toLowerCase(),
   };
 
+  const identityEngineIntelligence = (() => {
+    const { artist, track, genreSignal, moodSignal, purposeSignal } = creativeContext;
+
+    if (!artist || !track) {
+      return "Waiting for artist identity.";
+    }
+
+    const identityPressure =
+      genreSignal.includes("techno")
+        ? "a precise, high-control electronic identity"
+        : genreSignal.includes("house")
+        ? "a warm but curated club-facing identity"
+        : genreSignal.includes("ambient") || genreSignal.includes("downtempo")
+        ? "an atmospheric identity built through restraint and space"
+        : "a distinctive release identity shaped by the selected sound";
+
+    const emotionalPosition =
+      moodSignal.includes("nocturnal")
+        ? "The artist should feel intimate, late-night and close to the listener."
+        : moodSignal.includes("hypnotic")
+        ? "The artist should feel magnetic, repetitive and difficult to look away from."
+        : moodSignal.includes("tense")
+        ? "The artist should feel controlled, unresolved and visually disciplined."
+        : moodSignal.includes("euphoric")
+        ? "The artist should feel expansive, luminous and release-driven."
+        : "The artist identity should follow the emotional pressure of the track.";
+
+    const releasePosition =
+      purposeSignal.includes("identity")
+        ? "Prioritize recognition over plot."
+        : purposeSignal.includes("launch") || purposeSignal.includes("teaser")
+        ? "Prioritize immediate memory and anticipation."
+        : purposeSignal.includes("canvas")
+        ? "Prioritize loopable visual identity."
+        : "Prioritize a clear creative signature for the release.";
+
+    return `Creative Assessment: ${artist} — ${track} should present ${identityPressure}. ${emotionalPosition} ${releasePosition}`;
+  })();
+
   const sonicPressureIntelligence = (() => {
     const bpmNumber = Number(bpm);
     const genreSignal = String(genre || "").toLowerCase();
