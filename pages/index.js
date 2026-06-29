@@ -1010,6 +1010,51 @@ export default function Home() {
     return `Creative Assessment: ${styleDNA} in ${era} should create a world where ${eraBehavior}. ${dnaBehavior}; ${materialBehavior}; ${directorBehavior}.`;
   })();
 
+  const releaseObjectiveIntelligence = (() => {
+    const { purposeSignal, genreSignal, moodSignal, directorSignal } = creativeContext;
+
+    if (!reelPurpose) {
+      return "Waiting for release objective.";
+    }
+
+    const purposeBehavior =
+      purposeSignal.includes("identity")
+        ? "the reel should make the artist recognizable before it explains anything"
+        : purposeSignal.includes("teaser") || purposeSignal.includes("launch")
+        ? "the reel should create anticipation without resolving the full idea"
+        : purposeSignal.includes("canvas")
+        ? "the reel should become a hypnotic loop that strengthens track memory"
+        : purposeSignal.includes("festival")
+        ? "the reel should communicate scale, impact and instant visual readability"
+        : purposeSignal.includes("editorial") || purposeSignal.includes("campaign")
+        ? "the reel should feel campaign-ready, intentional and visually ownable"
+        : purposeSignal.includes("video")
+        ? "the reel should seed a larger music-video world without revealing everything"
+        : "the reel should serve the selected release goal with a clear creative function";
+
+    const emotionalStrategy =
+      moodSignal.includes("hypnotic")
+        ? "Repetition should become the retention mechanism."
+        : moodSignal.includes("tense")
+        ? "Unresolved pressure should hold attention."
+        : moodSignal.includes("nocturnal")
+        ? "Intimacy and atmosphere should create recognition."
+        : moodSignal.includes("euphoric")
+        ? "Release and lift should create shareability."
+        : "The emotional tone should define what the viewer remembers.";
+
+    const formatStrategy =
+      genreSignal.includes("techno")
+        ? "Keep the visual system disciplined and physical."
+        : genreSignal.includes("house")
+        ? "Keep the visual system warm, rhythmic and body-led."
+        : directorSignal.includes("minimal")
+        ? "Keep the concept precise, iconic and stripped of excess."
+        : "Keep the final creative signal easy to understand within seconds.";
+
+    return `Creative Assessment: For ${reelPurpose}, ${purposeBehavior}. ${emotionalStrategy} ${formatStrategy}`;
+  })();
+
   const selectedDirector =
     directorModes.find((mode) => mode.name === directorMode) ||
     directorModes?.[0];
