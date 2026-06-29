@@ -923,6 +923,54 @@ export default function Home() {
     return `Creative Assessment: ${directorMode} should translate the sonic and material decisions into camera behavior, framing discipline and reveal timing.`;
   })();
 
+  const worldLogicIntelligence = (() => {
+    const { dnaSignal, eraSignal, styleSignal, directorSignal, genreSignal, moodSignal } = creativeContext;
+
+    if (!styleDNA || !era) {
+      return "Waiting for world logic.";
+    }
+
+    const eraBehavior =
+      eraSignal.includes("ancient")
+        ? "time should feel mythic, ritualized and older than technology"
+        : eraSignal.includes("future") || eraSignal.includes("2090")
+        ? "time should feel engineered, speculative and physically transformed"
+        : eraSignal.includes("chrome") || eraSignal.includes("millennium")
+        ? "time should feel polished, synthetic and culturally over-designed"
+        : eraSignal.includes("vhs") || eraSignal.includes("analog")
+        ? "time should feel degraded, remembered and imperfect"
+        : "the selected era should define the world's visual laws";
+
+    const dnaBehavior =
+      dnaSignal.includes("noir")
+        ? "the world should hide information through shadow, reflection and partial visibility"
+        : dnaSignal.includes("dream")
+        ? "the world should follow emotional logic instead of realism"
+        : dnaSignal.includes("luxury")
+        ? "the world should communicate status through restraint, material control and silence"
+        : dnaSignal.includes("tokyo") || dnaSignal.includes("chrome")
+        ? "the world should feel dense, reflective and technologically saturated"
+        : "the cinematic DNA should control atmosphere, architecture and behavior";
+
+    const materialBehavior =
+      styleSignal.includes("chrome") || styleSignal.includes("reflection")
+        ? "surfaces must behave like active storytelling devices"
+        : styleSignal.includes("vhs") || styleSignal.includes("analog")
+        ? "imperfection must become part of the world physics"
+        : styleSignal.includes("dark") || styleSignal.includes("velvet")
+        ? "darkness must define what the viewer is allowed to understand"
+        : "materials must reinforce the world's internal rules";
+
+    const directorBehavior =
+      directorSignal.includes("minimal") || directorSignal.includes("monumental")
+        ? "camera logic should make the world feel larger than the subject"
+        : directorSignal.includes("noir") || directorSignal.includes("sci")
+        ? "camera logic should reveal the world through controlled fragments"
+        : "camera logic should expose how the world behaves under pressure";
+
+    return `Creative Assessment: ${styleDNA} in ${era} should create a world where ${eraBehavior}. ${dnaBehavior}; ${materialBehavior}; ${directorBehavior}.`;
+  })();
+
   const selectedDirector =
     directorModes.find((mode) => mode.name === directorMode) ||
     directorModes?.[0];
