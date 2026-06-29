@@ -1,6 +1,7 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
+import "../styles/premium.css";
 
 export default function App({ Component, pageProps }) {
   const [userPlan, setUserPlan] = useState("free");
@@ -28,11 +29,28 @@ export default function App({ Component, pageProps }) {
 
   return (
     <ClerkProvider>
-      <div style={{ display: "flex" }}>
+      <div
+        style={{
+          display: "flex",
+          minHeight: "100vh",
+          width: "100%",
+          background: "#050505",
+          color: "white",
+          overflowX: "hidden",
+        }}
+      >
         <Sidebar userPlan={userPlan} />
-        <div style={{ marginLeft: "260px", width: "100%" }}>
+
+        <main
+          style={{
+            flex: 1,
+            minWidth: 0,
+            minHeight: "100vh",
+            background: "#050505",
+          }}
+        >
           <Component {...pageProps} />
-        </div>
+        </main>
       </div>
     </ClerkProvider>
   );
