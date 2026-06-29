@@ -1,0 +1,9 @@
+body {
+  margin: 0;
+  background: #0b0b12;
+  font-family: Arial, sans-serif;
+}
+
+main {
+  background: radial-gradient(circle at top left, #3b1d5c 0%, #0b0b12 40%);
+}
