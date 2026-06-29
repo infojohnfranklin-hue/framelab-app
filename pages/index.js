@@ -757,6 +757,27 @@ export default function Home() {
   const creativeBriefComplete =
     creativeBriefCompletedEngines === creativeBriefEngines.length;
 
+  const creativeContext = {
+    artist,
+    track,
+    genre,
+    bpm,
+    mood,
+    style,
+    directorMode,
+    styleDNA,
+    era,
+    reelPurpose,
+    bpmNumber: Number(bpm),
+    genreSignal: String(genre || "").toLowerCase(),
+    moodSignal: String(mood || "").toLowerCase(),
+    styleSignal: String(style || "").toLowerCase(),
+    directorSignal: String(directorMode || "").toLowerCase(),
+    dnaSignal: String(styleDNA || "").toLowerCase(),
+    eraSignal: String(era || "").toLowerCase(),
+    purposeSignal: String(reelPurpose || "").toLowerCase(),
+  };
+
   const sonicPressureIntelligence = (() => {
     const bpmNumber = Number(bpm);
     const genreSignal = String(genre || "").toLowerCase();
