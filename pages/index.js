@@ -759,20 +759,49 @@ export default function Home() {
 
   const sonicPressureIntelligence = (() => {
     const bpmNumber = Number(bpm);
+    const genreSignal = String(genre || "").toLowerCase();
+    const moodSignal = String(mood || "").toLowerCase();
 
     if (!genre || !bpm || !mood) {
       return "Waiting for sonic profile.";
     }
 
-    if (bpmNumber >= 130) {
-      return "Creative Assessment: The selected combination rewards relentless kinetic energy. Camera movement should amplify pressure rather than release it.";
-    }
+    const tempoDirection =
+      bpmNumber >= 130
+        ? "high-pressure kinetic pacing"
+        : bpmNumber >= 118
+        ? "controlled forward momentum"
+        : "slow-burn emotional movement";
 
-    if (bpmNumber >= 118) {
-      return "Creative Assessment: The selected combination favors controlled momentum. Build psychological tension through restraint, repetition and disciplined pacing.";
-    }
+    const genreDirection =
+      genreSignal.includes("minimal")
+        ? "minimal repetition, negative space and restrained structural tension"
+        : genreSignal.includes("progressive")
+        ? "gradual escalation, layered movement and long-form release pressure"
+        : genreSignal.includes("techno")
+        ? "industrial drive, physical pulse and machine-like persistence"
+        : genreSignal.includes("house")
+        ? "club warmth, groove continuity and body-led motion"
+        : genreSignal.includes("ambient") || genreSignal.includes("downtempo")
+        ? "atmospheric drift, suspended rhythm and emotional spaciousness"
+        : "genre-led rhythm behavior and musical pressure";
 
-    return "Creative Assessment: The selected combination benefits from slower emotional progression. Atmosphere should dominate over velocity.";
+    const moodDirection =
+      moodSignal.includes("tense")
+        ? "anticipation should stay unresolved instead of exploding too early"
+        : moodSignal.includes("nocturnal")
+        ? "night pressure should feel intimate, controlled and close to the skin"
+        : moodSignal.includes("euphoric")
+        ? "release moments should feel earned, luminous and expansive"
+        : moodSignal.includes("melancholic")
+        ? "movement should carry emotional weight rather than pure energy"
+        : moodSignal.includes("romantic")
+        ? "distance, restraint and longing should shape the rhythm"
+        : moodSignal.includes("hypnotic")
+        ? "repetition should become the main visual engine"
+        : "the emotional tone should control how the rhythm is perceived";
+
+    return `Creative Assessment: ${genre} at ${bpm} BPM suggests ${tempoDirection}. Use ${genreDirection}; ${moodDirection}.`;
   })();
 
   const selectedDirector =
