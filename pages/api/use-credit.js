@@ -1,21 +1,24 @@
-import { getFreeUses } from "../../lib/credits";
+import { getAuth } from "@clerk/nextjs/server";
+import { increaseFreeUses } from "../../lib/credits";
 
 export default async function handler(req, res) {
   try {
+    const { userId } = getAuth(req);
+
     const identifier =
+      userId ||
       req.headers["x-forwarded-for"] ||
       req.socket.remoteAddress ||
       "guest";
 
-    const used = await getFreeUses(identifier);
+// await increaseFreeUses(identifier);
 
     return res.status(200).json({
-      used,
-      remaining: Math.max(0, 2 - used),
+      success: true,
     });
   } catch (error) {
     return res.status(500).json({
-      error: "Failed to load credits",
+      error: "Failed to increase credits",
     });
   }
 }
