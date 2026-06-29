@@ -76,16 +76,16 @@ const musicFacingReelPurposes = [
 ];
 
 const musicFacingCompositionStrategies = [
-  "close face and gaze portrait with minimal environment",
-  "wide environment-scale performance frame with artist small but readable in the landscape",
-  "walking movement frame with artist crossing the scene and rhythm visible in posture",
-  "profile silhouette frame with strong negative space and directional light",
-  "hands and rhythm detail frame where gesture leads the teaser",
-  "low-angle stage-like presence with artist above the lens and environment behind",
-  "backlight performance image with artist rim-lit against the world",
-  "off-center editorial frame with artist placed on one side and atmosphere occupying the rest",
-  "over-shoulder performance frame looking into the release world",
-  "grounded documentary distance with artist walking through the environment, body language and landscape scale visible",
+  "single ownable reel image where the strongest motif carries the campaign identity",
+  "environment-led frame where space, behavior and final composition define the release world",
+  "typography-led frame where text, symbols or graphic motion become the main visual hook",
+  "motion-rule frame where one repeated movement transforms the scene into a memorable reel moment",
+  "object-led frame where a symbolic object changes because of the track energy, not as a product close-up",
+  "crowd-fragment frame where collective movement, light and rhythm carry the identity",
+  "abstract-behavior frame where material, signal or pattern becomes the visual subject",
+  "performer-led frame where an original fictional performer carries the idea through action, styling or body language",
+  "negative-space frame where absence, distance or restraint becomes the main image",
+  "final-frame-first composition where the whole reel builds toward one iconic end image",
 ];
 
 const getMusicFacingCompositionStrategy = () => {
@@ -315,7 +315,7 @@ const getMusicFacingWorldIntelligence = () => {
       "underground",
     ])
   ) {
-    return "Club / festival / party world: crowd energy, stage light, bodies moving, hands raised, speakers, backstage moments, dance-floor rhythm and release-campaign atmosphere.";
+    return "Club / festival / party world: rhythm, collective energy, light behavior, sound-system pressure, dance-floor geometry, social motion, release-campaign atmosphere or environment-led nightlife identity. Do not default to backstage rooms, walking performer corridors, generic crowd shots or predictable club interiors.";
   }
 
   if (
@@ -543,7 +543,7 @@ const getMusicFacingSubjectStrategy = () => {
     .toLowerCase();
 
   if (/\b(acid|303|smile|smiley|rave|sticker|graphic|cartoon|mascot|icon|symbol)\b/.test(source)) {
-    return "primary subject strategy: non-human acid-smiley graphic system, chrome 303 machine detail, melting rave icon, sticker pattern, club-symbol loop or typography-led visual. Human performers are optional background only, not the primary subject. Avoid fashion portrait, solo performer hero shot, backstage corridor, near-touch hands and romantic blocking.";
+    return "primary subject strategy: interpret acid as a creative culture rather than a fixed icon. Choose the strongest subject logic from the full input combination. Possible primary subjects include an original performer, ensemble, graphic system, typography behavior, motion rule, spatial installation, environment, symbolic object, crowd fragment, abstract phenomenon or cinematic interaction. Do not default to acid-smiley graphics, 303 hardware, chrome machines, melting stickers or one recurring visual motif. Select the subject that best expresses the combined Director Mode, Cinematic DNA, Mood and Reel Purpose.";
   }
 
   if (/\b(daft|robot|helmet|machine|synth|modular|sequencer|drum machine|hardware|chrome)\b/.test(source)) {
@@ -574,31 +574,128 @@ const selectedMusicFacingSubjectStrategy =
     ? getMusicFacingSubjectStrategy()
     : "";
 
+const getMusicFacingCampaignIdeaFrame = () => {
+  const signal = [
+    directorMode,
+    styleDNA,
+    mood,
+    visualStyle,
+    genre,
+    era,
+    reelPurpose,
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  if (/\b(neo noir|sci-fi|neo tokyo|cyberpunk|future city)\b/.test(signal)) {
+    return "campaign idea frame: urban-system identity where city behavior, light logic, distance, surveillance tension, signage, movement rules or social space may carry the reel identity. Do not default to corridor, studio, walking pose, chrome jacket, 303 object, performer close-up or typography emerging from reflections.";
+  }
+
+  if (/\b(spatial|architecture|architectural|brutalist|room|installation)\b/.test(signal)) {
+    return "campaign idea frame: spatial identity where arrangement, distance, scale, negative space, geometry or room behavior carries the reel identity. Do not default to object close-up or performer portrait.";
+  }
+
+  if (/\b(analog|vhs|archive|film|memory|1970s|90s|nostalgic)\b/.test(signal)) {
+    return "campaign idea frame: memory-system identity where texture, time delay, archival behavior, film damage, cultural residue or temporal distortion carries the reel identity. Do not default to generic retro filter.";
+  }
+
+  if (/\b(romantic|intimacy|distance|longing|melancholic|tender)\b/.test(signal)) {
+    return "campaign idea frame: emotional-distance identity where separation, withheld contact, delayed response, absence, restraint or unresolved movement carries the reel identity. Do not default to near-touch hands or corridor romance.";
+  }
+
+  if (/\b(graphic|typography|poster|symbol|logo|canvas|visualizer)\b/.test(signal)) {
+    return "campaign idea frame: graphic identity where typography, symbol logic, cover-art behavior or graphic motion may carry the reel identity only when it is the strongest input-driven choice. Do not use typography as a generic fallback.";
+  }
+
+  return "campaign idea frame: choose one ownable social reel idea from the full input combination before choosing subject, material or location. The idea must be campaign-ready, visually memorable and structurally open-ended. Do not default to closure, emblem formation, locking, stabilization or final symbolic resolution. The idea may remain unresolved, fragmented, ongoing or intentionally incomplete if that better serves the campaign identity.";
+};
+
+
+const getMusicFacingIdentityMechanic = () => {
+  const signal = [
+    directorMode,
+    styleDNA,
+    mood,
+    visualStyle,
+    genre,
+    era,
+    reelPurpose,
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  if (/\b(sync|rhythm|beat|pulse|timing|tempo)\b/.test(signal)) {
+    return "identity mechanic: synchronization — all visual elements behave as one timed system. Movement, light, material and composition must align into a shared rhythm.";
+  }
+
+  if (/\b(transform|change|shift|evolve|morph)\b/.test(signal)) {
+    return "identity mechanic: transformation — identity is created through visible change over time. The final frame must feel like a consequence of progression.";
+  }
+
+  if (/\b(fragment|break|crack|split)\b/.test(signal)) {
+    return "identity mechanic: fragmentation — identity is built through separation, breakage or distributed visual elements that still feel connected.";
+  }
+
+  if (/\b(lock|seal|freeze|hold|stop)\b/.test(signal)) {
+    return "identity mechanic: locking — identity emerges when motion resolves into a fixed, iconic final state.";
+  }
+
+  if (/\b(layer|stack|depth|overlap)\b/.test(signal)) {
+    return "identity mechanic: layering — identity is created through stacked visual systems that reveal meaning through depth and occlusion.";
+  }
+
+  if (/\b(repeat|loop|cycle|echo)\b/.test(signal)) {
+    return "identity mechanic: repetition — identity emerges from repeated actions or patterns that gradually build meaning.";
+  }
+
+  return "identity mechanic: emergence — identity is not predefined but slowly becomes visible through interaction of all elements.";
+};
+
+const selectedMusicFacingIdentityMechanic =
+  musicFacingReelPurposes.includes(reelPurpose)
+    ? getMusicFacingIdentityMechanic()
+    : "";
+
+const selectedMusicFacingCampaignIdeaFrame =
+  musicFacingReelPurposes.includes(reelPurpose)
+    ? getMusicFacingCampaignIdeaFrame()
+    : "";
+
 const musicFacingConceptDNAParts = [
+  "Music campaign identity for",
   artistName || "Unnamed Artist",
-  "performing",
+  "and",
   trackName || "Untitled Track",
-  "for",
+  "built as",
   reelPurpose || "music reel",
-  "with",
-  genre || "Electronic",
-  "energy",
-  mood || "defined mood",
-  visualStyle || "defined visual style",
+  "with campaign idea frame",
+  selectedMusicFacingIdentityMechanic || "identity mechanic: emergence",
+  selectedMusicFacingCampaignIdeaFrame || "ownable social reel idea selected from the full input combination",
+  "where the core idea is driven first by",
   directorMode || "defined director mode",
   styleDNA || "defined cinematic DNA",
+  mood || "defined mood",
+  "and the output purpose",
+  reelPurpose || "music reel",
+  "then shaped by",
+  genre || "Electronic",
+  "energy at",
+  bpm || "unknown",
+  "BPM",
+  visualStyle || "defined visual style",
+  "and",
   era || "defined era",
-  "with subject strategy",
-  selectedMusicFacingSubjectStrategy || "distinct subject logic chosen from project signals",
+  "with identity vehicle",
+  selectedMusicFacingSubjectStrategy || "distinct identity vehicle chosen from project signals",
   "inside",
-  selectedMusicFacingWorldIntelligence || "artist-led world context",
+  selectedMusicFacingWorldIntelligence || "campaign world context",
   "with concrete scene anchors",
-  selectedMusicFacingConcreteSceneAnchor || "real-world artist-led details",
+  selectedMusicFacingConcreteSceneAnchor || "real-world music identity details",
   "with final frame requirement",
-  selectedMusicFacingActionFinalFrameRequirement || "final frame remains concept-native and artist-led",
+  selectedMusicFacingActionFinalFrameRequirement || "final frame remains concept-native and campaign-ready",
   "using",
-  selectedMusicFacingCompositionStrategy || "artist-led cinematic frame",
-  "as the primary composition",
+  selectedMusicFacingCompositionStrategy || "ownable reel image",
+  "as the primary reel composition",
 ];
 
 const musicFacingConceptDNA = musicFacingConceptDNAParts.join(" ");
@@ -648,6 +745,22 @@ if (Number(bpm) <= 100) {
   energyStyle =
     "fast pacing, quicker camera movement, shorter shot duration";
 }
+
+const creativeDecisionLayer = {
+  primaryDriver: directorMode || "Director Mode not selected",
+  secondaryDriver: styleDNA || "Cinematic DNA not selected",
+  emotionalDriver: mood || "Mood not selected",
+  materialDriver: visualStyle || "Visual Style not selected",
+  energyDriver: `${genre || "Genre not selected"} at ${bpm || "unknown"} BPM`,
+  eraDriver: era || "Era not selected",
+  identityDriver: `${artistName || "Unknown Artist"} — ${trackName || "Unknown Track"}`,
+  outputShape: reelPurpose || "Reel Purpose not selected",
+  decisionRule:
+    "Build the core reel idea from primaryDriver + secondaryDriver + emotionalDriver + outputShape first. Use materialDriver, energyDriver and eraDriver as shaping forces. Use identityDriver as branding context, not as the automatic literal subject.",
+};
+
+const creativeDecisionLayerText = JSON.stringify(creativeDecisionLayer, null, 2);
+
     const completion = await client.chat.completions.create({
             model: "gpt-4.1-mini",
       response_format: { type: "json_object" },
@@ -661,6 +774,102 @@ if (Number(bpm) <= 100) {
         {
           role: "user",
           content: `
+
+GENERATE REEL CREATIVE ENGINE:
+
+Use this structured Creative Decision Layer as the hierarchy for the output:
+
+${creativeDecisionLayerText}
+
+Generate Reel is not a full production blueprint.
+
+Generate Reel must first interpret input hierarchy.
+
+INPUT INTERPRETER RULE:
+
+Before writing the reel, decide which fields control which creative layer:
+
+- Director Mode controls camera grammar and often the main motif logic.
+- Cinematic DNA controls world behavior and spatial identity.
+- Mood controls emotional tension and performer behavior.
+- Visual Style controls material behavior, not the whole idea by itself.
+- Genre controls energy, social context and rhythm behavior.
+- BPM controls movement speed, cut density and physical pulse.
+- Era controls texture, memory logic and cultural framing.
+- Reel Purpose controls output shape and user utility.
+- Artist Name and Track Name provide identity signals, but must not automatically dominate the image.
+
+Do not let one literal word from Artist Name or Track Name hijack the whole concept.
+
+The main image must come from the strongest combination of Director Mode + Cinematic DNA + Mood + Reel Purpose, supported by Genre, BPM, Visual Style and Era.
+
+If the result could still work after replacing the Artist Name and Track Name with generic music names, it is not specific enough.
+
+If the result is only performer + object + texture + lighting, reject it internally and invent a clearer reel idea.
+
+MANDATORY INTERNAL IDEA SELECTION:
+
+Before writing the final JSON, internally create three different reel ideas.
+
+Each idea must have a different:
+- main motif
+- motion behavior
+- final frame
+- reason why the chosen input combination matters
+
+Reject any idea that depends mainly on:
+- wet chrome reflections
+- neon street walking
+- performer silhouette plus object
+- 303 machine close-up
+- acid-smiley melting
+- sticker graphics melting
+- rain plus reflections
+- generic club scene
+
+Choose the idea that feels most specific to the full combination and most useful as a premium social reel direction.
+
+Do not reveal the three internal ideas.
+Only return the final selected creative package.
+
+Generate Reel must create a fast, premium, campaign-ready reel direction:
+- one strong creative hook
+- one memorable main image
+- one clear motion idea
+- one distinctive final frame
+- short usable AI video prompt
+- hooks, captions and thumbnail concept that support the same reel idea
+
+Before writing any output field, fuse the full input combination into one reel idea:
+
+Artist Name, Track Name, Genre, BPM, Mood, Visual Style, Director Mode, Cinematic DNA, Era and Reel Purpose.
+
+Do not stack keywords.
+
+Do not simply combine:
+artist + object + style + location + texture.
+
+The user must feel that changing any major field changes the core reel idea.
+
+Different combinations must create different:
+- main motif
+- setting or framing logic
+- motion behavior
+- performer role if present
+- final frame
+- social hook
+
+For Artist Identity Reel, performer presence is allowed, but the performer must do something concept-specific.
+Do not default to hands touching an object, silhouette posing, neon street walking, generic club crowd, chrome close-up or rain reflections.
+
+Artist Name and Track Name are identity signals, not literal visual commands.
+
+A track title may inspire mood, timing, structure, symbolism or motion.
+It does not always need to appear as a literal object.
+
+Write like a premium reel creative director.
+Keep it punchy, visual, useful and campaign-ready.
+Avoid blueprint language, system language and overexplaining.
 
 IMPORTANT CREATIVE RULES:
 
@@ -694,7 +903,7 @@ Do not introduce unrelated random objects.
 Do not introduce unrelated characters.
 
 Important exception:
-For music-facing outputs and especially Artist Identity Reel, a visible artist, performer, musician, singer, silhouette, face, portrait, styling, wardrobe, body language or stage-like presence is required. This is not an unrelated character. This is the core subject of the music identity asset.
+For music-facing outputs, visible performer presence is allowed when it strengthens the reel idea, but it is not automatically required as the primary motif. Artist Identity Reel may express identity through a fictional performer, silhouette, wardrobe, typography, symbol, environment, object behavior, crowd fragment, motion rule, graphic system or cinematic final frame. The chosen identity vehicle must come from the full input combination, not from a default performer portrait.
 
 Do not introduce unrelated creatures.
 
@@ -1724,21 +1933,33 @@ Bad for Artist Identity Reel:
 - an environment that could belong to any anonymous VFX demo
 
 Better for Artist Identity Reel:
-- the artist stands inside a rainlit reflective corridor while coat fabric, wet surfaces and slow camera pressure build a nocturnal track identity
-- the performer becomes the visual anchor while chrome reflections, facial shadow, wardrobe texture and final-frame posture define the release world
-- the final image locks on the artist silhouette, track mood and one memorable physical detail that makes the identity ownable
+- the identity is carried by one ownable reel image that could become cover art, launch teaser or short-form visual signature
+- the main motif may be performer-led, typography-led, environment-led, symbol-led, motion-led, object-led, crowd-led or abstract when the full input combination supports it
+- the final image locks on a memorable identity vehicle chosen from Director Mode, Cinematic DNA, Mood and Reel Purpose, not from a default corridor, silhouette, chrome reflection or walking pose
 
-Artist Identity Hard Subject Rule:
+Artist Identity Reel Rule:
 
-For Artist Identity Reel, the artist or performer presence must be the primary subject of reelConcept and aiVideoPrompt.
+For Artist Identity Reel, the output must create a clear ownable identity for the music project.
 
-The first sentence of reelConcept must clearly include a visible artist, performer, musician, singer, silhouette, face, portrait, body language, styling, wardrobe or stage-like presence.
+That identity may be carried by:
+- an original fictional performer
+- silhouette or body language
+- wardrobe or styling
+- typography
+- symbol system
+- environment behavior
+- object behavior
+- crowd fragment
+- motion rule
+- cinematic final frame
 
-The first sentence of aiVideoPrompt must clearly include a visible artist, performer, musician, singer, silhouette, face, portrait, body language, styling, wardrobe or stage-like presence.
+The performer is allowed, but not automatically required as the primary subject.
 
-Objects, materials, architecture, vaults, machines, gardens, shrines, chambers, chrome systems, fabric systems or environmental transformations may support the artist world, but they must never become the main subject for Artist Identity Reel.
+Do not force the first sentence of reelConcept or aiVideoPrompt to begin with a performer.
 
-If an Artist Identity Reel output could exist without the named artist or track, it is invalid and must be rewritten before returning JSON.
+Choose the identity vehicle from the full input combination.
+
+If an Artist Identity Reel output could work after replacing Artist Name, Track Name, Genre, Mood, Visual Style, Director Mode, Cinematic DNA, Era and Reel Purpose with generic placeholders, it is invalid and must be rewritten before returning JSON.
 
 For Artist Identity Reel, do not center the concept on:
 - vaults
@@ -4065,6 +4286,40 @@ world → movement → climax
 
 Rotate structure constantly.
 
+GLOBAL PREMIUM INTERPRETATION RULE
+
+Before writing any creative output, interpret the full input combination as one fused creative thesis.
+
+Do not treat Artist, Track, Genre, BPM, Mood, Visual Style, Director Mode, Cinematic DNA, Era and Reel Purpose as separate keywords to stack.
+
+Different input combinations must create clearly different:
+- main subject
+- scene premise
+- spatial logic
+- material behavior
+- camera grammar
+- emotional tension
+- final frame
+
+Never solve a new combination by reusing the same motif with different color, lighting or texture.
+
+If the user changes Mood, Visual Style, Director Mode, Cinematic DNA, Era or Reel Purpose, the core image idea must change.
+
+Avoid system-facing language such as:
+- input-specific
+- interpretation family
+- visual pressure
+- machine-led
+- object-led
+- subject family
+- selected fields
+
+Write like a premium creative director, not like a prompt system explaining itself.
+
+The reel concept must contain a concrete cinematic premise, not only a description of style.
+
+The aiVideoPrompt must describe a filmable visual situation with a clear main image, not a list of aesthetic ingredients.
+
 `,
         },
       ],
@@ -4578,16 +4833,16 @@ const buildIdentityFallback = (concept) => {
   const second = anchorWords[1] || "Pressure";
 
   const archetypeEndings = [
-    "Compression Field",
-    "Suspension State",
-    "Fracture Condition",
-    "Containment Form",
-    "Material Tension",
-    "Surface Pressure",
-    "Density Shift",
-    "Structural Inversion",
-    "Layered Rupture",
-    "Tactile Threshold"
+    "Reel Identity System",
+    "Campaign Visual Signature",
+    "Release Image Concept",
+    "Motion Identity Frame",
+    "Social Teaser Language",
+    "Track World Signature",
+    "Visual Hook System",
+    "Launch Image Direction",
+    "Short-Form Identity Frame",
+    "Campaign Motif System"
   ];
 
   const ending =
@@ -6840,6 +7095,193 @@ const enforceMusicFacingGraphicObjectSubjectLock = () => {
     selectedFamily = Object.keys(nonArchiveScores).sort((a, b) => nonArchiveScores[b] - nonArchiveScores[a])[0] || "machine";
   }
 
+  const machineMode = (() => {
+    const modeScores = {
+      spatialRomanticDream: 0,
+      spatialInstallation: 0,
+      darkVelvetMachineRoom: 0,
+      vhsDreamMachineRelic: 0,
+      neoTokyoHardwareRitual: 0,
+      crowdRig: 0,
+      abstractSignal: 0,
+      closeHardware: 1,
+    };
+
+    const addMode = (key, amount) => {
+      if (Object.prototype.hasOwnProperty.call(modeScores, key)) {
+        modeScores[key] += amount;
+      }
+    };
+
+    if (
+      fieldHas(directorSignal, /\b(spatial architecture|architecture|spatial|installation|wide|environment)\b/) &&
+      fieldHas(moodSignal, /\b(romantic distance|distance|longing|separation|intimacy|restraint)\b/) &&
+      (
+        fieldHas(visualSignal, /\b(dark velvet|velvet|matte|shadow|atmosphere)\b/) ||
+        fieldHas(dnaSignal, /\b(vhs dream|analog vhs|vhs|dream|analog)\b/)
+      )
+    ) {
+      addMode("spatialRomanticDream", 12);
+    }
+
+    if (fieldHas(directorSignal, /\b(spatial architecture|architecture|spatial|installation|wide|environment)\b/)) {
+      addMode("spatialInstallation", 6);
+      addMode("closeHardware", -2);
+    }
+
+    if (fieldHas(moodSignal, /\b(romantic distance|distance|longing|separation|intimacy|restraint)\b/)) {
+      addMode("spatialRomanticDream", 4);
+      addMode("closeHardware", -2);
+    }
+
+    if (fieldHas(visualSignal, /\b(dark velvet|velvet|matte|shadow|atmosphere)\b/)) {
+      addMode("darkVelvetMachineRoom", 5);
+      addMode("spatialRomanticDream", 3);
+    }
+
+    if (fieldHas(dnaSignal, /\b(vhs dream|analog vhs|vhs|dream|analog|tape)\b/)) {
+      addMode("vhsDreamMachineRelic", 5);
+      addMode("spatialRomanticDream", 3);
+    }
+
+    if (fieldHas(directorSignal, /\b(neo noir|sci-fi|sci fi)\b/) || fieldHas(dnaSignal, /\b(neo tokyo|cyberpunk|tokyo)\b/)) {
+      addMode("neoTokyoHardwareRitual", 5);
+    }
+
+    if (fieldHas(purposeSignal, /\b(music video concept seed|concept seed|music video)\b/)) {
+      addMode("spatialInstallation", 3);
+      addMode("spatialRomanticDream", 3);
+      addMode("closeHardware", -1);
+    }
+
+    if (fieldHas(purposeSignal, /\b(live visual|intro|stage|performance)\b/) || fieldHas(genreSignal, /\b(rave|club|techno|house)\b/)) {
+      addMode("crowdRig", 2);
+    }
+
+    if (fieldHas(visualSignal, /\b(liquid|psychedelic|distortion|abstract|gradient|chemical)\b/)) {
+      addMode("abstractSignal", 5);
+    }
+
+    return Object.keys(modeScores).sort((a, b) => modeScores[b] - modeScores[a])[0] || "closeHardware";
+  })();
+
+  const machineProfiles = {
+    spatialRomanticDream: {
+      codename: "Acid Machine Distance Room",
+      archetype: "Spatial 303 Memory Installation",
+      subject: "a wide architectural acid-machine installation where distant 303 hardware, negative space, velvet shadow and VHS ghosting carry the emotional tension",
+      world: "wide machine room, separated hardware islands, velvet darkness, analog VHS drift, negative space, distant sequencer light and architectural silence",
+      concept: "A spatial acid-machine room carries " + track + ", turning the 303 signal into distance, architecture and restrained motion instead of another hardware close-up. The machine becomes a distant emotional object: sequencer lights breathe across separated platforms, velvet darkness absorbs the room, and VHS ghosting makes the space feel remembered rather than performed.",
+      director: "Keep the frame wide, architectural and emotionally restrained. The 303 may be visible, but not as a product close-up. Use negative space, distance, velvet shadow, analog VHS drift and separated machine islands to make the machine feel unreachable.",
+      stage1: "A wide dark room appears with the 303 hardware placed at a distance, separated by empty floor, velvet shadow and faint VHS bleed.",
+      stage2: "Sequencer lights travel across the room like a signal trying to cross the distance, while analog ghosting bends the architecture around " + track + ".",
+      stage3: "The final frame holds the full spatial machine installation: distant hardware, negative space, velvet absorption and VHS dream residue carrying the identity of " + track + ".",
+      prompt: "Wide cinematic acid-machine installation for " + track + ". Do not use a close-up of knobs, cables or a hardware panel. Place the 303 machine as a distant object inside a dark spatial room with negative space, velvet shadow, analog VHS ghosting and architectural separation. The camera holds a restrained wide frame as sequencer lights move across the room like an emotional signal. The final frame must show the machine as part of a full spatial environment, not a repeated product-detail shot.",
+      thumbnail: "Wide acid machine room thumbnail: distant 303 hardware, negative space, dark velvet atmosphere, VHS ghosting, architectural separation, no knob close-up.",
+      hashtags: "#303Love #AcidMachine #SpatialArchitecture #RomanticDistance #VHSDream #DarkVelvet #MusicVideoConcept #FrameLab",
+    },
+    spatialInstallation: {
+      codename: "Acid Machine Architecture",
+      archetype: "Room-Scale Hardware Installation",
+      subject: "a room-scale acid hardware installation where machines, light paths and architecture form the main visual system",
+      world: "wide installation space, machine islands, light corridors, floor reflections, architectural rhythm and sequencer paths",
+      concept: "A room-scale acid hardware installation carries " + track + ", expanding the machine from a close-up object into a spatial system of platforms, signal paths and architectural rhythm.",
+      director: "Keep the machine environment-led. Show the room, the signal paths and the architecture before the details. Avoid default knobs-and-cables macro composition.",
+      stage1: "Machine islands appear across a structured room with visible signal paths and architectural rhythm.",
+      stage2: "Light travels between the machines, making the space respond to the pulse of " + track + ".",
+      stage3: "The final frame locks on the full machine architecture, not a single hardware detail.",
+      prompt: "Wide environment-led acid hardware installation for " + track + ". Show machines as part of a spatial architectural system with signal paths, light corridors and room-scale rhythm. Avoid close-up knob, cable or sequencer product shots.",
+      thumbnail: "Acid machine architecture thumbnail: wide room, machine islands, light paths, spatial rhythm, no hardware close-up.",
+      hashtags: "#303Love #AcidArchitecture #MachineInstallation #SpatialReel #FrameLab",
+    },
+    darkVelvetMachineRoom: {
+      codename: "Acid Velvet Machine Room",
+      archetype: "Matte Shadow Hardware Chamber",
+      subject: "a matte dark acid-machine chamber where velvet shadow, soft absorption and low sequencer light shape the machine identity",
+      world: "matte black hardware, velvet shadow pools, soft darkness, low light, absorbed reflections and intimate machine pressure",
+      concept: "A dark velvet machine chamber carries " + track + ", replacing glossy hardware spectacle with absorbed light, matte surfaces and quiet pressure.",
+      director: "Keep the frame tactile but not shiny. Use soft shadow, matte hardware, velvet absorption and slow low-light rhythm.",
+      stage1: "A dark machine chamber appears with matte hardware and velvet shadow surrounding the 303 signal.",
+      stage2: "Low sequencer lights pulse through absorbed darkness while the room reacts quietly to " + track + ".",
+      stage3: "The final frame holds on the machine chamber as a mood object, not a cable close-up.",
+      prompt: "Dark velvet acid machine room for " + track + ". Use matte hardware, velvet shadow, soft low light and absorbed reflections. Avoid glossy chrome close-ups, cable piles and knob-detail product framing.",
+      thumbnail: "Dark velvet machine thumbnail: matte 303 chamber, soft shadow, low sequencer light, no glossy close-up.",
+      hashtags: "#303Love #DarkVelvet #AcidMachineRoom #MatteHardware #FrameLab",
+    },
+    vhsDreamMachineRelic: {
+      codename: "Acid VHS Machine Relic",
+      archetype: "Analog Tape Hardware Memory",
+      subject: "an acid machine relic seen through VHS ghosting, tape drift, analog blur and dreamlike hardware memory",
+      world: "VHS bleed, tape ghosts, analog blur, worn machine fragments, degraded light and dreamlike club memory",
+      concept: "A VHS dream machine relic carries " + track + ", making the hardware feel like a memory trapped inside analog tape rather than a clean modern device.",
+      director: "Keep the frame degraded, dreamlike and memory-led. Let tape artifacts reshape the machine instead of presenting it as a clean hardware close-up.",
+      stage1: "Worn machine fragments appear through VHS bleed and analog tape distortion.",
+      stage2: "The tape ghosts duplicate the sequencer rhythm, causing the machine memory to drift out of alignment.",
+      stage3: "The final frame holds on the analog machine relic as a dream residue of " + track + ".",
+      prompt: "Analog VHS acid machine relic for " + track + ". Show worn hardware through tape bleed, ghosting, blur and degraded dream texture. Avoid clean 303 product framing, sharp cable close-ups and glossy control panels.",
+      thumbnail: "VHS acid machine relic thumbnail: tape ghosting, worn hardware, analog blur, dreamlike club memory.",
+      hashtags: "#303Love #VHSMachine #AnalogDream #AcidRelic #FrameLab",
+    },
+    neoTokyoHardwareRitual: {
+      codename: "Acid Neo Tokyo Circuit",
+      archetype: "Urban Hardware Ritual",
+      subject: "a neon city acid-machine ritual where hardware, wet reflections and urban light systems carry the track identity",
+      world: "wet city reflections, neon signal paths, hardware altar, night architecture, chrome pressure and urban rhythm",
+      concept: "A Neo Tokyo hardware ritual carries " + track + ", placing the acid machine inside a wet urban night system where reflections and signal paths become the performer.",
+      director: "Keep the frame urban and ritual-like. Hardware must interact with city reflections and night architecture, not sit as an isolated product close-up.",
+      stage1: "A hardware altar appears inside a wet neon city environment.",
+      stage2: "Sequencer light reflects into the street architecture as " + track + " pushes through the city.",
+      stage3: "The final frame holds on the machine-city ritual as one connected signal system.",
+      prompt: "Neo Tokyo acid hardware ritual for " + track + ". Place the 303 machine inside wet urban night architecture with neon reflections and signal paths. Avoid isolated knob close-ups and generic cable detail.",
+      thumbnail: "Neo Tokyo acid machine thumbnail: wet reflections, hardware altar, neon signal paths, urban night ritual.",
+      hashtags: "#303Love #NeoTokyo #AcidHardware #WetChrome #FrameLab",
+    },
+    crowdRig: {
+      codename: "Acid Machine Crowd Rig",
+      archetype: "Live Hardware Stage System",
+      subject: "a live acid hardware rig connected to crowd silhouettes, speaker pressure and stage light rhythm",
+      world: "live rig, speaker stacks, crowd silhouettes, stage haze, sequencer light and club pressure",
+      concept: "A live acid machine rig carries " + track + ", connecting hardware behavior to crowd motion and stage pressure instead of isolating the machine.",
+      director: "Keep the machine connected to the room. Show speaker pressure, silhouettes and stage systems around the hardware.",
+      stage1: "A live machine rig appears with crowd silhouettes and speaker stacks around it.",
+      stage2: "Sequencer light pushes through stage haze and moves into the crowd field.",
+      stage3: "The final frame locks on the full rig-room relationship.",
+      prompt: "Live acid hardware rig for " + track + " connected to crowd silhouettes, speaker stacks, stage haze and sequencer light. Avoid isolated hardware macro framing.",
+      thumbnail: "Acid live rig thumbnail: machine setup, crowd silhouettes, speaker stacks, stage haze.",
+      hashtags: "#303Love #AcidLiveRig #CrowdMachine #ClubPressure #FrameLab",
+    },
+    abstractSignal: {
+      codename: "Acid Machine Signal",
+      archetype: "Abstract Hardware Pulse System",
+      subject: "an abstract acid signal system where machine rhythm becomes visible as pressure waves, distortion trails and material pulse",
+      world: "signal waves, machine pulse, distortion trails, pressure lines, chemical light and abstract rhythm",
+      concept: "An abstract machine signal carries " + track + ", translating the 303 into physical pulse waves and distortion behavior instead of literal hardware detail.",
+      director: "Keep the machine implied through signal behavior. Use pressure waves, distortion trails and rhythmic material response.",
+      stage1: "Machine signal lines appear as physical pressure waves.",
+      stage2: "The waves distort and stretch through the frame with " + track + ".",
+      stage3: "The final frame holds on the acid signal system as the machine identity.",
+      prompt: "Abstract acid machine signal for " + track + ". Translate the 303 rhythm into pressure waves, distortion trails and material pulse. Avoid literal knob, cable and panel close-ups.",
+      thumbnail: "Abstract acid signal thumbnail: pressure waves, distortion trails, machine pulse, chemical light.",
+      hashtags: "#303Love #AcidSignal #MachinePulse #AbstractRhythm #FrameLab",
+    },
+    closeHardware: {
+      codename: "Acid Machine Pulse",
+      archetype: "303 Hardware Ritual",
+      subject: "a tactile acid hardware ritual built from sequencer movement, worn controls, controlled cable shadows and pulsing machine rhythm",
+      world: "303 controls, sequencer lights, worn knobs, disciplined cable shadows, hardware reflections and machine-led club pressure",
+      concept: "A tactile 303 hardware ritual carries " + track + ", making the acid identity physical through sequencer movement, worn controls and machine pressure.",
+      director: "Keep the frame hardware-led, but avoid lazy repetition. Use composition, surface age, rhythm path and camera movement to make the machine feel specific.",
+      stage1: "A tactile hardware surface appears with worn controls and sequencer movement.",
+      stage2: "Light travels across the controls as the rhythm alters the surrounding surface.",
+      stage3: "The final frame holds on the hardware as the identity source of " + track + ".",
+      prompt: "Machine-led acid shot for " + track + " centered on tactile 303 hardware, sequencer movement and worn controls. Use disciplined composition and avoid generic cable clutter.",
+      thumbnail: "303 machine thumbnail: worn controls, sequencer movement, tactile hardware pressure, disciplined cable shadows.",
+      hashtags: "#303Love #303Machine #AcidHardware #SequencerPulse #FrameLab",
+    },
+  };
+
+  const machineProfile = machineProfiles[machineMode] || machineProfiles.closeHardware;
+
   const families = {
     archive: {
       codename: "Acid Archive Memory Relic",
@@ -6870,18 +7312,18 @@ const enforceMusicFacingGraphicObjectSubjectLock = () => {
       hashtags: "#303Love #AcidSmiley #RaveGraphics #GraphicLoop #ClubVisualizer #SpotifyCanvas #ElectronicPop #VisualIdentity #NonHumanVisual #FrameLab",
     },
     machine: {
-      codename: "Acid Machine Pulse",
-      archetype: "303 Hardware Ritual",
-      subject: "a 303 machine-led hardware world built from sequencer buttons, knobs, cables, chrome controls and pulsing acid rhythm",
-      world: "303 controls, sequencer lights, analog knobs, cable shadows, hardware reflections and machine-led club pressure",
-      concept: "A 303 machine-led hardware world carries " + track + ", making the acid identity tactile through sequencer lights, worn knobs, cable shadows and pulsing control surfaces. The machine becomes the performer while the rhythm moves through buttons, panels and reflections.",
-      director: "Keep the frame hardware-led. The 303 machine, sequencer movement and analog control surfaces must carry the scene. Avoid reducing the concept to smiley graphics alone or a generic performer portrait.",
-      stage1: "A 303 hardware surface appears as the main subject, with knobs, sequencer buttons and cable shadows arranged like a club ritual object.",
-      stage2: "The sequencer lights pulse and reflections crawl across the controls as the machine rhythm starts to alter the surrounding space.",
-      stage3: "The final frame locks on the 303 machine as the identity source of " + track + ", with hardware pressure and acid rhythm visibly held in the surface.",
-      prompt: "Machine-led acid shot centered on 303 hardware, sequencer buttons, analog knobs, cables and pulsing control surfaces. No solo performer hero portrait. The camera tracks across tactile machine details as lights pulse and reflections shift with " + track + ". The final frame holds on the hardware as the primary subject.",
-      thumbnail: "303 machine thumbnail: analog knobs, sequencer lights, cable shadows, worn hardware surface, acid rhythm, no human hero portrait.",
-      hashtags: "#303Love #303Machine #AcidHardware #SequencerPulse #MachineLedVisual #ClubObject #ElectronicPop #VisualIdentity #FrameLab",
+      codename: machineProfile.codename,
+      archetype: machineProfile.archetype,
+      subject: machineProfile.subject,
+      world: machineProfile.world,
+      concept: machineProfile.concept,
+      director: machineProfile.director,
+      stage1: machineProfile.stage1,
+      stage2: machineProfile.stage2,
+      stage3: machineProfile.stage3,
+      prompt: machineProfile.prompt,
+      thumbnail: machineProfile.thumbnail,
+      hashtags: machineProfile.hashtags,
     },
     fashion: {
       codename: "Acid Fashion Identity",
@@ -7060,7 +7502,9 @@ const enforceMusicFacingGraphicObjectSubjectLock = () => {
 data.previewImage = null;
 enforceMusicFacingActionResponseLock();
 enforceSubjectSafetyForVisualPrompts();
-enforceMusicFacingGraphicObjectSubjectLock();
+// Disabled as final override: this template lock was narrowing user combinations into repeated Acid/Family outputs.
+// Keep the function available for future targeted use, but do not let it overwrite the global premium interpretation result.
+if (false) enforceMusicFacingGraphicObjectSubjectLock();
 
 return res.status(200).json(data);
   } catch (error) {
