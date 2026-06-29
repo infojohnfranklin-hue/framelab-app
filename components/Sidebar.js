@@ -18,7 +18,6 @@ useEffect(() => {
 
 
   const menuItems = [
-    { label: "Dashboard", href: "/dashboard" },
     { label: "Generate", href: "/" },
     { label: "Blueprints", href: "/videos" },
     { label: "History", href: "/history" },

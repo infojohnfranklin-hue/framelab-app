@@ -31,11 +31,6 @@ useEffect(() => {
 
   const mobileNavItems = [
     {
-      label: "Dashboard",
-      href: "/dashboard",
-      icon: "📊",
-    },
-    {
       label: "Generate",
       href: "/",
       icon: "✨",
