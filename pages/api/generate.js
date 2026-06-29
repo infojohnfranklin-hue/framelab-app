@@ -4834,7 +4834,7 @@ const buildIdentityFallback = (concept) => {
 
   const archetypeEndings = [
     "Reel Identity System",
-    "Campaign Visual Signature",
+    "Visual Signature",
     "Release Image Concept",
     "Motion Identity Frame",
     "Social Teaser Language",
@@ -4842,7 +4842,7 @@ const buildIdentityFallback = (concept) => {
     "Visual Hook System",
     "Launch Image Direction",
     "Short-Form Identity Frame",
-    "Campaign Motif System"
+    "Motif System"
   ];
 
   const ending =
@@ -5095,7 +5095,7 @@ const buildSnowflakeSignature = (identity, concept) => {
     return [
       `attention fixed on the ${primary} change as it visibly alters the frame`,
       `unease as the ${secondary} structure tightens and prevents the motion from resolving`,
-      `satisfaction when the final ${tertiary} state locks into a clear physical consequence`,
+      "satisfaction when the final visible arrangement locks into a clear physical consequence",
     ];
   };
 
@@ -6838,7 +6838,7 @@ const enforceSubjectSafetyForVisualPrompts = () => {
   };
 
   const sanitizeHashtags = (value) => {
-    const safeTags = ["#OriginalPerformer", "#FictionalArtistPersona", "#VisualIdentity"];
+    const safeTags = ["#ArtistIdentity", "#VisualIdentity", "#CinematicReel", "#FrameLab"];
 
     if (typeof value === "string") {
       const tags = value
@@ -7498,6 +7498,174 @@ const enforceMusicFacingGraphicObjectSubjectLock = () => {
   data.youtube_short_caption = youtubeShortsCaption;
   data.hashtags = selectedHashtags;
 };
+
+
+const cleanFinalRepeatedWords = (value = "") => {
+  const words = String(value || "")
+    .replace(/\bCampaign\s+Campaign\b/gi, "Campaign")
+    .replace(/\bMusic\s+Campaign\s+Campaign\b/gi, "Music Campaign")
+    .split(/\s+/)
+    .filter(Boolean);
+
+  const cleanedWords = [];
+
+  for (const word of words) {
+    const previous = cleanedWords[cleanedWords.length - 1] || "";
+
+    if (previous.toLowerCase() === word.toLowerCase()) {
+      continue;
+    }
+
+    cleanedWords.push(word);
+  }
+
+  return cleanedWords.join(" ").trim();
+};
+
+const cleanFinalAudienceEmotion = (items = []) => {
+  const artistWords = String(artistName || "")
+    .replace(/[^a-zA-Z0-9\s-]/g, " ")
+    .split(/[\s-]+/)
+    .map((word) => word.trim())
+    .filter((word) => word.length >= 3);
+
+  const cleanItem = (value) => {
+    let text = String(value || "").trim();
+
+    artistWords.forEach((word) => {
+      const pattern = new RegExp(`\\bfinal\\s+${escapeRegExp(word)}\\s+state\\b`, "gi");
+      text = text.replace(pattern, "final visible state");
+    });
+
+    text = text
+      .replace(/\bfinal\s+fictional\s+performer\s+state\b/gi, "final visible state")
+      .replace(/\bfinal\s+artist\s+state\b/gi, "final visible state")
+      .replace(/\bfinal\s+performer\s+state\b/gi, "final visible state")
+      .replace(/\bthe final visible state locks\b/gi, "the final visible arrangement locks")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    return text;
+  };
+
+  return Array.isArray(items) ? items.map(cleanItem) : items;
+};
+
+const buildFinalProfessionalHashtags = () => {
+  const normalizeWordsForTag = (value) =>
+    String(value || "")
+      .replace(/['’]/g, "")
+      .replace(/&/g, " and ")
+      .replace(/[^a-zA-Z0-9]+/g, " ")
+      .split(/\s+/)
+      .map((word) => word.trim())
+      .filter(Boolean);
+
+  const toHashtag = (value) => {
+    const words = normalizeWordsForTag(value);
+
+    if (words.length === 0) return "";
+
+    const tag =
+      "#" +
+      words
+        .slice(0, 4)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join("");
+
+    return tag.length >= 4 && tag.length <= 34 ? tag : "";
+  };
+
+  const bannedTagParts = [
+    "campaignidentityjohn",
+    "identityjohn",
+    "franklinnot",
+    "notbuilt",
+    "fictionalartistpersona",
+    "originalperformer",
+  ];
+
+  const conceptWords = String(
+    data?.cinematicIdentity?.visualDNA?.join?.(" ") ||
+      data?.reelConcept ||
+      selectedConceptDNA ||
+      ""
+  )
+    .replace(/[^a-zA-Z0-9\s-]/g, " ")
+    .split(/\s+/)
+    .map((word) => word.trim())
+    .filter((word) => word.length >= 5)
+    .filter(
+      (word) =>
+        ![
+          "under",
+          "through",
+          "their",
+          "there",
+          "these",
+          "those",
+          "final",
+          "frame",
+          "state",
+          "surfaces",
+          "surface",
+        ].includes(word.toLowerCase())
+    )
+    .slice(0, 4);
+
+  const candidates = [
+    artistName,
+    trackName,
+    genre,
+    reelPurpose,
+    "Artist Identity",
+    "Visual Identity",
+    "Cinematic Reel",
+    "AI Video Prompt",
+    "Music Video Concept",
+    ...conceptWords,
+    "FrameLab",
+  ];
+
+  const tags = [];
+
+  candidates.map(toHashtag).forEach((tag) => {
+    if (!tag) return;
+
+    const normalized = tag.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+    if (bannedTagParts.some((part) => normalized.includes(part))) return;
+
+    if (!tags.some((existing) => existing.toLowerCase() === tag.toLowerCase())) {
+      tags.push(tag);
+    }
+  });
+
+  return tags.slice(0, 12).join(" ");
+};
+
+if (data?.cinematicIdentity?.creativeArchetype) {
+  data.cinematicIdentity.creativeArchetype = cleanFinalRepeatedWords(
+    data.cinematicIdentity.creativeArchetype
+  );
+}
+
+if (data?.cinematicIdentity?.audienceEmotion) {
+  data.cinematicIdentity.audienceEmotion = cleanFinalAudienceEmotion(
+    data.cinematicIdentity.audienceEmotion
+  );
+}
+
+const finalProfessionalHashtags = buildFinalProfessionalHashtags();
+
+if (finalProfessionalHashtags) {
+  data.hashtags = finalProfessionalHashtags;
+
+  if (data.captions) {
+    data.captions.hashtags = finalProfessionalHashtags;
+  }
+}
+
 
 data.previewImage = null;
 enforceMusicFacingActionResponseLock();
