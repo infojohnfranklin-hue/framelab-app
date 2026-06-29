@@ -804,6 +804,32 @@ export default function Home() {
     return `Creative Assessment: ${genre} at ${bpm} BPM suggests ${tempoDirection}. Use ${genreDirection}; ${moodDirection}.`;
   })();
 
+  const materialLanguageIntelligence = (() => {
+    const styleSignal = String(style || "").toLowerCase();
+
+    if (!style) {
+      return "Waiting for material language.";
+    }
+
+    if (styleSignal.includes("vhs") || styleSignal.includes("analog") || styleSignal.includes("dusty")) {
+      return "Creative Assessment: Imperfection should become part of the image logic. Grain, bleed, blur and optical decay must feel physical, not decorative.";
+    }
+
+    if (styleSignal.includes("chrome") || styleSignal.includes("reflection") || styleSignal.includes("glass")) {
+      return "Creative Assessment: Reflective surfaces should carry tension. Highlights, mirrors and compressed light must reveal the world instead of simply making it glossy.";
+    }
+
+    if (styleSignal.includes("editorial") || styleSignal.includes("fashion")) {
+      return "Creative Assessment: Light should behave like a decisive editorial gesture. Contrast, pose, reveal and silhouette must feel intentional and campaign-ready.";
+    }
+
+    if (styleSignal.includes("velvet") || styleSignal.includes("dark")) {
+      return "Creative Assessment: Darkness should absorb the frame. Texture, shadow and negative space must create restraint instead of visual emptiness.";
+    }
+
+    return "Creative Assessment: The visual style should define material behavior, surface response and atmospheric discipline across the reel.";
+  })();
+
   const selectedDirector =
     directorModes.find((mode) => mode.name === directorMode) ||
     directorModes?.[0];
