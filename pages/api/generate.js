@@ -38,6 +38,33 @@ export default async function handler(req, res) {
   reelPurpose = "Artist Identity Reel",
 } = req.body;
 
+if (process.env.FRAMELAB_GENERATE_MOCK === "true") {
+  const mockTitle = `${artistName || "Unknown Artist"} — ${trackName || "Untitled Track"}`;
+
+  return res.status(200).json({
+    reelConcept: `MOCK TEST OUTPUT: ${mockTitle} becomes a premium cinematic reel system shaped by ${genre || "unknown genre"}, ${mood || "unknown mood"}, ${visualStyle || "unknown visual style"}, ${directorMode || "unknown director mode"}, ${styleDNA || "unknown cinematic DNA"}, ${era || "unknown era"} and ${reelPurpose || "Artist Identity Reel"}.`,
+    cinematicIdentity: "Mock cinematic identity for safe local testing without OpenAI API usage.",
+    directorsNotes: "Mock director notes. This response proves the UI flow works without calling OpenAI.",
+    narrativeArc: "Stage 1: Establish the visual world. Stage 2: Transform the main motif. Stage 3: Resolve into a strong final frame.",
+    aiVideoPrompt: "Mock AI video prompt. No live OpenAI call was made.",
+    caption: `Mock caption for ${mockTitle}.`,
+    mainCaption: `Mock caption for ${mockTitle}.`,
+    instagramCaption: `Mock Instagram caption for ${mockTitle}.`,
+    tiktokCaption: `Mock TikTok caption for ${mockTitle}.`,
+    youtubeShorts: `Mock YouTube Shorts line for ${mockTitle}.`,
+    youtubeShortsCaption: `Mock YouTube Shorts caption for ${mockTitle}.`,
+    shortsCaption: `Mock YouTube Shorts caption for ${mockTitle}.`,
+    hooks: [
+      "Mock hook one.",
+      "Mock hook two.",
+      "Mock hook three."
+    ],
+    hashtags: "#FrameLab #MockMode #SafeTest #NoOpenAICall",
+    mockMode: true,
+  });
+}
+
+
     const randomItem = (array) =>
       array[Math.floor(Math.random() * array.length)];
 
