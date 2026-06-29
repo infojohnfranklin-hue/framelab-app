@@ -741,6 +741,22 @@ export default function Home() {
 
   const resultRef = useRef(null);
 
+  const creativeBriefEngines = [
+    artist && track,
+    genre && bpm && mood,
+    style,
+    directorMode,
+    styleDNA && era,
+    reelPurpose,
+  ];
+
+  const creativeBriefCompletedEngines = creativeBriefEngines.filter(Boolean).length;
+  const creativeBriefProgress = Math.round(
+    (creativeBriefCompletedEngines / creativeBriefEngines.length) * 100
+  );
+  const creativeBriefComplete =
+    creativeBriefCompletedEngines === creativeBriefEngines.length;
+
   const selectedDirector =
     directorModes.find((mode) => mode.name === directorMode) ||
     directorModes?.[0];
