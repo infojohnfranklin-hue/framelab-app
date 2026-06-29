@@ -9,7 +9,13 @@ export default function Layout({ children }) {
 useEffect(() => {
   async function loadPlan() {
     try {
-      const res = await fetch("/api/me-plan");
+      const res = await fetch(`/api/me-plan?ts=${Date.now()}`, {
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
+
       const data = await res.json();
 
       setUserPlan(data.plan || "free");
