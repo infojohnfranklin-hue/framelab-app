@@ -27,11 +27,11 @@ export default function Sidebar({ userPlan }) {
     <aside
       className="sidebar"
       style={{
-        width: "300px",
+        width: "240px",
         height: "100vh",
         background: "linear-gradient(180deg, #08080f 0%, #140f1f 100%)",
         borderRight: "1px solid rgba(255,255,255,0.08)",
-        padding: "22px 18px",
+        padding: "18px 14px",
         position: "sticky",
         top: 0,
         display: "flex",
@@ -43,7 +43,7 @@ export default function Sidebar({ userPlan }) {
       <div
         style={{
           textAlign: "center",
-          margin: "10px 0 28px",
+          margin: "6px 0 22px",
         }}
       >
         <Link href="/">
@@ -51,7 +51,7 @@ export default function Sidebar({ userPlan }) {
             src="/videos/logo/framelab-logo.png"
             alt="FrameLab"
             style={{
-              width: "170px",
+              width: "140px",
               display: "block",
               margin: "0 auto",
               filter: "drop-shadow(0 0 18px rgba(168,85,247,0.22))",
@@ -76,7 +76,7 @@ export default function Sidebar({ userPlan }) {
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "12px",
+          gap: "9px",
         }}
       >
         {menuItems.map((item) => {
@@ -99,11 +99,11 @@ export default function Sidebar({ userPlan }) {
                     ? "1px solid rgba(168,85,247,0.55)"
                     : "1px solid rgba(255,255,255,0.07)",
                   color: "white",
-                  padding: "15px 18px",
-                  borderRadius: "17px",
+                  padding: "12px 14px",
+                  borderRadius: "14px",
                   textAlign: "left",
                   cursor: "pointer",
-                  fontSize: "15px",
+                  fontSize: "14px",
                   fontWeight: "700",
                   transition: "0.28s ease",
                   boxShadow: isActive
@@ -144,10 +144,10 @@ export default function Sidebar({ userPlan }) {
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "12px",
+          gap: "9px",
           marginTop: "14px",
-          padding: "14px",
-          borderRadius: "18px",
+          padding: "12px",
+          borderRadius: "16px",
           background: "rgba(255,255,255,0.045)",
           border: "1px solid rgba(255,255,255,0.07)",
         }}
@@ -190,8 +190,8 @@ export default function Sidebar({ userPlan }) {
       <div
         style={{
           marginTop: "auto",
-          padding: "20px",
-          borderRadius: "22px",
+          padding: "16px",
+          borderRadius: "18px",
           background: "rgba(124,58,237,0.12)",
           border: "1px solid rgba(124,58,237,0.25)",
           boxShadow: "0 0 40px rgba(124,58,237,0.12)",
@@ -202,7 +202,7 @@ export default function Sidebar({ userPlan }) {
             color: "white",
             fontWeight: "800",
             margin: "0 0 10px",
-            fontSize: "17px",
+            fontSize: "15px",
           }}
         >
           Upgrade to Pro
@@ -223,7 +223,7 @@ export default function Sidebar({ userPlan }) {
           style={{
             marginTop: "16px",
             width: "100%",
-            padding: "14px",
+            padding: "12px",
             borderRadius: "14px",
             border: "none",
             background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
