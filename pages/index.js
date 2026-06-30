@@ -1264,6 +1264,8 @@ export default function Home() {
     setResult(null);
     setThumbnailImage(null);
 
+
+
     try {
       const response = await fetch("/api/generate", {
         method: "POST",
@@ -3130,6 +3132,8 @@ ${result.viralHook}`}
                       setEra(item.era || "Y2K");
                       setResult(item.result || null);
                       setThumbnailImage(null);
+
+
 
                       setTimeout(() => {
                         resultRef.current?.scrollIntoView({
