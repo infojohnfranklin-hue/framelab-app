@@ -7,6 +7,10 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+function escapeRegExp(string = "") {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export default async function handler(req, res) {
   try {
     const { userId } = getAuth(req);
