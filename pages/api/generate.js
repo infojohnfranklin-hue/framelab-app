@@ -7055,6 +7055,9 @@ const enforceMusicFacingGraphicObjectSubjectLock = () => {
     add("fashion", 3);
     add("crowd", 2);
   }
+  if (fieldHas(moodSignal, /\b(romantic distance|distance|longing|separation|restraint)\b/)) {
+    add("machine", 3);
+  }
 
   // Visual Style is a very strong material driver.
   if (fieldHas(visualSignal, /\b(vhs|analog|archive|tape|degraded|nostalgic)\b/)) add("archive", 8);
@@ -7062,6 +7065,9 @@ const enforceMusicFacingGraphicObjectSubjectLock = () => {
     add("machine", 6);
     add("fashion", 3);
     add("crowd", 2);
+  }
+  if (fieldHas(visualSignal, /\b(dark velvet|velvet|matte|shadow|atmosphere)\b/)) {
+    add("machine", 3);
   }
   if (fieldHas(visualSignal, /\b(graphic|sticker|typography|poster|flyer|icon|symbol)\b/)) add("graphic", 6);
 
@@ -7071,6 +7077,9 @@ const enforceMusicFacingGraphicObjectSubjectLock = () => {
     add("machine", 5);
     add("fashion", 3);
     add("crowd", 2);
+  }
+  if (fieldHas(directorSignal, /\b(spatial architecture|architecture|spatial|installation|wide|environment)\b/)) {
+    add("machine", 4);
   }
 
   // Cinematic DNA is the world architecture.
@@ -7105,6 +7114,10 @@ const enforceMusicFacingGraphicObjectSubjectLock = () => {
     add("fashion", 3);
     add("crowd", 2);
     add("machine", 1);
+  }
+  if (fieldHas(purposeSignal, /\b(music video concept seed|concept seed|music video)\b/)) {
+    add("machine", 3);
+    add("crowd", 1);
   }
 
   let selectedFamily = Object.keys(scores).sort((a, b) => scores[b] - scores[a])[0];
