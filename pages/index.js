@@ -3415,3 +3415,14 @@ ${result.viralHook}`}
     </div>
   );
 }
+const frameLabSynthesisIntelligence = () => {
+  return {
+    identity: identityEngineIntelligence,
+    sonic: sonicPressureIntelligence,
+    material: materialLanguageIntelligence,
+    director: directorGrammarIntelligence,
+    world: worldLogicIntelligence,
+    release: releaseObjectiveIntelligence,
+  };
+};
+
