@@ -4864,16 +4864,16 @@ const buildIdentityFallback = (concept) => {
   const second = anchorWords[1] || "Pressure";
 
   const archetypeEndings = [
-    "Reel Identity System",
-    "Visual Signature",
-    "Release Image Concept",
-    "Motion Identity Frame",
-    "Social Teaser Language",
-    "Track World Signature",
-    "Visual Hook System",
-    "Launch Image Direction",
-    "Short-Form Identity Frame",
-    "Motif System"
+    "Spatial Lock",
+    "Material Threshold",
+    "Surface Condition",
+    "Depth Mark",
+    "Frame Relic",
+    "Texture Signal",
+    "Pressure Image",
+    "World Fragment",
+    "Motion Seal",
+    "Visual Consequence"
   ];
 
   const ending =
