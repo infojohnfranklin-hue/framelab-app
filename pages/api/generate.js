@@ -1453,6 +1453,21 @@ Do not treat this list as a required behavior library.
 
 Prefer concept-specific physical consequences over reusing example behaviors.
 
+Reality Persistence Rule:
+
+Before choosing any material behavior, preserve the selected world as a lived reality.
+
+The output must first define:
+- world physics
+- agents
+- behavior
+- narrative flow
+- camera observation
+
+Material behavior is secondary and must not become the default story.
+
+Typography is optional only when it is strongly input-driven.
+
 Common outcomes are heavily discouraged:
 
 - rearrangement
