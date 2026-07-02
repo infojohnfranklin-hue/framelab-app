@@ -514,7 +514,7 @@ function ResultSectionHeader({ eyebrow, title, description }) {
     <div
       style={{
         marginTop: "42px",
-        marginBottom: "18px",
+        marginBottom: "20px",
         padding: "22px 24px",
         borderRadius: "24px",
         background:
