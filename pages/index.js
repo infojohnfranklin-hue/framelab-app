@@ -711,16 +711,16 @@ ${identity.snowflakeSignature || ""}`;
 export default function Home() {
   const { isSignedIn, user } = useUser();
 
-  const [artist, setArtist] = useState("Acid Smile");
-  const [track, setTrack] = useState("303 Love");
-  const [genre, setGenre] = useState("Tech House");
-  const [bpm, setBpm] = useState("133");
-  const [mood, setMood] = useState("Nocturnal Intimacy");
-  const [style, setStyle] = useState("Wet Chrome Reflections");
-  const [styleDNA, setStyleDNA] = useState("Neo Tokyo");
+  const [artist, setArtist] = useState("Aurora Wolves");
+  const [track, setTrack] = useState("Northern Migration");
+  const [genre, setGenre] = useState("Ambient");
+  const [bpm, setBpm] = useState("92");
+  const [mood, setMood] = useState("Warm Cinematic Hope");
+  const [style, setStyle] = useState("Soft Grain Cinema");
+  const [styleDNA, setStyleDNA] = useState("Ocean Noir");
   const [era, setEra] = useState("1970s Analog Film");
   const [reelPurpose, setReelPurpose] = useState("Artist Identity Reel");
-  const [directorMode, setDirectorMode] = useState("Neo Noir Sci-Fi");
+  const [directorMode, setDirectorMode] = useState("Poetic Documentary");
 
   const [loading, setLoading] = useState(false);
   const [userPlan, setUserPlan] = useState("free");
