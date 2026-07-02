@@ -851,7 +851,7 @@ Before writing the reel, decide which fields control which creative layer:
 
 Do not let one literal word from Artist Name or Track Name hijack the whole concept.
 
-The main image must come from the strongest combination of Director Mode + Cinematic DNA + Mood + Reel Purpose, supported by Genre, BPM, Visual Style and Era.
+The main image must come from the strongest combination of World Driver + Director Mode + Cinematic DNA + Mood + Reel Purpose, supported by Genre, BPM, Visual Style and Era.
 
 If the result could still work after replacing the Artist Name and Track Name with generic music names, it is not specific enough.
 
