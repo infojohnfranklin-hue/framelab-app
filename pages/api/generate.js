@@ -6939,6 +6939,10 @@ const enforceSubjectSafetyForVisualPrompts = () => {
     let text = cleanVisibleSafetyBlock(value);
 
     text = text
+      .replace(/file:\/\/\/[^\s"'<>]+/gi, "")
+      .replace(/\b\/Users\/[^\s"'<>]+/gi, "")
+      .replace(/\b\/mnt\/data\/[^\s"'<>]+/gi, "")
+      .replace(/\b[A-Z]:\\\\[^\s"'<>]+/gi, "")
       .replace(artistPossessivePattern, safePossessiveSubject)
       .replace(artistPattern, safeSubject)
       .replace(/\bthe star(?:'s|’s)\b/gi, safePossessiveSubject)
