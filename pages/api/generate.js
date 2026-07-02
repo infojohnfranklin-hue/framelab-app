@@ -802,6 +802,7 @@ const creativeDecisionLayer = {
   materialDriver: visualStyle || "Visual Style not selected",
   energyDriver: `${genre || "Genre not selected"} at ${bpm || "unknown"} BPM`,
   eraDriver: era || "Era not selected",
+  worldDriver: selectedMusicFacingWorldIntelligence || "World route not selected",
   identityDriver: `${artistName || "Unknown Artist"} — ${trackName || "Unknown Track"}`,
   outputShape: reelPurpose || "Reel Purpose not selected",
   decisionRule:
