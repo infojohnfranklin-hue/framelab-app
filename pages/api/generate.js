@@ -787,7 +787,7 @@ const creativeDecisionLayer = {
   identityDriver: `${artistName || "Unknown Artist"} — ${trackName || "Unknown Track"}`,
   outputShape: reelPurpose || "Reel Purpose not selected",
   decisionRule:
-    "Build the core reel idea from primaryDriver + secondaryDriver + emotionalDriver + outputShape first. Use materialDriver, energyDriver and eraDriver as shaping forces. Use identityDriver as branding context, not as the automatic literal subject.",
+    "Build the core reel idea from primaryDriver + secondaryDriver + emotionalDriver + outputShape + eraDriver first. Use materialDriver and energyDriver as shaping forces. Use identityDriver and the selected subject strategy as active identity context, not as automatic literal subject.",
 };
 
 const creativeDecisionLayerText = JSON.stringify(creativeDecisionLayer, null, 2);
