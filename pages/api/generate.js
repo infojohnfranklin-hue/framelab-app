@@ -171,6 +171,24 @@ const getMusicFacingWorldIntelligence = () => {
   const hasAny = (terms) =>
     terms.some((term) => source.includes(term));
 
+  const scoreWorld = (signals) =>
+    signals.reduce((score, signal) => {
+      return source.includes(signal) ? score + 1 : score;
+    }, 0);
+
+  const worldScores = {
+    studio: scoreWorld(["studio", "recording", "signal", "monitor", "producer", "technical"]),
+    live: scoreWorld(["jazz", "ensemble", "live", "stage", "microphone", "audience"]),
+    street: scoreWorld(["street", "cafe", "funk", "disco", "1970", "retro", "vintage"]),
+    action: scoreWorld(["action", "drama", "chase", "danger", "vehicle", "road"]),
+    transit: scoreWorld(["car", "train", "motorcycle", "subway", "drive", "transit"]),
+    duo: scoreWorld(["romantic", "duo", "kiss", "desire", "velvet", "intimacy"]),
+    nature: scoreWorld(["animal", "nature", "forest", "horse", "bird", "wolf", "field"]),
+    club: scoreWorld(["club", "festival", "rave", "techno", "dance", "crowd"]),
+    body: scoreWorld(["silence", "stillness", "breath", "hands", "skin", "pressure"]),
+    campaign: 1,
+  };
+
   if (
     hasAny([
       "frequency",
