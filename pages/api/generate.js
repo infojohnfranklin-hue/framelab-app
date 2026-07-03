@@ -7191,7 +7191,9 @@ const enforceMusicFacingGraphicObjectSubjectLock = () => {
     add("crowd", 1);
   }
 
-  let selectedFamily = Object.keys(scores).sort((a, b) => scores[b] - scores[a])[0];
+const creativeState = { scores, fractureBias };
+const resolveCreativeState = (state) => { const weighted = Object.entries(state.scores).map(([k,v]) => ({ key:k, score:v + (state.fractureBias > 0.65 ? 0.5 : 0) })); return weighted.sort((a,b)=>b.score-a.score)[0].key; };
+let selectedFamily = resolveCreativeState(creativeState);
   if (!selectedFamily || scores[selectedFamily] <= 0) selectedFamily = "graphic";
 
   // Safety override: archive may win only when actual archive/memory fields are present,
