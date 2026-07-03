@@ -184,10 +184,13 @@ const getMusicFacingWorldIntelligence = () => {
       return source.includes(signal) ? score + 1 + (fractureBias > 0.65 ? 0.5 : 0) : score;
     }, 0);
 
+    
+    
+
   const worldScores = {
     // VARIANCE CONNECT LAYER (SAFE)
-    const gravityBias = subjectGravity > 0.5 ? 1.2 : 1;
-    const cameraBias = cameraVariance > 0.6 ? 1.1 : 1;
+    
+    
 
     studio: scoreWorld(["studio", "recording", "signal", "monitor", "producer", "technical"]),
     live: scoreWorld(["jazz", "ensemble", "live", "stage", "microphone", "audience"]),
