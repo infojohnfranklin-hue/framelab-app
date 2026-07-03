@@ -1953,35 +1953,35 @@ Why are the marbles hanging beneath the aqueduct?
 
 Artist Identity Reel Hook and Caption Rule:
 
-If Reel Purpose is Artist Identity Reel, hooks and captions must feel like a signature music-artist asset, not a generic VFX demonstration.
+If Reel Purpose is Artist Identity Reel, hooks and captions must remain music-facing, but they must not force symbolic closure, identity locking, emblem formation, typographic resolution or final meaning.
 
 Hooks must still obey the banned-word rules above.
 Do not use the words reel, video, visual, content, platform, AI, generated, concept or prompt.
 
 For Artist Identity Reel:
-- hooks should make the core image feel instantly ownable by the artist world
-- hooks should emphasize a memorable final-frame event
-- hooks should feel suitable for a track launch, artist identity moment or profile-defining creative asset
+- hooks should point to an observable world condition, performer action, environmental pressure or unresolved cinematic moment
+- hooks should not require a final-frame event, symbol, emblem, signature, title, logo, text, halo, graphic mark or identity lock
+- hooks should feel suitable for a track launch or artist-world moment without turning the world into a branding device
 - hooks should not sound like technical VFX descriptions
 - hooks should not sound like museum labels
 
-Captions must connect the generated physical event to the artist and track context.
-Use the artist name (${artistName}) or track name (${trackName}) when it feels natural.
+Captions must connect the generated physical event to the artist and track context without converting the artist or track into visible text, symbol, emblem, signature, logo or identity mark.
+Use the artist name (${artistName}) or track name (${trackName}) only when it feels natural in caption text, never as something visible inside the scene.
 
 Captions should feel:
 - premium
 - music-facing
-- identity-driven
-- short-form ready
 - emotionally clear
-- built around the most memorable final image
+- grounded in the observed world
+- short-form ready
+- open-ended when the world logic supports it
 
 Captions must not become generic marketing copy.
-Captions must stay grounded in the exact Concept DNA and visible transformation.
+Captions must stay grounded in the exact Concept DNA and visible world behavior.
 
 Artist / Track / Reel Purpose Lock:
 
-If Reel Purpose is Artist Identity Reel, Track Launch Teaser, Spotify Canvas Direction, Music Video Concept Seed, Social Teaser Hook or Album World Reveal, the entire output must stay music-facing and artist-facing.
+If Reel Purpose is Artist Identity Reel, Track Launch Teaser, Spotify Canvas Direction, Music Video Concept Seed, Social Teaser Hook or Album World Reveal, the output must stay music-facing and artist-facing without forcing the world to become a branding object.
 
 This rule applies to:
 - reelConcept
@@ -1993,53 +1993,54 @@ This rule applies to:
 - captions
 - thumbnailPrompt
 
-For music-facing outputs, the concept must feel like a signature creative asset for the artist and track, not an abstract VFX demo, product film, museum object, architecture study, machine system or unrelated physical experiment.
+For music-facing outputs, the concept must feel connected to the artist and track through mood, tempo, performance logic, environment pressure, camera behavior, body language, styling, world behavior or physical consequence.
 
-The artist name and track name are not decorative metadata. They must shape the creative direction, identity language, emotional framing, final image logic and campaign usability.
+The artist name and track name are cultural gravity signals. They must shape emotional pressure, rhythm, pacing, atmosphere, movement and world behavior. They must not become literal visible content, graphic identity, symbolic shorthand or a required final image.
 
 For Artist Identity Reel specifically:
-- the central subject must feel connected to the artist identity, performance presence, silhouette, face, body language, styling, world, track mood or profile-defining visual signature
+- the central subject must feel connected to the artist world through lived reality, performance presence, body language, styling, environment behavior, object behavior, crowd behavior, motion rule or camera observation
 - do not replace the artist/track context with unrelated objects such as gears, clocks, shrines, marbles, aqueducts, mechanical gardens, abstract machines, anonymous architecture or product-like transformations
-- physical detail is still required, but it must support the artist world instead of becoming the main subject
-- the final frame must feel usable as an artist profile asset, release teaser, campaign still or music-world signature frame
-- the output must feel like it belongs to the named artist and track
+- physical detail is required, but it must support the lived world instead of becoming a symbolic identity device
+- the final frame may remain unresolved, observational or ongoing if that is truer to the world logic
+- the output must feel like it belongs to the named artist and track without displaying the artist or track as text, emblem, logo, phrase, title card, signature, halo or symbolic mark
 
-If the model wants to use an object, material or environmental transformation, it must be anchored to the artist or track world through visible performance, styling, body language, stage-like presence, portrait framing, symbolic prop use, cover-art logic or release-campaign identity.
+If the model wants to use an object, material or environmental transformation, it must be anchored to the artist or track world through visible performance, styling, body language, stage-like presence, environment pressure, object behavior, crowd behavior, camera grammar or release-context atmosphere.
 
 Bad for Artist Identity Reel:
 - a brass clockwork garden folding into mechanical cavities
-- a concrete shrine changing shape with no artist presence
-- marbles hanging inside an aqueduct with no music identity
+- a concrete shrine changing shape with no artist-world context
+- marbles hanging inside an aqueduct with no music-facing pressure
 - a product-like object transformation unrelated to the track
 - an environment that could belong to any anonymous VFX demo
+- a symbol, emblem, signature, halo, title, logo or typographic mark forming as the final proof of identity
 
 Better for Artist Identity Reel:
-- the identity is carried by one ownable reel image that could become cover art, launch teaser or short-form visual signature
-- the main motif may be performer-led, typography-led, environment-led, symbol-led, motion-led, object-led, crowd-led or abstract when the full input combination supports it
-- the final image locks on a memorable identity vehicle chosen from Director Mode, Cinematic DNA, Mood and Reel Purpose, not from a default corridor, silhouette, chrome reflection or walking pose
+- identity is felt through one specific lived world condition, not a branding mark
+- the main motif may be performer-led, environment-led, object-led, crowd-led, motion-led or behavior-led when the full input combination supports it
+- the final image does not need to lock meaning; it may hold on an unresolved but specific physical condition created by the world logic
 
 Artist Identity Reel Rule:
 
-For Artist Identity Reel, the output must create a clear ownable identity for the music project.
+For Artist Identity Reel, the output must create a clear ownable artist world, not a forced identity symbol.
 
-That identity may be carried by:
+That world may be carried by:
 - an original fictional performer
 - silhouette or body language
 - wardrobe or styling
-- symbol system
 - environment behavior
 - object behavior
 - crowd fragment
 - motion rule
+- camera observation
+- unresolved physical consequence
 
-Typography may carry the identity only when the input explicitly points to graphic design, poster language, lyric text, logo behavior, visualizer language or typography as the strongest concept-native choice. Otherwise, prefer performer, environment, subject, world behavior or motion-rule identity before typography.
-- cinematic final frame
+Typography, readable text, logos, emblems, signatures, symbolic marks, title-card logic, graphic identity systems and typographic final frames may carry identity only when the input explicitly requests graphic design, poster language, lyric text, logo behavior, visualizer language, typography or cover-art typography as the strongest concept-native choice.
 
 The performer is allowed, but not automatically required as the primary subject.
 
 Do not force the first sentence of reelConcept or aiVideoPrompt to begin with a performer.
 
-Choose the identity vehicle from the full input combination.
+Choose the artist-world logic from the full input combination.
 
 If an Artist Identity Reel output could work after replacing Artist Name, Track Name, Genre, Mood, Visual Style, Director Mode, Cinematic DNA, Era and Reel Purpose with generic placeholders, it is invalid and must be rewritten before returning JSON.
 
@@ -2055,18 +2056,23 @@ For Artist Identity Reel, do not center the concept on:
 - product-like objects
 - material-only transformations
 - abstract mechanical systems
+- symbols
+- emblems
+- signatures
+- halos
+- typographic marks
 
-The concept must feel like a release campaign asset, artist profile signature, cover-art motion moment or track identity film.
+The concept must feel like a lived artist world, performance condition, release atmosphere or track-specific cinematic situation.
 
 Artist Identity Balance Rule:
 
 For Artist Identity Reel, the output balance must be:
-- at least 60% artist, performer, portrait, body language, wardrobe, expression, posture, presence, emotional framing or campaign identity
-- at most 40% environment, object, material transformation, architecture or abstract visual system
+- at least 60% lived artist world, performance condition, body language, environment pressure, camera observation, mood-specific atmosphere, styling, motion rule or observable physical consequence
+- at most 40% abstract material transformation, architecture, graphic system or symbolic identity device
 
-The artist must not be a person placed inside a material experiment. The material world must behave around the artist and strengthen the artist identity.
+The artist must not be a person placed inside a material experiment. The world must behave around the artist or artist-facing context and remain observable without turning into a logo, text, emblem, signature, halo or meaning-lock final frame.
 
-The reelConcept, directorSummary, narrativeArc and aiVideoPrompt must include at least two of these artist-facing details:
+The reelConcept, directorSummary, narrativeArc and aiVideoPrompt must include at least two of these artist-facing world details:
 - face
 - gaze
 - posture
@@ -2078,9 +2084,11 @@ The reelConcept, directorSummary, narrativeArc and aiVideoPrompt must include at
 - breath
 - expression
 - performance stillness
-- release campaign presence
-- cover-art pose
-- profile-defining final frame
+- release atmosphere
+- camera distance
+- environment pressure
+- object behavior
+- crowd behavior
 
 Avoid over-centering Artist Identity Reel on invented material nouns such as:
 - memory glass
@@ -2096,7 +2104,7 @@ Avoid over-centering Artist Identity Reel on invented material nouns such as:
 
 These may appear only as secondary visual texture, not as the main concept.
 
-Captions for Artist Identity Reel must be grammatically clean, music-facing and centered on the artist and track. Avoid awkward phrasing such as possessive world constructions when singular/plural grammar is unclear.
+Captions for Artist Identity Reel must be grammatically clean, music-facing and centered on the artist and track context without leaking internal labels or turning the artist/track into visible scene content.
 
 Music-Facing World Intelligence Rule:
 
