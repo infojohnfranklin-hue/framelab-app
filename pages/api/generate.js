@@ -6970,7 +6970,7 @@ const enforceSubjectSafetyForVisualPrompts = () => {
       .replace(/\b[A-Z]:\\\\[^\s"'<>]+/gi, "")
       .replace(artistPossessivePattern, safePossessiveSubject)
       .replace(artistPattern, safeSubject)
-      .replace(/\ban original fictional performer['’]\b/gi, "an original fictional performer")
+      .replace(/\ban original fictional performer['’](?=\s|$)/gi, "an original fictional performer")
       .replace(/\bthe star(?:'s|’s)\b/gi, safePossessiveSubject)
       .replace(/\bthe star\b/gi, "the fictional performer")
       .replace(/\brecognizable as\b/gi, "not recognizable as any real person")
