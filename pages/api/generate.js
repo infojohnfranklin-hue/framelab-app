@@ -615,7 +615,7 @@ const getMusicFacingSubjectStrategy = () => {
     return "primary subject strategy: accessory-led fashion identity with original fictional styling, distinctive object detail and varied casting. The accessory or wardrobe behavior must carry the concept, not a repeated generic beauty portrait.";
   }
 
-  return "primary subject strategy: choose a distinct subject logic from the project signals before writing the concept. Do not automatically default to a solo human performer. Consider fictional solo performer, duo, group, ensemble, animal-led subject, object-led subject, graphic-led frame, typography-led frame, club equipment, festival scene, room, landscape, vehicle, mascot or abstract visual system. Avoid repeating backstage rooms, near-touch hands, moody young performer portraits and romantic corridor blocking unless explicitly required.";
+  return "primary subject strategy: choose a distinct subject logic from the project signals before writing the concept. Do not automatically default to a solo human performer, harbor, pier, fog, mist, wet street, water surface, dock, archival table, film strip, tape reel or condensation scene. Consider fictional solo performer, duo, group, ensemble, animal-led subject, object-led subject, wardrobe-led subject, vehicle-led subject, room behavior, crowd fragment, club equipment, festival scene, landscape, transit setting, tactile prop, physical task, performance action, mascot or abstract visual system. Avoid repeating backstage rooms, near-touch hands, moody young performer portraits, romantic corridor blocking, ocean-edge moisture scenes and generic analog archive surfaces unless explicitly required.";
 };
 
 const selectedMusicFacingSubjectStrategy =
