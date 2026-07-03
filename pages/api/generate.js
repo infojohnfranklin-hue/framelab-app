@@ -1833,7 +1833,11 @@ The final frame holds on fractured amber shells compressed into a translucent ba
 
 Do not use labels such as Scene 1, Scene 2, Scene 3, Stage 1, Stage 2 or Stage 3 inside aiVideoPrompt.
 
-No text.
+No generated text inside the image.
+No artist name text.
+No track title text.
+No title cards.
+No readable typography.
 No logos.
 No subtitles.
 No watermarks.
