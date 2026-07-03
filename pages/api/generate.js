@@ -6874,7 +6874,7 @@ const enforceSubjectSafetyForVisualPrompts = () => {
   };
 
   const safeSubject = "an original fictional performer";
-  const safePossessiveSubject = "the fictional performer's";
+  const safePossessiveSubject = "the performer's";
   const shortSafeSubject = "Original Performer";
   const artistPattern = new RegExp("\\b" + escapeRegExp(artistProjectName) + "\\b", "gi");
   const artistPossessivePattern = new RegExp("\\b" + escapeRegExp(artistProjectName) + "(?:'s|’s)\\b", "gi");
