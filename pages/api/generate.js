@@ -185,6 +185,10 @@ const getMusicFacingWorldIntelligence = () => {
     }, 0);
 
   const worldScores = {
+    // VARIANCE CONNECT LAYER (SAFE)
+    const gravityBias = subjectGravity > 0.5 ? 1.2 : 1;
+    const cameraBias = cameraVariance > 0.6 ? 1.1 : 1;
+
     studio: scoreWorld(["studio", "recording", "signal", "monitor", "producer", "technical"]),
     live: scoreWorld(["jazz", "ensemble", "live", "stage", "microphone", "audience"]),
     street: scoreWorld(["street", "cafe", "funk", "disco", "1970", "retro", "vintage"]),
