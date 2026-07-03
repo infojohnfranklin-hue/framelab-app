@@ -645,7 +645,7 @@ const getMusicFacingCampaignIdeaFrame = () => {
   }
 
   if (/\b(analog|vhs|archive|film|memory|1970s|90s|nostalgic)\b/.test(signal)) {
-    return "campaign idea frame: memory-system identity where texture, time delay, archival behavior, film damage, cultural residue or temporal distortion carries the reel identity. Do not default to generic retro filter.";
+    return "campaign idea frame: temporal-world behavior where era, grain, delay and cultural residue shape camera texture, pacing and atmosphere without defaulting to archive objects, film strips, tape reels, paper fragments, memory systems or identity carriers.";
   }
 
   if (/\b(romantic|intimacy|distance|longing|melancholic|tender)\b/.test(signal)) {
