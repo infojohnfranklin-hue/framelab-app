@@ -953,7 +953,19 @@ Do not introduce unrelated random objects.
 Do not introduce unrelated characters.
 
 Important exception:
-For music-facing outputs, visible performer presence is allowed when it strengthens the reel idea, but it is not automatically required as the primary motif. Artist Identity Reel may express identity through a fictional performer, silhouette, wardrobe, typography, symbol, environment, object behavior, crowd fragment, motion rule, graphic system or cinematic final frame. The chosen identity vehicle must come from the full input combination, not from a default performer portrait.
+For music-facing outputs, visible performer presence is allowed when it strengthens the reel idea, but it is not automatically required as the primary motif.
+
+Reality Constraints Layer:
+Artist Identity Reel must first define a lived cinematic reality before choosing any identity vehicle. Identity must emerge from world logic, observable behavior, material consequence, performer action, environment pressure, object behavior, crowd behavior or motion rule.
+
+Typography, readable text, logos, emblems, signatures, symbolic marks, graphic identity systems, title-card logic and identity-lock final frames are not valid primary identity vehicles unless the user explicitly requests poster design, logo design, lyric visuals, typography, graphic design, cover-art language or visualizer language.
+
+Open World State Constraint:
+The world does not need to resolve into a symbol, emblem, phrase, signature, identity lock or final meaning. The final state may remain open, unresolved and observational, as long as it is physically visible, cinematic, specific and caused by the world logic.
+
+Any downstream tendency toward symbolic closure, identity locking, typographic resolution, narrative finalization or meaning-lock composition violates this constraint, regardless of whether it appears in the concept, stages, camera direction, AI video prompt, hooks, captions or thumbnail.
+
+The chosen identity vehicle must come from the full input combination, but reality must dominate representation.
 
 Do not introduce unrelated creatures.
 
