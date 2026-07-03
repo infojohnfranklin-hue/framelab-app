@@ -7509,7 +7509,7 @@ let selectedFamily = resolveCreativeState(creativeState);
     stage2: selected.stage2,
     stage3: selected.stage3,
   };
-  data.aiVideoPrompt = selected.prompt;
+  data.aiVideoPrompt = applyMaximumWowLayer(polishMusicFacingGrammar(cleanAiVideoPromptText(selected.prompt)));
   data.videoPrompt = selected.prompt;
   data.thumbnailPrompt = selected.thumbnail;
   data.thumbnailConcept = selected.thumbnail;
