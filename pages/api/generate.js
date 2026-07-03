@@ -2010,12 +2010,13 @@ That identity may be carried by:
 - an original fictional performer
 - silhouette or body language
 - wardrobe or styling
-- typography
 - symbol system
 - environment behavior
 - object behavior
 - crowd fragment
 - motion rule
+
+Typography may carry the identity only when the input explicitly points to graphic design, poster language, lyric text, logo behavior, visualizer language or typography as the strongest concept-native choice. Otherwise, prefer performer, environment, subject, world behavior or motion-rule identity before typography.
 - cinematic final frame
 
 The performer is allowed, but not automatically required as the primary subject.
