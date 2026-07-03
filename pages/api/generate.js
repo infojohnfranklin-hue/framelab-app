@@ -154,6 +154,13 @@ const getMusicFacingCompositionStrategy = () => {
 };
 
 const getMusicFacingWorldIntelligence = () => {
+  const subjectGravity = Math.random();
+  const cameraVariance = Math.random();
+  const worldResponseMode = (() => {
+    const modes = ["resistance", "absorption", "echo", "collapse", "expansion"];
+    return modes[Math.floor(Math.random() * modes.length)];
+  })();
+
   const source = [
     artistName,
     trackName,
