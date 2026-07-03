@@ -173,7 +173,7 @@ const getMusicFacingWorldIntelligence = () => {
 
   const scoreWorld = (signals) => // WORLD DOMINANCE ENGINE (primary cinematic reality selector)
     signals.reduce((score, signal) => {
-      return source.includes(signal) ? score + 1 : score;
+      return source.includes(signal) ? score + 1 + (fractureBias > 0.65 ? 0.5 : 0) : score;
     }, 0);
 
   const worldScores = {
