@@ -5185,7 +5185,7 @@ const buildSnowflakeSignature = (identity, concept) => {
     return [
       `attention fixed on the ${primary} change as it visibly alters the frame`,
       `unease as the ${secondary} structure tightens and prevents the motion from resolving`,
-      "satisfaction when the final visible arrangement locks into a clear physical consequence",
+      "attention held by the unresolved visible condition and its physical tension",
     ];
   };
 
