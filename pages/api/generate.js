@@ -660,7 +660,7 @@ const getMusicFacingCampaignIdeaFrame = () => {
 };
 
 
-const getMusicFacingIdentityMechanic = () => {
+const getMusicFacingWorldBehaviorMechanic = () => {
   const signal = [
     directorMode,
     styleDNA,
@@ -674,35 +674,35 @@ const getMusicFacingIdentityMechanic = () => {
     .toLowerCase();
 
   if (/\b(sync|rhythm|beat|pulse|timing|tempo)\b/.test(signal)) {
-    return "identity mechanic: synchronization — all visual elements behave as one timed system. Movement, light, material and composition must align into a shared rhythm.";
+    return "world behavior mechanic: synchronization — movement, light, material and camera rhythm respond to the track timing without resolving into a symbol or fixed identity mark.";
   }
 
   if (/\b(transform|change|shift|evolve|morph)\b/.test(signal)) {
-    return "identity mechanic: transformation — identity is created through visible change over time. The final frame must feel like a consequence of progression.";
+    return "world behavior mechanic: transformation — visible change alters the scene condition over time without requiring identity formation, symbolic payoff or final meaning.";
   }
 
   if (/\b(fragment|break|crack|split)\b/.test(signal)) {
-    return "identity mechanic: fragmentation — identity is built through separation, breakage or distributed visual elements that still feel connected.";
+    return "world behavior mechanic: fragmentation — separation or distribution changes how the world behaves without turning fragments into a logo, portrait, emblem or message.";
   }
 
   if (/\b(lock|seal|freeze|hold|stop)\b/.test(signal)) {
-    return "identity mechanic: locking — identity emerges when motion resolves into a fixed, iconic final state.";
+    return "world behavior mechanic: suspension — motion may slow, hold or remain unresolved without becoming an iconic final state, identity lock or meaning-lock composition.";
   }
 
   if (/\b(layer|stack|depth|overlap)\b/.test(signal)) {
-    return "identity mechanic: layering — identity is created through stacked visual systems that reveal meaning through depth and occlusion.";
+    return "world behavior mechanic: layering — stacked surfaces, depth and occlusion create observable pressure without revealing hidden meaning, text, symbol or identity.";
   }
 
   if (/\b(repeat|loop|cycle|echo)\b/.test(signal)) {
-    return "identity mechanic: repetition — identity emerges from repeated actions or patterns that gradually build meaning.";
+    return "world behavior mechanic: repetition — repeated actions change rhythm, pressure or spatial behavior without building a readable sign, symbol or final explanation.";
   }
 
-  return "identity mechanic: emergence — identity is not predefined but slowly becomes visible through interaction of all elements.";
+  return "world behavior mechanic: emergence — a world condition becomes observable through interaction, but it does not need to become identity, symbolism or closure.";
 };
 
-const selectedMusicFacingIdentityMechanic =
+const selectedMusicFacingWorldBehaviorMechanic =
   musicFacingReelPurposes.includes(reelPurpose)
-    ? getMusicFacingIdentityMechanic()
+    ? getMusicFacingWorldBehaviorMechanic()
     : "";
 
 const selectedMusicFacingCampaignIdeaFrame =
@@ -718,7 +718,7 @@ const musicFacingConceptDNAParts = [
   "built as",
   reelPurpose || "music reel",
   "with campaign idea frame",
-  selectedMusicFacingIdentityMechanic || "identity mechanic: emergence",
+  selectedMusicFacingWorldBehaviorMechanic || "world behavior mechanic: emergence",
   selectedMusicFacingCampaignIdeaFrame || "ownable social reel idea selected from the full input combination",
   "where the core idea is driven first by",
   directorMode || "defined director mode",
@@ -734,8 +734,8 @@ const musicFacingConceptDNAParts = [
   visualStyle || "defined visual style",
   "and",
   era || "defined era",
-  "with identity vehicle",
-  selectedMusicFacingSubjectStrategy || "distinct identity vehicle chosen from project signals",
+  "with subject strategy",
+  selectedMusicFacingSubjectStrategy || "distinct subject strategy chosen from project signals",
   "inside",
   selectedMusicFacingWorldIntelligence || "campaign world context",
   "with concrete scene anchors",
