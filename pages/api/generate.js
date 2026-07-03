@@ -3000,7 +3000,7 @@ Prefer specific reaction language:
 - pressure from color trapped inside depth
 - attention pulled toward the sealed rupture
 - concern as the surface keeps reorganizing
-- satisfaction when the final state locks into place
+- attention as the final state remains visibly unresolved
 
 Reject any item that could describe a perfume campaign, luxury brand mood, architecture article, or generic sci-fi scene.
 
@@ -3024,11 +3024,11 @@ Use it only as surface behavior, lighting response, reflection logic, color trea
 
 The selected Reel Purpose (${reelPurpose}) must shape how the result feels as a finished creative asset.
 For Artist Identity Reel:
-- reelConcept must feel immediately readable as a signature artist visual
-- directorNotes must describe a memorable final image suitable for artist identity
-- aiVideoPrompt must prioritize a clean, iconic final frame
-- hooks and captions must feel usable for a music artist reel, not a generic VFX demo
-- audienceEmotion must include why the visual feels memorable or identity-defining
+- reelConcept must feel immediately readable as a lived artist world, not a signature mark
+- directorNotes must describe an observable world condition without forcing symbolic closure
+- aiVideoPrompt must prioritize physical behavior, camera observation and open-world continuity
+- hooks and captions must feel usable for a music artist reel without explaining identity as a visible object
+- audienceEmotion must describe how the visible world condition affects the viewer without using identity-defining language
 
 Do not turn Reel Purpose into a new subject, location, prop, character or narrative event.
 It may only affect framing, readability, pacing, final-image clarity and presentation intent.
