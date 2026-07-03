@@ -2780,7 +2780,7 @@ and inseparable from the generated Concept DNA.
 
 
 visualDNA:
-      "anchorFracture: single micro-temporal deviation in physical response",
+      //
 - exactly 3 items
 - each item must feel premium and identity-defining
 - derived from the Concept DNA
@@ -6533,7 +6533,7 @@ const enforceMusicFacingActionScene = () => {
     projectCodename: "Night Drive Pursuit",
     creativeArchetype: artist + " Vehicle Chase Signal",
     visualDNA: [selectedFamily + " primary world", secondaryFamily + " subtle perceptual distortion",
-      "anchorFracture: single micro-temporal deviation in physical response",
+      //
       "visible vehicle and wet road direction",
       "headlights and taillights defining chase geography",
       "medium-wide night-drive action composition",
@@ -7515,7 +7515,7 @@ const enforceMusicFacingGraphicObjectSubjectLock = () => {
     projectCodename: selected.codename,
     creativeArchetype: selected.archetype,
     visualDNA: [selectedFamily + " primary world", secondaryFamily + " subtle perceptual distortion",selected.subject, selected.world, selectedFamily + " interpretation family"],
-      "anchorFracture: single micro-temporal deviation in physical response",
+      //
     emotionalTone: [
       moodLabel + " through acid culture",
       selectedFamily + "-led visual pressure",
