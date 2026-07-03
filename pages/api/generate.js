@@ -4923,16 +4923,16 @@ const buildIdentityFallback = (concept) => {
   const second = anchorWords[1] || "Pressure";
 
   const archetypeEndings = [
-    "Spatial Lock",
-    "Material Threshold",
-    "Surface Condition",
-    "Depth Mark",
-    "Frame Relic",
-    "Texture Signal",
-    "Pressure Image",
+    "World Behavior",
+    "Material Response",
+    "Surface Drift",
+    "Camera Observation",
+    "Atmosphere Study",
+    "Texture Movement",
+    "Pressure Field",
     "World Fragment",
-    "Motion Seal",
-    "Visual Consequence"
+    "Motion Continuity",
+    "Visible Condition"
   ];
 
   const ending =
