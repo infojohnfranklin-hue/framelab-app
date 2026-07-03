@@ -171,7 +171,7 @@ const getMusicFacingWorldIntelligence = () => {
   const hasAny = (terms) =>
     terms.some((term) => source.includes(term));
 
-  const fractureBias = Math.random();
+  const fractureBias = (() => { if (genre === "Ambient") return 0.75; if (genre === "Jazz") return 0.65; if (genre === "Electronic") return 0.55; return 0.5; })() * Math.random();
   const scoreWorld = (signals) => // WORLD DOMINANCE ENGINE (primary cinematic reality selector)
     signals.reduce((score, signal) => {
       return source.includes(signal) ? score + 1 + (fractureBias > 0.65 ? 0.5 : 0) : score;
