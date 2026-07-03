@@ -49,7 +49,7 @@ if (process.env.FRAMELAB_GENERATE_MOCK === "true") {
     reelConcept: `MOCK TEST OUTPUT: ${mockTitle} becomes a premium cinematic reel system shaped by ${genre || "unknown genre"}, ${mood || "unknown mood"}, ${visualStyle || "unknown visual style"}, ${directorMode || "unknown director mode"}, ${styleDNA || "unknown cinematic DNA"}, ${era || "unknown era"} and ${reelPurpose || "Artist Identity Reel"}.`,
     cinematicIdentity: "Mock cinematic identity for safe local testing without OpenAI API usage.",
     directorsNotes: "Mock director notes. This response proves the UI flow works without calling OpenAI.",
-    narrativeArc: "Stage 1: Establish the visual world. Stage 2: Transform the main motif. Stage 3: Resolve into a strong final frame.",
+    narrativeArc: "Stage 1: Establish the visual world. Stage 2: Transform the main motif. Stage 3: Continue the observed material evolution without closure.",
     aiVideoPrompt: "Mock AI video prompt. No live OpenAI call was made.",
     caption: `Mock caption for ${mockTitle}.`,
     mainCaption: `Mock caption for ${mockTitle}.`,
@@ -171,7 +171,7 @@ const getMusicFacingWorldIntelligence = () => {
   const hasAny = (terms) =>
     terms.some((term) => source.includes(term));
 
-  const scoreWorld = (signals) =>
+  const scoreWorld = (signals) => // WORLD DOMINANCE ENGINE (primary cinematic reality selector)
     signals.reduce((score, signal) => {
       return source.includes(signal) ? score + 1 : score;
     }, 0);
@@ -550,7 +550,7 @@ const getMusicFacingActionFinalFrameRequirement = () => {
       source
     )
   ) {
-    return "final frame must stay action-based: artist plus visible vehicle plus readable road direction, tunnel, lane, curve, underpass or intersection. The final image must not center suspended droplets, puddles, shards, prisms, locked reflections or frozen light as the main subject.";
+    return "final observable state is defined by ongoing motion and spatial behavior, not closure or resolution";
   }
 
   return "";
@@ -1003,11 +1003,11 @@ unless those objects are already explicitly implied by the Concept DNA.
 
 Every concept must contain at least one unexpected consequence.
 
-Scene 2 must exist because of Scene 1.
+Scenes may follow a sequence, but no scene is required to exist because of another scene. Each scene is independently observable and may represent a continuation, variation, or re-observation of the same material state.
 
-Scene 3 must exist because of Scene 2.
+Scene 3 may exist as an optional continuation, reinterpretation, or re-observation of prior material states, without dependency or required progression.
 
-Scene 2 must introduce a new state.
+Scene 2 may reveal a new observable condition without requiring state progression.
 
 Scene 3 must introduce another new state.
 
@@ -1207,7 +1207,7 @@ Only after the FINAL FRAME is defined may Stage 1, Stage 2, and Stage 3 be gener
 
 Stage 2 must exist because of Stage 1.
 
-Stage 3 must exist because of Stage 2.
+Stage 3 continues the observed material evolution from Stage 2 without introducing closure or dependency resolution
 
 2. State Change
 
@@ -1807,7 +1807,7 @@ The final sentence must clearly describe what the video model should hold on scr
 
 Final Frame Literalness Rule:
 
-The final sentence of aiVideoPrompt must describe only the visible final frame.
+The aiVideoPrompt may end on continuous observation without isolating a final frame.
 
 Do not end the aiVideoPrompt with abstract interpretation, physics metaphors or meaning-based language.
 
@@ -1835,13 +1835,13 @@ Bad:
 The final frame shows gravity and balance rewriting the monastery's physical rules.
 
 Better:
-The final frame holds on inverted granite bells locked above bent metal clappers, with the suspended stone forms frozen in a tight circular arrangement.
+the camera continues observing inverted granite bells locked above bent metal clappers, with the suspended stone forms frozen in a tight circular arrangement.
 
 Bad:
 The final shot captures a moment of frozen collapse.
 
 Better:
-The final frame holds on fractured amber shells compressed into a translucent basin beneath motionless insect wings, with suspended particles trapped above the pooled surface.
+the camera continues observing fractured amber shells compressed into a translucent basin beneath motionless insect wings, with suspended particles trapped above the pooled surface.
 
 Do not use labels such as Scene 1, Scene 2, Scene 3, Stage 1, Stage 2 or Stage 3 inside aiVideoPrompt.
 
@@ -5292,16 +5292,16 @@ const cleanAiVideoPromptText = (value) => {
     [/\bimplying\b/gi, "showing"],
     [/\bevoking\b/gi, "showing"],
     [/\breinforcing\b/gi, "showing"],
-    [/\brewrite(?:s|ing)? physical rules\b/gi, "lock into a visible new arrangement"],
-    [/\bgravity loses its hold\b/gi, "objects remain suspended in place"],
+    [/\brewrite(?:s|ing)? physical rules\b/gi, "surfaces continue evolving into a visible arrangement"],
+    [/\bgravity loses its hold\b/gi, "objects continue subtle motion"],
     [/\breality bends\b/gi, "surfaces bend into a visible new shape"],
-    [/\btime freezes\b/gi, "movement stops in the final frame"],
-    [/\bthe scene transforms into tension\b/gi, "the materials lock into a compressed arrangement"],
+    [/\btime freezes\b/gi, "movement continues in reduced form"],
+    [/\bthe scene transforms into tension\b/gi, "the materials settle into a visible arrangement"],
     [/\bthe moment becomes symbolic\b/gi, "the final frame holds on the visible material state"],
     [/\bthe image captures emotion\b/gi, "the final frame holds on the visible material state"],
-    [/\bthe frame represents\b/gi, "the final frame shows"],
+    [/\bthe frame represents\b/gi, "continues as visible behavior"],
     [/\bthe shot embodies\b/gi, "the shot holds on"],
-    [/\bthe sequence reveals meaning\b/gi, "the sequence ends on a visible final arrangement"],
+    [/\bthe sequence reveals meaning\b/gi, "the sequence continues through a visible material evolution"],
   ];
 
   replacements.forEach(([pattern, replacement]) => {
@@ -6531,7 +6531,7 @@ const enforceMusicFacingActionScene = () => {
     ...(data.cinematicIdentity || {}),
     projectCodename: "Night Drive Pursuit",
     creativeArchetype: artist + " Vehicle Chase Signal",
-    visualDNA: [
+    visualDNA: [selectedFamily + " primary world", secondaryFamily + " atmospheric influence",
       "visible vehicle and wet road direction",
       "headlights and taillights defining chase geography",
       "medium-wide night-drive action composition",
@@ -7512,7 +7512,7 @@ const enforceMusicFacingGraphicObjectSubjectLock = () => {
   data.cinematicIdentity = {
     projectCodename: selected.codename,
     creativeArchetype: selected.archetype,
-    visualDNA: [selected.subject, selected.world, selectedFamily + " interpretation family"],
+    visualDNA: [selectedFamily + " primary world", secondaryFamily + " atmospheric influence",selected.subject, selected.world, selectedFamily + " interpretation family"],
     emotionalTone: [
       moodLabel + " through acid culture",
       selectedFamily + "-led visual pressure",
