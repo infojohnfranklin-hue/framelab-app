@@ -7554,7 +7554,7 @@ let selectedFamily = resolveCreativeState(creativeState);
     output = cleanAiVideoPromptText(output);
 
     // 2. GRAMMAR POLISH (NO STYLE CHANGE)
-    output = polishMusicFacingGrammar(output);
+    const grammarBefore = output; const grammarAfter = polishMusicFacingGrammar(output); lightTrace("GRAMMAR_LAYER", grammarBefore, grammarAfter); output = grammarAfter;
 
     // 3. WOW ENHANCEMENT (STYLE ONLY, NO STRUCTURE CHANGE)
     const wowBefore = output; const wowAfter = applyMaximumWowLayer(output); lightTrace("WOW_LAYER", wowBefore, wowAfter); output = wowAfter;
