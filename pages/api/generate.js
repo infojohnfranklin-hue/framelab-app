@@ -7525,6 +7525,20 @@ let selectedFamily = resolveCreativeState(creativeState);
   };
   // === AI VIDEO PROMPT RENDER PIPELINE (ORDERED, STABLE) ===
   const renderPipeline = (prompt) => {
+
+  // === CINEMATIC PHYSICS ENGINE (MAXIMUM WOW LEVEL) ===
+  const cameraModes = ["observer", "drifting", "intrusive", "fractured"];
+  const forceModes = ["resistance", "absorption", "echo", "collapse", "expansion"];
+
+  const selectedCameraMode = cameraModes[Math.floor(Math.random() * cameraModes.length)];
+  const selectedForceMode = forceModes[Math.floor(Math.random() * forceModes.length)];
+
+  const injectCinematicPhysics = (text) => {
+    return `${text}\n\nCAMERA MODE: ${selectedCameraMode}\nWORLD FORCE: ${selectedForceMode}`;
+  };
+
+  const applyCinematicPhysics = (text) => injectCinematicPhysics(text);
+
     let output = prompt;
 
     // 1. CLEAN STRUCTURE
