@@ -7525,6 +7525,15 @@ let selectedFamily = resolveCreativeState(creativeState);
   };
   // === AI VIDEO PROMPT RENDER PIPELINE (ORDERED, STABLE) ===
   const renderPipeline = (prompt) => {
+  // === FRAME-LAB LIGHT TRACE (NON-INTRUSIVE) ===
+  const lightTrace = (layer, input, output) => {
+    console.log("\n[FRAME-LAB LIGHT TRACE]");
+    console.log("Layer:", layer);
+    console.log("Input Preview:", String(input).slice(0, 120));
+    console.log("Output Preview:", String(output).slice(0, 120));
+    console.log("-----------------------------");
+  };
+
 
   // === CINEMATIC PHYSICS ENGINE (MAXIMUM WOW LEVEL) ===
   const cameraModes = ["observer", "drifting", "intrusive", "fractured"];
