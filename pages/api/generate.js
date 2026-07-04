@@ -7935,3 +7935,15 @@ function describeLayerEffect(layerName) {
   return LayerSemantics[layerName]?.perceivedEffect || "unknown effect";
 }
 
+
+// === FRAME-LAB SEMANTIC FLOW ATTACHMENT v1 (SAFE INSERT) ===
+if (typeof describeLayerEffect === "function") {
+  const semanticNarrative = {
+    grammarImpact: describeLayerEffect("grammar"),
+    wowImpact: describeLayerEffect("wow"),
+    physicsImpact: describeLayerEffect("physics")
+  };
+
+  console.log("[FRAME-LAB SEMANTIC FLOW]", semanticNarrative);
+}
+
