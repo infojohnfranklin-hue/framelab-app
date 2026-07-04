@@ -7891,27 +7891,6 @@ function analyzeLayerCausality(base, output) {
 
 // === FRAME-LAB CONFLICT LOGIC v1 (NON-DESTRUCTIVE) ===
 
-const resolveLayerConflicts = (grammar, wow, physics) => {
-  const signals = [
-    { layer: "grammar", strength: grammar.length, type: "stability" },
-    { layer: "wow", strength: wow.length, type: "amplification" },
-    { layer: "physics", strength: physics.length, type: "constraint" }
-  ];
-
-  const sorted = signals.sort((a, b) => b.strength - a.strength);
-
-  return {
-    primaryDriver: sorted[0].layer,
-    secondaryDriver: sorted[1].layer,
-    tertiaryDriver: sorted[2].layer,
-    interactionMap: {
-      stabilityVsAmplification: grammar.length - wow.length,
-      amplificationVsConstraint: wow.length - physics.length,
-      constraintVsStability: physics.length - grammar.length
-    }
-  };
-};
-
 
 // === FRAME-LAB SEMANTIC LAYER EFFECT MODEL v1 ===
 
@@ -8011,6 +7990,37 @@ function applyLayerWeighting(causalMap) {
     weighted,
     totalInfluence,
     mode: "SOFT_CONTROL_WEIGHTING"
+  };
+}
+
+
+// === FRAME-LAB CONFLICT RESOLUTION ENGINE v1 ===
+
+function resolveLayerConflicts(causalMap) {
+  if (!causalMap?.weighted) return { winner: null };
+
+  const { grammar, wow, physics } = causalMap.weighted;
+
+  const signals = [
+    { layer: "grammar", value: grammar || 0 },
+    { layer: "wow", value: wow || 0 },
+    { layer: "physics", value: physics || 0 }
+  ];
+
+  // deterministic winner selection (soft tie-aware)
+  signals.sort((a, b) => b.value - a.value);
+
+  const winner = signals[0];
+  const runnerUp = signals[1];
+
+  const conflictDelta = winner.value - runnerUp.value;
+
+  return {
+    winner: winner.layer,
+    runnerUp: runnerUp.layer,
+    conflictDelta,
+    resolutionMode: conflictDelta < 0.1 ? "SOFT_TIE_BLEND" : "CLEAR_DOMINANCE",
+    allSignals: signals
   };
 }
 
