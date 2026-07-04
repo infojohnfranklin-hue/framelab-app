@@ -7947,3 +7947,21 @@ if (typeof describeLayerEffect === "function") {
   console.log("[FRAME-LAB SEMANTIC FLOW]", semanticNarrative);
 }
 
+
+// === FRAME-LAB CAUSAL MAP v1 ===
+
+function buildCausalMap(base, output, semantic) {
+  const lengthDelta = output.length - base.length;
+
+  return {
+    structuralShift: lengthDelta,
+    semanticDrivers: semantic,
+    causalHypothesis: {
+      grammarContribution: semantic?.grammarImpact,
+      wowContribution: semantic?.wowImpact,
+      physicsContribution: semantic?.physicsImpact
+    },
+    interpretation: "pre-attribution model (non-deterministic)"
+  };
+}
+
