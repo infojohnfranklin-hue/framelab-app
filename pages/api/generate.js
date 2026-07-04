@@ -7983,3 +7983,34 @@ const attachCausalMap = (data, basePrompt) => {
   return data;
 };
 
+
+// === FRAME-LAB CAUSAL WEIGHTING v1 (SOFT CONTROL) ===
+
+const LayerWeights = {
+  grammar: 1.0,
+  wow: 1.0,
+  physics: 1.0
+};
+
+function applyLayerWeighting(causalMap) {
+  if (!causalMap) return causalMap;
+
+  const weighted = {
+    grammar: causalMap.causalHypothesis?.grammarContribution * LayerWeights.grammar,
+    wow: causalMap.causalHypothesis?.wowContribution * LayerWeights.wow,
+    physics: causalMap.causalHypothesis?.physicsContribution * LayerWeights.physics
+  };
+
+  const totalInfluence =
+    (weighted.grammar || 0) +
+    (weighted.wow || 0) +
+    (weighted.physics || 0);
+
+  return {
+    ...causalMap,
+    weighted,
+    totalInfluence,
+    mode: "SOFT_CONTROL_WEIGHTING"
+  };
+}
+
