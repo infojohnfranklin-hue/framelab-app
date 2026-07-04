@@ -7563,6 +7563,14 @@ let selectedFamily = resolveCreativeState(creativeState);
   };
 
   data.aiVideoPrompt = renderPipeline(selected.prompt);
+// === FRAME-LAB OUTPUT OBSERVATION (LIGHT MODE SAFE) ===
+const outputTrace = {
+  raw: selected.prompt,
+  afterRender: data.aiVideoPrompt,
+  timestamp: Date.now()
+};
+console.log("[FRAME-LAB OUTPUT TRACE]", outputTrace);
+
   data.videoPrompt = selected.prompt;
   data.thumbnailPrompt = selected.thumbnail;
   data.thumbnailConcept = selected.thumbnail;
