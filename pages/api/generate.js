@@ -7557,7 +7557,7 @@ let selectedFamily = resolveCreativeState(creativeState);
     output = polishMusicFacingGrammar(output);
 
     // 3. WOW ENHANCEMENT (STYLE ONLY, NO STRUCTURE CHANGE)
-    output = applyMaximumWowLayer(output);
+    const wowBefore = output; const wowAfter = applyMaximumWowLayer(output); lightTrace("WOW_LAYER", wowBefore, wowAfter); output = wowAfter;
 
     return output;
   };
