@@ -7965,3 +7965,21 @@ function buildCausalMap(base, output, semantic) {
   };
 }
 
+
+// === FRAME-LAB CAUSAL BINDING FIX v1 ===
+
+// ATTACH CAUSAL MAP INTO OUTPUT PIPELINE (SAFE HOOK)
+const attachCausalMap = (data, basePrompt) => {
+  if (!data || !data.semanticNarrative) return data;
+
+  const causalMap = buildCausalMap(
+    basePrompt,
+    data.aiVideoPrompt,
+    data.semanticNarrative
+  );
+
+  data.__causalMap = causalMap;
+
+  return data;
+};
+
