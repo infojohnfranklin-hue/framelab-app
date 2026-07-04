@@ -7523,7 +7523,23 @@ let selectedFamily = resolveCreativeState(creativeState);
     stage2: selected.stage2,
     stage3: selected.stage3,
   };
-  data.aiVideoPrompt = applyMaximumWowLayer(polishMusicFacingGrammar(cleanAiVideoPromptText(selected.prompt)));
+  // === AI VIDEO PROMPT RENDER PIPELINE (ORDERED, STABLE) ===
+  const renderPipeline = (prompt) => {
+    let output = prompt;
+
+    // 1. CLEAN STRUCTURE
+    output = cleanAiVideoPromptText(output);
+
+    // 2. GRAMMAR POLISH (NO STYLE CHANGE)
+    output = polishMusicFacingGrammar(output);
+
+    // 3. WOW ENHANCEMENT (STYLE ONLY, NO STRUCTURE CHANGE)
+    output = applyMaximumWowLayer(output);
+
+    return output;
+  };
+
+  data.aiVideoPrompt = renderPipeline(selected.prompt);
   data.videoPrompt = selected.prompt;
   data.thumbnailPrompt = selected.thumbnail;
   data.thumbnailConcept = selected.thumbnail;
