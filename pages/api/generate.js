@@ -7562,7 +7562,7 @@ let selectedFamily = resolveCreativeState(creativeState);
     return output;
   };
 
-  data.aiVideoPrompt = renderPipeline(selected.prompt);
+  const base = selected.prompt; const out = renderPipeline(selected.prompt); const influence = computeLayerInfluence(base, out, out, out); data.__influence = influence; data.aiVideoPrompt = out;
 // === FRAME-LAB OUTPUT OBSERVATION (LIGHT MODE SAFE) ===
 const outputTrace = {
   raw: selected.prompt,
