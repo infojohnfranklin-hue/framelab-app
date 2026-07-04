@@ -7912,3 +7912,26 @@ const resolveLayerConflicts = (grammar, wow, physics) => {
   };
 };
 
+
+// === FRAME-LAB SEMANTIC LAYER EFFECT MODEL v1 ===
+
+const LayerSemantics = {
+  grammar: {
+    meaning: "reduces structural entropy",
+    perceivedEffect: "makes output coherent, readable, stable"
+  },
+  wow: {
+    meaning: "amplifies perceptual density",
+    perceivedEffect: "makes output cinematic, expressive, emotionally charged"
+  },
+  physics: {
+    meaning: "constrains reality consistency",
+    perceivedEffect: "makes output feel physically plausible and grounded"
+  }
+};
+
+// semantic interpretation (non-metric)
+function describeLayerEffect(layerName) {
+  return LayerSemantics[layerName]?.perceivedEffect || "unknown effect";
+}
+
