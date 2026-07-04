@@ -7858,3 +7858,33 @@ return res.status(200).json(data);
     });
   }
 }
+
+// === FRAME-LAB CAUSAL LAYER MODEL v1 (SIDE-CAR ANALYSIS) ===
+
+const CausalLayerModel = {
+  grammar: {
+    role: "STRUCTURE_STABILIZER",
+    effect: "reduces entropy / increases coherence",
+  },
+  wow: {
+    role: "AMPLITUDE_DRIVER",
+    effect: "increases expressive variance / cinematic intensity",
+  },
+  physics: {
+    role: "REALITY_CONSTRAINT_ENGINE",
+    effect: "defines material consistency / world causality",
+  }
+};
+
+// === CAUSAL ANALYSIS FUNCTION (READ-ONLY) ===
+
+function analyzeLayerCausality(base, output) {
+  const delta = output.length - base.length;
+
+  return {
+    delta,
+    normalizedImpact: base.length ? delta / base.length : 0,
+    layerModel: CausalLayerModel
+  };
+}
+
