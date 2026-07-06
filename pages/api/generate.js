@@ -6978,6 +6978,11 @@ const enforceSubjectSafetyForVisualPrompts = () => {
     if (typeof value !== "string") return value;
 
     const normalizedKey = String(keyName || "").toLowerCase().replace(/[^a-z0-9_]+/g, "");
+    const isCaptionOrHookField =
+      normalizedKey.includes("caption") ||
+      normalizedKey.includes("captions") ||
+      normalizedKey.includes("hook") ||
+      normalizedKey.includes("hooks");
     let text = cleanVisibleSafetyBlock(value);
 
     text = text
@@ -6985,8 +6990,6 @@ const enforceSubjectSafetyForVisualPrompts = () => {
       .replace(/\b\/Users\/[^\s"'<>]+/gi, "")
       .replace(/\b\/mnt\/data\/[^\s"'<>]+/gi, "")
       .replace(/\b[A-Z]:\\\\[^\s"'<>]+/gi, "")
-      .replace(artistPossessivePattern, safePossessiveSubject)
-      .replace(artistPattern, safeSubject)
       .replace(/\ban original fictional performer['’](?=\s|$)/gi, "an original fictional performer")
       .replace(/\bthe star(?:'s|’s)\b/gi, safePossessiveSubject)
       .replace(/\bthe star\b/gi, "the fictional performer")
@@ -7000,6 +7003,12 @@ const enforceSubjectSafetyForVisualPrompts = () => {
       .replace(/\btrademark\b/gi, "original")
       .replace(/\bsignature outfit\b/gi, "original wardrobe category")
       .replace(/\bsignature pose\b/gi, "original performance pose");
+
+    if (!isCaptionOrHookField) {
+      text = text
+        .replace(artistPossessivePattern, safePossessiveSubject)
+        .replace(artistPattern, safeSubject);
+    }
 
     if (normalizedKey.includes("archetype") || normalizedKey.includes("codename")) {
       text = text.replace(new RegExp(escapeRegExp(safeSubject), "g"), shortSafeSubject);
