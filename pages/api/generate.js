@@ -5520,6 +5520,9 @@ const polishMusicFacingGrammar = (value) => {
   let text = String(value).trim();
 
   const replacements = [
+    [/\btextured\s+textures\b/gi, "layered surfaces"],
+    [/\btexture\s+textures\b/gi, "surface textures"],
+    [/\b(intimate\s+)?(light|shadow|grain|haze|air|silence|moment|sound)\s+bend\b/gi, "$1$2 bends"],
     [/\b(performance|silhouette|presence|figure|artist|subject|moment|wardrobe|fabric|coat|dress|veil|haze|air|light|dust|sand|mirage|atmosphere)\s+fold\b/gi, "$1 folds"],
     [/\b(performance|silhouette|presence|figure|artist|subject|moment|wardrobe|fabric|coat|dress|veil|haze|air|light|dust|sand|mirage|atmosphere)\s+curl\b/gi, "$1 curls"],
     [/\b(performance|silhouette|presence|figure|artist|subject|moment|wardrobe|fabric|coat|dress|veil|haze|air|light|dust|sand|mirage|atmosphere)\s+trap\b/gi, "$1 traps"],
