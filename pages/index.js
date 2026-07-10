@@ -1060,6 +1060,187 @@ export default function Home() {
     directorModes?.[0];
 
   useEffect(() => {
+    if (process.env.NODE_ENV !== "development") {
+      return;
+    }
+
+    const matrixTests = {
+      1: {
+        genre: "Techno",
+        mood: "Lonely Neon",
+        style: "Neon Rain Noir",
+        directorMode: "Neo Noir Sci-Fi",
+        styleDNA: "Blade Runner Noir",
+        era: "Near-Future Editorial",
+        reelPurpose: "Track Launch Teaser",
+      },
+      2: {
+        genre: "Downtempo",
+        mood: "Warm Cinematic Hope",
+        style: "Soft Grain Cinema",
+        directorMode: "Indie Realism",
+        styleDNA: "Golden Hour Melancholy",
+        era: "Timeless Cinema",
+        reelPurpose: "Artist Identity Reel",
+      },
+      3: {
+        genre: "Future Garage",
+        mood: "Cold Futurism",
+        style: "Cold Digital Gloss",
+        directorMode: "Cyberpunk Motion",
+        styleDNA: "Neo Tokyo",
+        era: "Chrome Millennium",
+        reelPurpose: "Social Teaser Hook",
+      },
+      4: {
+        genre: "Deep House",
+        mood: "Luxury Calm",
+        style: "Wet Chrome Reflections",
+        directorMode: "Luxury Sci-Fi",
+        styleDNA: "Chrome Dreams",
+        era: "Modern Luxury",
+        reelPurpose: "Luxury Brand Mood Film",
+      },
+      5: {
+        genre: "Melodic House",
+        mood: "Hypnotic Motion",
+        style: "Mirror Room Glow",
+        directorMode: "Symmetry Cinema",
+        styleDNA: "Sacred Geometry",
+        era: "Minimal Future",
+        reelPurpose: "Spotify Canvas Direction",
+      },
+      6: {
+        genre: "Ambient",
+        mood: "Surreal Stillness",
+        style: "Pearl Light Minimalism",
+        directorMode: "Spatial Architecture",
+        styleDNA: "Cathedral Light",
+        era: "Ancient Future",
+        reelPurpose: "Album World Reveal",
+      },
+      7: {
+        genre: "Minimal House",
+        mood: "Tense Anticipation",
+        style: "Concrete Noir",
+        directorMode: "Monumental Minimalism",
+        styleDNA: "Concrete Dreamscape",
+        era: "Near-Future Editorial",
+        reelPurpose: "Live Visual Intro",
+      },
+      8: {
+        genre: "Organic House",
+        mood: "Mystic Wonder",
+        style: "Holographic Mist",
+        directorMode: "Submerged Noir",
+        styleDNA: "Underwater Cathedral",
+        era: "Ancient Future",
+        reelPurpose: "Music Video Concept Seed",
+      },
+      9: {
+        genre: "Electronic Pop",
+        mood: "Confident Arrival",
+        style: "Editorial Flash",
+        directorMode: "Editorial Fashion Film",
+        styleDNA: "Editorial Fashion Film",
+        era: "Y2K Digital Gloss",
+        reelPurpose: "Editorial Campaign Cut",
+      },
+      10: {
+        genre: "Lo-Fi House",
+        mood: "Soft Nostalgia",
+        style: "Dusty Film Memory",
+        directorMode: "Analog Memory",
+        styleDNA: "Pearl Archive",
+        era: "Polaroid Memory",
+        reelPurpose: "Spotify Canvas Direction",
+      },
+      11: {
+        genre: "Indie Dance",
+        mood: "Dreamlike Suspense",
+        style: "Golden Hour Surrealism",
+        directorMode: "Surreal Dream Cinema",
+        styleDNA: "Dreamscape",
+        era: "Early Internet Dream",
+        reelPurpose: "Music Video Concept Seed",
+      },
+      12: {
+        genre: "Afro House",
+        mood: "Emotional Lift",
+        style: "Solar Haze",
+        directorMode: "Poetic Documentary",
+        styleDNA: "Desert Mirage",
+        era: "1970s Analog Film",
+        reelPurpose: "Festival Visual Moment",
+      },
+      13: {
+        genre: "Trance",
+        mood: "Dark Elegance",
+        style: "Silver Smoke",
+        directorMode: "Minimal Ritual Cinema",
+        styleDNA: "Obsidian Ritual",
+        era: "Mythic Past",
+        reelPurpose: "Artist Identity Reel",
+      },
+      14: {
+        genre: "House",
+        mood: "Euphoric Release",
+        style: "High Fashion Blur",
+        directorMode: "Gloss Music Video",
+        styleDNA: "Luxury Underground",
+        era: "1990s Music Video",
+        reelPurpose: "Track Launch Teaser",
+      },
+    };
+
+    window.fillFrameLabMatrixTest = (testNumber) => {
+      const normalizedTestNumber =
+        typeof testNumber === "string" && testNumber.trim() !== ""
+          ? Number(testNumber)
+          : testNumber;
+
+      const isValidTest =
+        Number.isInteger(normalizedTestNumber) &&
+        Object.prototype.hasOwnProperty.call(
+          matrixTests,
+          normalizedTestNumber
+        );
+
+      if (!isValidTest) {
+        console.error(
+          `Invalid Matrix Test ${testNumber}. Available tests: 1-14`
+        );
+        return false;
+      }
+
+      const test = matrixTests[normalizedTestNumber];
+
+      setArtist("Aurora Wolves");
+      setTrack("Northern Migration");
+      setBpm("120");
+
+      setGenre(test.genre);
+      setMood(test.mood);
+      setStyle(test.style);
+      setDirectorMode(test.directorMode);
+      setStyleDNA(test.styleDNA);
+      setEra(test.era);
+      setReelPurpose(test.reelPurpose);
+
+      console.log(
+        `FrameLab Matrix Test ${normalizedTestNumber} state update requested. Verify the UI before Generate.`
+      );
+
+      return true;
+    };
+
+    return () => {
+      delete window.fillFrameLabMatrixTest;
+    };
+  }, []);
+
+
+  useEffect(() => {
     const loadCredits = async () => {
       try {
         const creditsRes = await fetch("/api/credits");
