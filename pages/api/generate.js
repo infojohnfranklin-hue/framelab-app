@@ -1980,8 +1980,9 @@ For Artist Identity Reel:
 - hooks should not sound like technical VFX descriptions
 - hooks should not sound like museum labels
 
-Captions must connect the generated physical event to the artist and track context without converting the artist or track into visible text, symbol, emblem, signature, logo or identity mark.
-Use the artist name (${artistName}) or track name (${trackName}) only when it feels natural in caption text, never as something visible inside the scene.
+Captions must be world-first and grounded in the observable physical event.
+Artist and track are context signals; do not repeat the artist name or track name by default in captions.
+If artist or track appears, it must be restrained, natural and never make the caption feel like marketing copy or visible scene text.
 
 Captions should feel:
 - premium
@@ -5498,23 +5499,18 @@ const isWeakCaption = (value) => {
 };
 
 const buildMusicFacingMainCaption = () => {
-  const artist = artistName || "The artist";
-  const track = trackName || "the track";
   const purpose = String(reelPurpose || "music reel").toLowerCase();
   const moodLabel = String(mood || "emotional tension").toLowerCase();
   const visual = visualStyle || "a defined cinematic visual language";
 
   return (
-    artist +
-    " frames " +
-    track +
-    " as a " +
+    "An intimate " +
     purpose +
-    " built around " +
+    " where " +
     moodLabel +
-    ", using " +
+    " moves through " +
     visual +
-    " to turn performance presence, wardrobe texture and controlled visual pressure into a release-ready cinematic identity."
+    ", letting one observable physical detail carry the atmosphere without explaining itself."
   );
 };
 
