@@ -405,7 +405,7 @@ const getMusicFacingWorldIntelligence = () => {
     return "Minimal real-life body state world: quiet room, restrained posture, breath, hands, shoulders, skin detail, empty space and subtle physical pressure instead of spectacle.";
   }
 
-  return "Realistic artist campaign world: grounded people, real locations, wardrobe, vehicles, animals, streets, clubs, studios, cafes or natural places may be used when they fit the title, before any surreal transformation is added.";
+  return "Realistic artist campaign world: choose a specific lived campaign reality from the full input combination before selecting location or material behavior. Vary between broad anchor families such as movement infrastructure, work or process spaces, public thresholds, domestic or exterior everyday spaces, nature or animal scale, group or crowd fragments, object-led tasks and environment-led social behavior. Do not repeatedly choose the same anchor family across outputs. Listed examples must not become default motifs. Use cafe, studio, street corner, pier, fog, wet pavement, ferry, transit barrier, latch or generic club settings only when the input combination clearly makes them native.";
 };
 
 const getMusicFacingConcreteSceneAnchor = () => {
@@ -542,7 +542,7 @@ const getMusicFacingConcreteSceneAnchor = () => {
     return "two people, close glances, hands almost touching, backstage distance, club doorway light and restrained romantic body language";
   }
 
-  return "one concrete real-world anchor such as a street, room, stage, vehicle, animal, crowd, instrument, cafe, studio or landscape detail before any surreal visual transformation";
+  return "one concrete real-world anchor with an observable function, not a generic location. Choose from broad anchor families: movement or passage systems, work and repair processes, public threshold spaces, domestic or exterior everyday settings, nature or animal movement, group or crowd fragments, object-led physical tasks or environment-led social action. Do not repeatedly choose the same anchor family. Listed examples must not become default motifs. Use cafe, studio, street corner, pier, fog, ferry, transit barrier, latch or generic room setups only when the input combination clearly makes them native.";
 };
 
 const getMusicFacingActionFinalFrameRequirement = () => {
