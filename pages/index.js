@@ -1095,20 +1095,55 @@ export default function Home() {
         .split("—")
         .map((part) => part.trim());
 
-      const reopenedArtist = item.artist || titleParts[0] || "Velvet Mirage";
-      const reopenedTrack = item.track || titleParts[1] || "After Midnight";
+      const fullPackage = item.full_package || item.fullPackage || null;
+      const fullPackageResult =
+        fullPackage &&
+        typeof fullPackage === "object" &&
+        !Array.isArray(fullPackage) &&
+        fullPackage.type === "generate_reel" &&
+        fullPackage.schema_version === 1 &&
+        fullPackage.result &&
+        typeof fullPackage.result === "object" &&
+        !Array.isArray(fullPackage.result)
+          ? fullPackage.result
+          : null;
+      const fullPackageProject =
+        (fullPackage && fullPackage.generated_project) ||
+        fullPackageResult?.generatedProject ||
+        {};
+
+      const reopenedArtist =
+        fullPackageProject.artist ||
+        item.artist ||
+        titleParts[0] ||
+        "Velvet Mirage";
+      const reopenedTrack =
+        fullPackageProject.track ||
+        item.track ||
+        titleParts[1] ||
+        "After Midnight";
       const reopenedDirector =
+        fullPackageProject.director_mode ||
+        fullPackageProject.directorMode ||
         item.director_mode ||
         item.directorMode ||
         directorModes?.[0]?.name ||
         "Neo Noir Sci-Fi";
       const reopenedStyleDNA =
-        item.style_dna || item.styleDNA || "Neo Tokyo";
+        fullPackageProject.cinematic_dna ||
+        fullPackageProject.styleDNA ||
+        fullPackageProject.style_dna ||
+        item.style_dna ||
+        item.styleDNA ||
+        "Neo Tokyo";
       const reopenedEra =
-        item.era === "Y2K"
+        fullPackageProject.era ||
+        (item.era === "Y2K"
           ? "Y2K Digital Gloss"
-          : item.era || "Y2K Digital Gloss";
+          : item.era || "Y2K Digital Gloss");
       const reopenedReelPurpose =
+        fullPackageProject.reel_purpose ||
+        fullPackageProject.reelPurpose ||
         item.reel_purpose ||
         item.reelPurpose ||
         item.result?.reelPurpose ||
@@ -1116,16 +1151,21 @@ export default function Home() {
 
       setArtist(reopenedArtist);
       setTrack(reopenedTrack);
-      setGenre(item.genre || "Melodic House");
-      setBpm(item.bpm || "122");
-      setMood(item.mood || "");
-      setStyle(item.style || "");
+      setGenre(fullPackageProject.genre || item.genre || "Melodic House");
+      setBpm(fullPackageProject.bpm || item.bpm || "122");
+      setMood(fullPackageProject.mood || item.mood || "");
+      setStyle(
+        fullPackageProject.visual_style ||
+          fullPackageProject.style ||
+          item.style ||
+          ""
+      );
       setDirectorMode(reopenedDirector);
       setStyleDNA(reopenedStyleDNA);
       setEra(reopenedEra);
       setReelPurpose(reopenedReelPurpose);
 
-      setResult({
+      setResult(fullPackageResult || {
         concept: item.reel_concept || item.reelConcept || "",
         cinematicIdentity: null,
         prompt: item.prompt || "",
@@ -1358,6 +1398,25 @@ Stage 3: ${data.narrativeArc.stage3 || ""}`
         previewImage: data.previewImage || null,
       };
 
+      const fullPackage = {
+        type: "generate_reel",
+        schema_version: 1,
+        generated_project: {
+          artist,
+          track,
+          genre,
+          bpm,
+          mood,
+          visual_style: style,
+          director_mode: directorMode,
+          cinematic_dna: styleDNA,
+          era,
+          reel_purpose: reelPurpose,
+        },
+        result: newResult,
+        saved_at: new Date().toISOString(),
+      };
+
       setResult(newResult);
 
       if (userPlan === "free") {
@@ -1388,6 +1447,7 @@ Stage 3: ${data.narrativeArc.stage3 || ""}`
               mood,
               style,
               camera: directorMode,
+              fullPackage,
             }),
           });
         } catch (saveError) {

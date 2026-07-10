@@ -18,6 +18,14 @@ export default async function handler(req, res) {
       era,
       reelPurpose,
       videoUrl,
+      artist,
+      track,
+      genre,
+      bpm,
+      mood,
+      style,
+      camera,
+      fullPackage,
     } = req.body;
 
     if (!userId) {
@@ -25,6 +33,18 @@ export default async function handler(req, res) {
         error: "Missing userId",
       });
     }
+
+    const isValidFullPackage =
+      fullPackage &&
+      typeof fullPackage === "object" &&
+      !Array.isArray(fullPackage) &&
+      fullPackage.type === "generate_reel" &&
+      fullPackage.schema_version === 1 &&
+      fullPackage.result &&
+      typeof fullPackage.result === "object" &&
+      !Array.isArray(fullPackage.result);
+
+    const safeFullPackage = isValidFullPackage ? fullPackage : null;
 
     const { data, error } = await supabase
       .from("generations")
@@ -39,6 +59,14 @@ export default async function handler(req, res) {
           era: era || "Y2K",
           reel_purpose: reelPurpose || "Artist Identity Reel",
           video_url: videoUrl || "",
+          artist: artist || "",
+          track: track || "",
+          genre: genre || "",
+          bpm: bpm || null,
+          mood: mood || "",
+          style: style || "",
+          camera: camera || directorMode || "",
+          full_package: safeFullPackage,
         },
       ])
       .select()
