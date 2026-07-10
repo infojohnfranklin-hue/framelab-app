@@ -5556,6 +5556,7 @@ const polishMusicFacingGrammar = (value) => {
       rewires: "rewire",
       reshapes: "reshape",
       cracks: "crack",
+      compresses: "compress",
     };
 
     return forms[String(verb || "").toLowerCase()] || verb;
@@ -5579,13 +5580,20 @@ const polishMusicFacingGrammar = (value) => {
       rewire: "rewires",
       reshape: "reshapes",
       crack: "cracks",
+      compress: "compresses",
     };
 
     return forms[String(verb || "").toLowerCase()] || verb;
   };
 
   text = text.replace(
-    /\b(does|did)\s+([^.!?]{0,90}?)\s+(folds|curls|traps|shapes|moves|freezes|envelops|catches)\b/gi,
+    /\b((?:the\s+)?(?:paper\s+fold|map\s+edge|folded\s+map\s+corner|dance\s+floor|silver\s+smoke|smoke|floor|surface|panel|latch|barrier))(?:\s+(slowly|subtly|gently|quietly|softly|gradually|delicately))?\s+(trap|compress|fold|curl|shape|move|freeze|hold|lock|shift|fracture|reshape|crack)\b/gi,
+    (match, subject, adverb, verb) =>
+      subject + (adverb ? " " + adverb : "") + " " + toThirdPersonSingular(verb)
+  );
+
+  text = text.replace(
+    /\b(does|did)\s+([^.!?]{0,90}?)\s+(folds|curls|traps|shapes|moves|freezes|envelops|catches|compresses)\b/gi,
     (match, aux, subject, verb) => aux + " " + subject + " " + toBaseVerb(verb)
   );
 
