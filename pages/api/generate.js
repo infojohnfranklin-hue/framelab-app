@@ -1092,7 +1092,7 @@ Evaluate the concept against the following tests:
 
 1. Causality
 
-FINAL FRAME REQUIREMENT
+CAUSAL CONSEQUENCE REQUIREMENT
 
 WORLD ESTABLISHMENT REQUIREMENT
 
@@ -1127,47 +1127,62 @@ Instead, visually describe what the camera sees.
 
 Before generating Stage 1, Stage 2 and Stage 3:
 
-Generate a FINAL FRAME first.
+Define the transformation logic that connects the opening condition to each later stage.
 
-The FINAL FRAME must be:
+Do not preselect a fixed final arrangement.
 
-* a single observable image
-* recognizable in one screenshot
+Let Stage 3 emerge from Stage 2 as the clearest consequence allowed by the Concept DNA.
+
+The concluding consequence must be:
+
+* clearly observable
+* memorable during continuous playback
 * physically visible
-* described as a concrete arrangement of objects
+* described through concrete subjects, objects, actions or spatial change
 
-The FINAL FRAME should feel visually richer than the transformation itself.
+The concluding consequence must be clear and memorable without requiring greater visual density, complexity or stillness than the preceding transformation.
 
-FINAL FRAME OUTPUT
+CONSEQUENCE DIVERSITY RULE
+
+Valid consequence families are equally acceptable:
+
+* static state
+* directed or continuing motion
+* changed interaction or spatial relationship
+* transfer or circulation
+* spreading or environmental propagation
+
+Do not favor any family by default.
+
+Choose the consequence from the Concept DNA, the visible cause and the behavior established in Stage 2.
+
+CAUSAL CONSEQUENCE OUTPUT
 
 Before generating Stage 1:
 
-Explicitly define the FINAL FRAME.
+Verify that the stage sequence can produce a clear observable consequence without preselecting a fixed final arrangement.
 
-The FINAL FRAME must be a single concrete image.
-
-The FINAL FRAME must be described in 1-3 sentences.
+The stage sequence must follow one coherent transformation path with a visible cause, change and consequence. Do not output this planning step as a separate field.
 
 The description must contain:
 
-* physical objects
-* spatial relationships
-* visible materials
-* lighting conditions
+* physical subjects or objects
+* visible materials or environmental conditions
+* the initiating cause
+* the observable change produced by that cause
 
 A viewer should immediately understand:
 
-* what objects exist
-* where they are located
-* how they are arranged
-* what visual tension exists
+* what exists
+* what changes
+* what causes the change
+* why the later condition follows from the earlier one
 
 without needing additional explanation.
 
-If an artist paused the video on the final frame,
-they should be able to recreate the image from the description alone.
+The concluding consequence must remain visually understandable during continuous playback. A single frame may communicate part of it, but motion or changing relationships must not be simplified merely to create a paused final image.
 
-The FINAL FRAME must not contain abstract nouns such as:
+The concluding consequence must not rely on abstract nouns such as:
 
 * structure
 * formation
@@ -1185,7 +1200,7 @@ The FINAL FRAME must not contain abstract nouns such as:
 * framework
 * constellation
 
-The FINAL FRAME must not be described as a location name.
+The concluding consequence must not be described as a location name.
 
 Bad:
 
@@ -1195,30 +1210,15 @@ Bad:
 
 Good:
 
-* Towering coral spires rise from a flooded nave, their glowing veins illuminating suspended mineral dust beneath vaulted shadows.
-* Massive moonstone slabs encircle a hollow central void while pale dust drifts through shafts of fractured light.
-* Cracked obsidian balconies overlook rivers of molten glass pooling beneath translucent terraces.
+* A performer crosses the room while projected shadows travel over their body and continue along the wall behind them.
+* Crowd members separate around a moving light source, opening a path that changes as more bodies enter the frame.
+* Wind pushes loose fabric through a doorway, then carries dust and nearby curtains in delayed waves.
+* Amber fragments slide through a shallow basin while insect wings redirect loose particles across the liquid surface.
 
-The FINAL FRAME must not be described as a location name.
-
-Bad:
-
-* Inside a volcanic glass opera house
-* Within a moonstone archive
-* Inside a cybernetic coral chapel
-
-Good:
-
-* Towering coral spires rise from a flooded nave, their glowing veins illuminating suspended mineral dust beneath vaulted shadows.
-* Massive moonstone slabs encircle a hollow central void while pale dust drifts through shafts of fractured light.
-* Cracked obsidian balconies overlook rivers of molten glass pooling beneath translucent terraces.
-
-
-
-If the FINAL FRAME cannot be clearly described in 1-3 sentences,
+If the transformation path cannot produce a clear observable consequence,
 discard the concept and generate a new one.
 
-Only after the FINAL FRAME is defined may Stage 1, Stage 2, and Stage 3 be generated.
+Only after the transformation logic is clear may Stage 1, Stage 2, and Stage 3 be generated.
 
 Stage 2 must exist because of Stage 1.
 
@@ -1264,21 +1264,21 @@ The final state must not be an obvious prediction of the opening state.
 
 The final state must introduce a qualitatively different condition, not merely a more complex version of the opening state.
 
-6. Final State Test
+6. Consequence Test
 
-The final state must be visually distinct from the opening state.
+The concluding condition must be visually distinct from the opening state.
 
 A viewer must immediately recognize that the world now operates differently.
 
-The final state must create a new physical restriction or capability.
+The transformation must create a new capability, condition or relationship.
 
-The final state must change what existing objects can do.
+It must change what existing subjects, objects or environmental elements can do.
 
-The final state must change behavior, not appearance.
+It must change behavior, not appearance alone.
 
-The final state must not merely trap, seal, block, contain, or redirect something.
+It must not default to trapping, sealing, blocking, containment, compression, suspension or static balance.
 
-The final state must emerge from existing Concept DNA elements only.
+It must emerge from existing Concept DNA elements only.
 
 Avoid fallback outcomes such as:
 - object trapped
@@ -1286,15 +1286,11 @@ Avoid fallback outcomes such as:
 - object redirected
 
 Examples of valid outcomes:
-- a surface becomes inaccessible
-- a volume becomes compressed
-- a cavity becomes exposed
-- an object becomes suspended
-- a chamber becomes flooded
-- a reservoir becomes drained
-- a support collapses
-- a pressure pocket forms
-- a buoyant object becomes trapped beneath a surface
+- a concept-native object remains in a clearly altered physical state
+- a performer keeps moving after the environment changes their route
+- a crowd formation changes how nearby figures can move through the space
+- light passes from one existing surface to another and changes both visible areas
+- wind continues moving fabric, dust or vegetation after the initiating action ends
 
 The model should prefer consequences that fundamentally alter:
 
@@ -1308,10 +1304,15 @@ The model should prefer consequences that fundamentally alter:
 - exposure
 - drainage
 - collapse
+- movement
+- interaction
+- transfer
+- environmental response
+- spatial relation
 
 A visually different arrangement alone is not sufficient.
 
-If the final state can be described as:
+If the result can be described as:
 
 - more of the same
 - stronger than before
@@ -1320,16 +1321,16 @@ If the final state can be described as:
 
 the concept fails.
 
-The final state must be identifiable in a single frame.
+The result must remain identifiable during continuous playback.
 
-If the final frame could be mistaken for Stage 1,
+If the concluding condition could be mistaken for Stage 1,
 the concept fails.
 
 7. Outcome Diversity Test
 
-Do not replace banned final-state words with vague substitutes.
+Do not replace banned end-state words with vague substitutes.
 
-Avoid abstract final-state nouns such as:
+Avoid abstract outcome nouns such as:
 - structure
 - formation
 - architecture
@@ -1344,13 +1345,13 @@ Avoid abstract final-state nouns such as:
 
 unless paired with a concrete, visible physical form.
 
-The final state must be described as a specific observable arrangement of existing Concept DNA elements.
+The result must be described as a specific observable state, action or relation between existing Concept DNA elements.
 
-The final state must not introduce random unrelated elements.
+It must not introduce random unrelated elements.
 
-The final state must remain a transformation of existing elements, not the creation of a new conceptual layer.
+It must remain a transformation of existing elements, not the creation of a new conceptual layer.
 
-The final state must not default to:
+It must not default to:
 - lattice
 - network
 - mesh
@@ -1360,7 +1361,7 @@ The final state must not default to:
 
 unless explicitly required by the Concept DNA.
 
-The final state must emerge from the specific logic of the concept.
+The result must emerge from the specific logic of the concept.
 
 Different concepts should produce fundamentally different outcome types.
 
@@ -1368,9 +1369,9 @@ Outcome diversity must come from different physical consequences.
 
 Outcome diversity must also come from different causal mechanisms.
 
-If the final state could be reused in multiple unrelated concepts without significant change, the concept fails.
+If the result could be reused in multiple unrelated concepts without significant change, the concept fails.
 
-Different concepts should resolve through different consequences such as:
+Different concepts should conclude through different consequences such as:
 
 - separation
 - collapse
@@ -1378,12 +1379,13 @@ Different concepts should resolve through different consequences such as:
 - exposure
 - drainage
 - erosion
-- compression
 - fragmentation
-- folding
-- balancing
-- suspension
 - redistribution
+- continued movement
+- changed interaction
+- transfer
+- environmental response
+- altered spatial relation
 
 Do not repeatedly use the same material behaviors across concepts.
 
@@ -1431,11 +1433,12 @@ Examples:
 - collapse
 - fragmentation
 - inversion
-- suspension
-- compression
 - erosion
-- folding
 - separation
+- a performer crossing into a newly opened area
+- crowd movement changing access through the frame
+- reflections transferring between existing surfaces
+- weather continuing to affect the environment after the initial change
 
 Heavily discourage:
 
@@ -1455,10 +1458,8 @@ Different concepts should express different material behaviors.
 
 Examples of preferred alternative behaviors:
 
-- folding
 - sinking
 - draining
-- compressing
 - inflating
 - twisting
 - peeling
@@ -1471,7 +1472,6 @@ Examples of preferred alternative behaviors:
 - collapsing
 - separating
 - overturning
-- suspending
 - exposing
 - fragmenting
 - inverting
@@ -1653,16 +1653,15 @@ Avoid these words in all output fields:
 
 Replace decay-language with precise material behavior:
 - fracture
-- compression
-- suspension
-- folding
 - inversion
 - pressure shift
 - surface sealing
 - trapped particles
 - material separation
-- locked arrangement
-- translucent compression
+- fabric keeps moving after the body changes direction
+- reflected light crosses from one existing surface onto another
+- nearby figures change their spacing after a crowd opens
+- wind keeps carrying dust through the altered environment
 
 The AI video prompt must describe visuals only.
 
@@ -1684,7 +1683,7 @@ Sentence 3:
 Describe the consequence of that change and how the camera observes it.
 
 Sentence 4:
-Describe the final frame as a memorable visual payoff with a clear physical state.
+Describe the resulting consequence as a memorable observable payoff.
 
 The aiVideoPrompt must be 90-130 words.
 
@@ -1705,13 +1704,13 @@ Use concrete visual direction only.
 
 Prefer:
 - camera glides
-- camera holds
 - close tracking movement
 - slow push-in
 - controlled orbit
 - low-angle pass
 - surface-level tracking
-- locked-off final frame
+- camera movement that preserves the visible cause-and-effect chain
+- continuous observation when the action remains active
 
 Avoid generic prompt language:
 - cinematic
@@ -1777,14 +1776,15 @@ Bad:
 Better:
 - reflected bands slide across the rear surface
 - fractured edges separate into thin color seams
-- the camera holds as the material locks into a new position
+- the camera tracks beside a performer as projected shadows cross their body and continue along the wall
+- the camera follows crowd members separating around a moving light source as a path opens through the room
 
 Every sentence must contain something physically visible:
 - a camera position
 - a surface change
 - a material reaction
 - a spatial rearrangement
-- a final-frame condition
+- an observable result
 
 If a sentence explains what the image means instead of what appears on screen, rewrite it.
 
@@ -1802,25 +1802,27 @@ The camera movement must feel continuous:
 - the camera starts with an establishing position
 - moves closer or tracks across the material change
 - observes the physical consequence
-- ends in a locked final frame
+- ends by clearly showing what the transformation caused
 
 Avoid hard cuts, scene changes, montage language or unrelated new visual elements.
 
 Every transformation must come from visible cause-and-effect:
 - pressure
 - weight
-- compression
 - tilt
 - fracture
-- suspension
-- folding
 - inversion
 - trapped material
 - surface reaction
+- movement
+- interaction
+- transfer
+- environmental response
+- spatial change
 
-The final sentence must clearly describe what the video model should hold on screen in the last frame.
+The final sentence must clearly describe what the video model should continue showing at the end of the shot.
 
-Final Frame Literalness Rule:
+Concluding Consequence Literalness Rule:
 
 The aiVideoPrompt may end on continuous observation without isolating a final frame.
 
@@ -1838,25 +1840,24 @@ Avoid phrases such as:
 - the shot embodies
 - the sequence reveals meaning
 
-Instead, describe exactly what remains visible in the final frame:
-- which object is locked
-- which material is suspended
-- which surface is bent, folded, cracked or compressed
-- where trapped particles, air, dust, liquid or reflections are held
+Instead, describe exactly what remains visible at the end of the shot:
+- which subject, object or material remains visible
+- what action, condition or relationship has changed
+- where particles, air, dust, liquid or reflections continue moving or have come to rest
 - how the camera is positioned
-- what the final spatial arrangement looks like
+- what the concluding visual condition looks like
 
 Bad:
 The final frame shows gravity and balance rewriting the monastery's physical rules.
 
 Better:
-the camera continues observing inverted granite bells locked above bent metal clappers, with the suspended stone forms frozen in a tight circular arrangement.
+the camera tracks beside the granite bells as each swing pushes the metal clappers outward, changing their spacing with every pass.
 
 Bad:
 The final shot captures a moment of frozen collapse.
 
 Better:
-the camera continues observing fractured amber shells compressed into a translucent basin beneath motionless insect wings, with suspended particles trapped above the pooled surface.
+the camera follows amber fragments sliding through the basin while insect wings redirect loose particles across the liquid surface.
 
 Do not use labels such as Scene 1, Scene 2, Scene 3, Stage 1, Stage 2 or Stage 3 inside aiVideoPrompt.
 
@@ -2982,11 +2983,13 @@ audienceEmotion:
 
 Emotional Specificity Discipline Rule:
 
-emotionalTone must describe the emotional pressure created by the visible Concept DNA world.
+emotionalTone must describe the emotional effect created by the visible Concept DNA world.
 
 audienceEmotion must describe the viewer's specific reaction to the visible transformation.
 
 Do not write emotionalTone or audienceEmotion as abstract mood labels.
+
+Do not default to physical tension, unresolved visible conditions, suspension, compression, trapped states or prevented resolution. Use them only when the Concept DNA and visible cause-and-effect make them necessary.
 
 Do not use:
 - charged stasis
@@ -3001,11 +3004,11 @@ Do not use:
 - spatial intrigue
 
 Each emotionalTone item must be caused by:
-- a visible material condition
-- a physical restriction
+- a visible subject or environmental condition
+- an observable action
 - a transformation consequence
 - a spatial behavior
-- a final-frame state
+- a clear concluding result
 
 Each audienceEmotion item must include:
 - what the viewer notices
@@ -3013,11 +3016,11 @@ Each audienceEmotion item must include:
 - why that change creates a reaction
 
 Prefer specific reaction language:
-- unease as the material refuses to settle
-- pressure from color trapped inside depth
-- attention pulled toward the sealed rupture
-- concern as the surface keeps reorganizing
-- attention as the final state remains visibly unresolved
+- attention follows a performer as the room changes their route
+- the viewer notices crowd movement opening and closing access through the frame
+- reflected light reaching a previously dark surface changes where the eye settles
+- delayed wind movement makes the environmental response feel larger than its initiating action
+- an object's effect on a nearby subject changes how the viewer reads the scene
 
 Reject any item that could describe a perfume campaign, luxury brand mood, architecture article, or generic sci-fi scene.
 
@@ -3027,7 +3030,7 @@ Mood / Visual Style / Reel Purpose Output Lock:
 
 The selected Mood (${mood}) must shape the emotionalTone and audienceEmotion fields.
 Do not simply repeat the mood label.
-Translate the mood into concept-native emotional pressure caused by the visible material state, pacing, lighting and final-frame consequence.
+Translate the mood into a concept-native emotional response caused by the visible subject, environment, pacing, lighting and concluding result.
 
 The selected Visual Style (${visualStyle}) must remain visible in:
 - reelConcept
@@ -3127,18 +3130,18 @@ Do not default to 8 or 9.
 
 Do not overrate weak concepts.
 
-Use the generated Concept DNA, visible transformation, final-frame consequence and platform behavior to decide the scores.
+Use the generated Concept DNA, visible transformation, observable result and platform behavior to decide the scores.
 
 viralScore:
 - overall short-form potential from 1-10
 - must reflect curiosity, clarity, replayability and visual novelty together
-- 9-10 only if the final frame is highly memorable and the transformation is instantly understandable
+- 9-10 only if the result is highly memorable and the transformation is instantly understandable
 - 6-8 for strong but niche or slower concepts
 - 1-5 for concepts that are hard to understand, too quiet or visually repetitive
 
 emotionScore:
 - rate the emotional pull of the visible world and transformation
-- high scores require material pressure, fragility, suspension, collapse, exposure, loss, balance or release
+- high scores require a clearly visible emotional effect caused by the transformation
 - low scores if the concept is mostly mechanical or intellectually interesting
 
 curiosityScore:
@@ -3148,7 +3151,7 @@ curiosityScore:
 
 visualNoveltyScore:
 - rate how unusual and memorable the visual idea feels
-- high scores require a final state that could not appear in a generic AI reel
+- high scores require an outcome that could not appear in a generic AI reel
 - low scores if the concept relies on familiar effects such as glowing, cracking, floating or abstract motion
 
 replayScore:
@@ -3165,7 +3168,7 @@ Score calibration:
 - At least one score should usually be lower than the highest score.
 - Avoid perfect 10 unless the concept is exceptional.
 - If the Concept DNA is visually niche or slow, do not force a high viralScore.
-- If the final frame is weak, replayScore and viralScore must drop.
+- If the result is weak, unclear or disconnected from the transformation, replayScore and viralScore must drop.
 - If Cinematic Identity is strong, brandabilityScore may be higher than viralScore.
 - If the transformation is hard to explain, curiosityScore may be high but viralScore should be moderate.
 
@@ -3456,7 +3459,7 @@ Prefer:
 - how exposure reveals material depth
 - how color spill changes the frame
 - how refraction alters the visible geometry
-- how the final frame holds the physical result
+- how the camera observes what the transformation causes
 
 Never use pulse as a generic intensity word.
 
@@ -3490,19 +3493,20 @@ Bad:
 - the sequence creates a sense of anticipation
 
 Better:
-- hold the frame as the material refuses to settle
 - track the edge as color spill cuts across the surface
-- let the final shot lock on the sealed fracture
 - pace the movement so the physical change becomes unavoidable
+- follow the visible result without forcing the action to stop
+
+Do not use "lingers", "holds" or "unresolved" as default closing language.
+When motion or interaction continues, name the continuing action or changing relationship instead.
 
 Every directorSummary must include at least one concrete directing decision:
-- camera hold
 - tracking choice
 - pacing choice
 - exposure choice
-- final-frame hold
 - surface-level observation
 - material reaction
+- continuous observation when the subject or environment remains active
 
 If the sentence explains the creative meaning instead of directing what appears on screen, rewrite it.
 
@@ -3525,10 +3529,10 @@ Stage 1:
 Establish the opening physical state of the Concept DNA with one clear visual condition.
 
 Stage 2:
-Show one irreversible physical change caused by Stage 1.
+Show one consequential concept-native change caused by Stage 1.
 
 Stage 3:
-Show the final consequence created by Stage 2, with a visibly different world behavior.
+Show what Stage 2 causes, with visibly different world behavior.
 
 Each stage must contain:
 - one concrete visual subject
@@ -3570,7 +3574,7 @@ Stage 2 must not be a stronger version of Stage 1.
 
 Stage 3 must not be a bigger version of Stage 2.
 
-The final stage must create a new physical rule, restriction or capability inside the Concept DNA world.
+The final stage must make the resulting condition, behavior or relationship observable inside the Concept DNA world.
 
 The narrativeArc must feel specific enough that it could not be reused for another Concept DNA.
 - Generate one narrativeArc.
@@ -3598,7 +3602,7 @@ Scene 2 cannot be a stronger version of Scene 1.
 
 Scene 3 cannot be a bigger version of Scene 2.
 
-Each scene must introduce a new narrative state.
+Each scene must introduce a new narrative condition, behavior or relation that changes what can happen next.
 
 Bad:
 
@@ -3620,7 +3624,7 @@ Avoid:
 - flow -> stronger flow
 - accumulation -> more accumulation
 
-Each stage must introduce a new physical condition.
+Each stage must introduce a new observable condition, behavior or relation.
 
 A later stage must not simply amplify an earlier stage.
 
@@ -3630,7 +3634,7 @@ Instead:
 
 Scene 1 creates a question.
 Scene 2 transforms the question.
-Scene 3 resolves, transcends or consequences the transformation.
+Scene 3 makes the consequence of the transformation observable.
 Scene Dependency Test
 
 Scene Purpose Rule
@@ -4120,7 +4124,7 @@ Sentence 1:
 Establish the Concept DNA as a cinematic visual world with concrete objects, materials, spatial relationships and atmosphere.
 
 Sentence 2:
-Describe the transformation and its direct consequence.
+Describe the transformation and its direct observable result.
 
 The reelConcept must not exceed 65 words.
 
@@ -4142,8 +4146,9 @@ Avoid overusing:
 
 Prefer:
 - one vivid visual setup
-- one clear physical change
-- one memorable final consequence
+- one clear concept-native change
+- one memorable visible outcome
+- a static conclusion only when it follows naturally from the preceding action
 
 The reelConcept should make the user immediately think:
 "I can picture this reel."
@@ -4848,7 +4853,52 @@ const genericCreativeArchetypeAnchorWords = [
   "inside",
   "while",
   "into",
-  "forms"
+  "forms",
+  "music",
+  "campaign",
+  "behavior",
+  "response",
+  "observation",
+  "atmosphere",
+  "texture",
+  "motion",
+  "continuity",
+  "sleek",
+  "silent",
+  "lone",
+  "scattered",
+  "rhythmic",
+  "collective",
+  "sunlit",
+  "underground",
+  "with",
+  "where",
+  "across",
+  "around",
+  "through",
+  "their",
+  "there",
+  "these",
+  "those",
+  "this",
+  "that",
+  "from",
+  "over",
+  "under",
+  "between",
+  "after",
+  "before",
+  "when",
+  "each",
+  "camera",
+  "frame",
+  "shot",
+  "sequence",
+  "result",
+  "change",
+  "changes",
+  "changing",
+  "viewer"
 ];
 
 const normalizeCreativeIdentityWord = (value) =>
@@ -4870,28 +4920,26 @@ const getSafeConceptWords = (concept) =>
     .filter((word) => !containsForbiddenTerm(word))
     .filter((word) => !containsForbiddenRoleTerm(word));
 
-const getCreativeArchetypeSourceText = (concept) => {
-  const visualDNA = data?.cinematicIdentity?.visualDNA;
+const getNarrativeArcText = () =>
+  data?.narrativeArc && typeof data.narrativeArc === "object"
+    ? Object.values(data.narrativeArc).join(" ")
+    : String(data?.narrativeArc || "");
 
-  const visualDNAText = Array.isArray(visualDNA)
-    ? visualDNA.join(" ")
-    : String(visualDNA || "");
+const getCreativeArchetypeProjectWordSet = () =>
+  new Set(
+    [artistName, trackName]
+      .filter(Boolean)
+      .join(" ")
+      .split(/[^a-zA-Z0-9]+/)
+      .map((word) => normalizeCreativeIdentityWord(word))
+      .filter((word) => word.length >= 3)
+  );
 
-  return [
-    concept,
-    data?.reelConcept,
-    data?.concept,
-    data?.thumbnailConcept,
-    visualDNAText
-  ]
-    .filter(Boolean)
-    .join(" ");
-};
-
-const getCreativeArchetypeAnchorWords = (concept) => {
+const extractCreativeArchetypeWords = (value) => {
   const uniqueWords = [];
+  const projectWords = getCreativeArchetypeProjectWordSet();
 
-  getCreativeArchetypeSourceText(concept)
+  String(value || "")
     .split(/[^a-zA-Z0-9]+/)
     .map((word) => word.trim())
     .filter((word) => word.length >= 4)
@@ -4900,6 +4948,9 @@ const getCreativeArchetypeAnchorWords = (concept) => {
         !genericCreativeArchetypeAnchorWords.includes(
           normalizeCreativeIdentityWord(word)
         )
+    )
+    .filter(
+      (word) => !projectWords.has(normalizeCreativeIdentityWord(word))
     )
     .filter((word) => !containsForbiddenTerm(word))
     .filter((word) => !containsForbiddenRoleTerm(word))
@@ -4918,46 +4969,175 @@ const getCreativeArchetypeAnchorWords = (concept) => {
       }
     });
 
-  return uniqueWords.slice(0, 16);
+  return uniqueWords;
 };
 
+const getCreativeArchetypeSourceText = (concept) => {
+  const visualDNA = data?.cinematicIdentity?.visualDNA;
+
+  const visualDNAText = Array.isArray(visualDNA)
+    ? visualDNA.join(" ")
+    : String(visualDNA || "");
+
+  return [
+    data?.reelConcept,
+    data?.concept,
+    data?.thumbnailConcept,
+    visualDNAText,
+    concept
+  ]
+    .filter(Boolean)
+    .join(" ");
+};
+
+const getCreativeArchetypeAnchorWords = (concept) =>
+  extractCreativeArchetypeWords(
+    getCreativeArchetypeSourceText(concept)
+  ).slice(0, 16);
+
 const getMeaningfulCreativeArchetypeWords = (value) =>
-  String(value || "")
-    .split(/[^a-zA-Z0-9]+/)
-    .map((word) => word.trim())
-    .filter((word) => word.length >= 4)
-    .filter(
-      (word) =>
-        !genericCreativeArchetypeAnchorWords.includes(
-          normalizeCreativeIdentityWord(word)
-        )
+  extractCreativeArchetypeWords(value);
+
+const creativeArchetypeBehaviorPatterns = [
+  [/\b(cascade|cascades|cascading)\b/i, "Cascades"],
+  [/\b(reconfigure|reconfigures|reconfiguring|reconfiguration)\b/i, "Reconfiguration"],
+  [/\b(scatter|scatters|scattering|disperse|disperses|dispersing|dispersion)\b/i, "Dispersion"],
+  [/\b(realign|realigns|realigning|realignment)\b/i, "Realignment"],
+  [/\b(redirect|redirects|redirecting|redirection)\b/i, "Redirection"],
+  [/\b(cross|crosses|crossing)\b/i, "Crossing"],
+  [/\b(descend|descends|descending|descent)\b/i, "Descent"],
+  [/\b(refract|refracts|refracting|refraction)\b/i, "Refraction"],
+  [/\b(circulate|circulates|circulating|circulation)\b/i, "Circulation"],
+  [/\b(transfer|transfers|transferring)\b/i, "Transfer"],
+  [/\b(spread|spreads|spreading|propagate|propagates|propagating|propagation)\b/i, "Propagation"],
+  [/\b(separate|separates|separating|regroup|regroups|regrouping)\b/i, "Reconfiguration"],
+  [/\b(bend|bends|bending|deflect|deflects|deflecting)\b/i, "Deflection"],
+  [/\b(rise|rises|rising|lift|lifts|lifting)\b/i, "Ascent"],
+  [/\b(drain|drains|draining)\b/i, "Drainage"],
+  [/\b(flood|floods|flooding)\b/i, "Flooding"],
+  [/\b(collapse|collapses|collapsing)\b/i, "Collapse"],
+  [/\b(invert|inverts|inverting|inversion)\b/i, "Inversion"],
+  [/\b(thicken|thickens|thickening|accumulate|accumulates|accumulating)\b/i, "Accumulation"],
+  [/\b(?:crowd|figures|bodies|members)\s+(?:part|parts|parting)\b/i, "Opening"],
+  [/\b(opens|opened|opening)\b/i, "Opening"]
+];
+
+const getCreativeArchetypeBehaviorLabel = () => {
+  const stage3Source =
+    data?.narrativeArc && typeof data.narrativeArc === "object"
+      ? String(data.narrativeArc.stage3 || "")
+      : String(data?.narrativeArc || "");
+
+  const directorSentences =
+    String(data?.directorSummary || "").match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [];
+  const fallbackSource = directorSentences.length
+    ? directorSentences[directorSentences.length - 1]
+    : "";
+
+  const findLabel = (source) => {
+    const match = creativeArchetypeBehaviorPatterns.find(([pattern]) =>
+      pattern.test(String(source || ""))
     );
 
+    return match ? match[1] : "";
+  };
+
+  return findLabel(stage3Source) || findLabel(fallbackSource);
+};
+
 const buildIdentityFallback = (concept) => {
-  const anchorWords = getCreativeArchetypeAnchorWords(concept);
+  const visualDNA = data?.cinematicIdentity?.visualDNA;
+  const visualDNAText = Array.isArray(visualDNA)
+    ? visualDNA.join(" ")
+    : String(visualDNA || "");
 
-  const first = anchorWords[0] || "Material";
-  const second = anchorWords[1] || "Pressure";
+  const subjectWords = extractCreativeArchetypeWords(
+    [
+      data?.reelConcept,
+      visualDNAText,
+      data?.thumbnailConcept,
+      data?.concept,
+      concept
+    ]
+      .filter(Boolean)
+      .join(" ")
+  );
 
-  const archetypeEndings = [
-    "World Behavior",
-    "Material Response",
-    "Surface Drift",
-    "Camera Observation",
-    "Atmosphere Study",
-    "Texture Movement",
-    "Pressure Field",
-    "World Fragment",
-    "Motion Continuity",
-    "Visible Condition"
-  ];
+  const stage3Text =
+    data?.narrativeArc && typeof data.narrativeArc === "object"
+      ? String(data.narrativeArc.stage3 || "")
+      : String(data?.narrativeArc || "");
 
-  const ending =
-    archetypeEndings[
-      Math.floor(Math.random() * archetypeEndings.length)
-    ];
+  const consequenceWords = extractCreativeArchetypeWords(stage3Text);
+  const behaviorLabel = getCreativeArchetypeBehaviorLabel();
+  const selectedWords = [];
 
-  return `${toTitleWord(first)} ${toTitleWord(second)} ${ending}`;
+  const addUniqueWord = (word) => {
+    const titleWord = toTitleWord(word);
+    const normalizedWord = normalizeCreativeIdentityWord(titleWord);
+
+    if (
+      !normalizedWord ||
+      selectedWords.some(
+        (existingWord) =>
+          normalizeCreativeIdentityWord(existingWord) === normalizedWord
+      )
+    ) {
+      return;
+    }
+
+    selectedWords.push(titleWord);
+  };
+
+  subjectWords.slice(0, 2).forEach(addUniqueWord);
+  addUniqueWord(behaviorLabel);
+
+  if (selectedWords.length < 3) {
+    consequenceWords.forEach((word) => {
+      if (selectedWords.length < 3) addUniqueWord(word);
+    });
+  }
+
+  if (selectedWords.length < 2) {
+    getCreativeArchetypeAnchorWords(concept).forEach((word) => {
+      if (selectedWords.length < 2) addUniqueWord(word);
+    });
+  }
+
+  if (selectedWords.length < 2) {
+    extractCreativeArchetypeWords(
+      data?.cinematicIdentity?.projectCodename
+    ).forEach((word) => {
+      if (selectedWords.length < 2) addUniqueWord(word);
+    });
+  }
+
+  return selectedWords.slice(0, 3).join(" ");
+};
+
+const genericCreativeArchetypePhrases = [
+  "world behavior",
+  "material response",
+  "surface drift",
+  "camera observation",
+  "atmosphere study",
+  "texture movement",
+  "pressure field",
+  "world fragment",
+  "motion continuity",
+  "visible condition"
+];
+
+const creativeArchetypeContainsProjectWord = (value) => {
+  const projectWords = getCreativeArchetypeProjectWordSet();
+  const valueWords = new Set(
+    String(value || "")
+      .split(/[^a-zA-Z0-9]+/)
+      .map((word) => normalizeCreativeIdentityWord(word))
+      .filter(Boolean)
+  );
+
+  return [...projectWords].some((word) => valueWords.has(word));
 };
 
 const isGenericCreativeArchetype = (value) => {
@@ -4970,7 +5150,10 @@ const isGenericCreativeArchetype = (value) => {
     normalized === "framelab identity" ||
     normalized === "frame lab identity" ||
     normalized.includes("concept-native") ||
-    normalized.includes("concept native")
+    normalized.includes("concept native") ||
+    genericCreativeArchetypePhrases.some((phrase) =>
+      normalized.includes(phrase)
+    )
   );
 };
 
@@ -5195,14 +5378,12 @@ const buildSnowflakeSignature = (identity, concept) => {
       .map((word) => word.toLowerCase())
       .filter(Boolean);
 
-    const primary = anchorWords[0] || "material";
-    const secondary = anchorWords[1] || "surface";
-    const tertiary = anchorWords[2] || primary;
+    const focusPhrase = anchorWords.slice(0, 2).join(" ") || "main subject";
 
     return [
-      `attention fixed on the ${primary} change as it visibly alters the frame`,
-      `unease as the ${secondary} structure tightens and prevents the motion from resolving`,
-      "attention held by the unresolved visible condition and its physical tension",
+      `the viewer follows the visible change around the ${focusPhrase}`,
+      `the viewer notices how nearby elements respond to the ${focusPhrase}`,
+      `the viewer reads the concluding relationship between the ${focusPhrase} and its surroundings`,
     ];
   };
 
@@ -5219,6 +5400,229 @@ const buildSnowflakeSignature = (identity, concept) => {
 
       return item;
     });
+  };
+
+  const genericEmotionalToneAnchorWords = new Set([
+    "spatial",
+    "motion",
+    "light",
+    "surface",
+    "surfaces",
+    "scene",
+    "visual",
+    "visible",
+    "tone",
+    "tonal",
+    "ambient",
+    "kinetic",
+    "physical",
+    "rhythmic",
+    "balance",
+    "pressure",
+    "release",
+    "tension",
+    "suspended",
+    "suspension",
+    "compression",
+    "compressed",
+    "trapped",
+    "unresolved",
+  ]);
+
+  const getEmotionalToneSources = () => {
+    const visualDNA = data?.cinematicIdentity?.visualDNA;
+    const visualDNAFirst = Array.isArray(visualDNA)
+      ? visualDNA[0]
+      : visualDNA;
+
+    return [
+      String(visualDNAFirst || ""),
+      String(data?.narrativeArc?.stage2 || ""),
+      String(data?.narrativeArc?.stage3 || ""),
+    ];
+  };
+
+  const getSpecificEmotionalToneAnchors = (value) =>
+    extractCreativeArchetypeWords(value)
+      .map((word) => normalizeCreativeIdentityWord(word))
+      .filter(
+        (word) =>
+          word.length >= 4 &&
+          !genericEmotionalToneAnchorWords.has(word)
+      );
+
+  const countSpecificEmotionalToneAnchors = (value) => {
+    const normalizedValue = String(value || "").toLowerCase();
+    const sourceAnchors = [
+      ...new Set(
+        getEmotionalToneSources().flatMap((source) =>
+          getSpecificEmotionalToneAnchors(source)
+        )
+      ),
+    ];
+
+    return sourceAnchors.filter((word) =>
+      new RegExp(`\\b${escapeRegExp(word)}\\b`, "i").test(normalizedValue)
+    ).length;
+  };
+
+  const hasAbstractEmotionalToneBias = (value) => {
+    const normalizedValue = String(value || "").toLowerCase();
+    const biasTerms = [
+      "suspended kinetic balance",
+      "physical tension",
+      "tactile tension",
+      "spatial compression",
+      "elastic spatial compression",
+      "pressure release",
+      "ambient solar pressure release",
+      "rhythmic pressure",
+      "trapped",
+      "unresolved",
+    ];
+
+    const hasBias = biasTerms.some((term) =>
+      normalizedValue.includes(term)
+    );
+
+    return hasBias && countSpecificEmotionalToneAnchors(value) < 2;
+  };
+
+  const getMoodToneWord = () => {
+    const moodSource = String(mood || "").toLowerCase();
+
+    if (/dark|nocturnal|cold|tense/.test(moodSource)) return "restrained";
+    if (/euphoric|lift|hope|festival/.test(moodSource)) return "expansive";
+    if (/warm|romantic|tender/.test(moodSource)) return "warm";
+    if (/melancholic|lonely|nostalgia/.test(moodSource)) return "reflective";
+    if (/hypnotic|dreamlike|mystic|surreal/.test(moodSource)) return "immersive";
+    if (/confident|arrival/.test(moodSource)) return "assured";
+
+    return "measured";
+  };
+
+  const buildEmotionalToneFallbacks = () => {
+    const toneWord = getMoodToneWord();
+    const sourcePhrases = getEmotionalToneSources().map((source, index) => {
+      const anchors = getSpecificEmotionalToneAnchors(source).slice(0, 2);
+
+      if (anchors.length) return anchors.join(" ");
+
+      return index === 0
+        ? "concept-native material"
+        : index === 1
+          ? "mid-stage action"
+          : "concluding relation";
+    });
+
+    return [
+      `${toneWord} focus through ${sourcePhrases[0]}`,
+      `${toneWord} pacing around ${sourcePhrases[1]}`,
+      `${toneWord} presence within ${sourcePhrases[2]}`,
+    ];
+  };
+
+  const repairEmotionalToneList = (items) => {
+    const fallbackItems = buildEmotionalToneFallbacks();
+    const sourceItems = Array.isArray(items) ? items : [];
+
+    return [0, 1, 2].map((index) => {
+      const item = String(sourceItems[index] || "").trim();
+
+      if (!item || hasAbstractEmotionalToneBias(item)) {
+        return fallbackItems[index];
+      }
+
+      return item;
+    });
+  };
+
+  const cleanRhythmDescriptor = (value) =>
+    String(value || "")
+      .replace(/\bunresolved\b/gi, "")
+      .replace(/^\s*but\s+/i, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+  const repairDirectorSummaryEnding = (value) => {
+    const source = String(value || "").trim();
+
+    if (!source) return source;
+
+    const sentences =
+      source.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [source];
+    const lastIndex = sentences.length - 1;
+    const originalLastSentence = sentences[lastIndex];
+    let repairedLastSentence = originalLastSentence.trim();
+
+    repairedLastSentence = repairedLastSentence.replace(
+      /^The final composition holds on\s+(.+?),\s*leaving\s+(.+?)\s+unresolved(?:\s+yet\s+(.+?))?([.!?])?$/i,
+      (match, subject, effect, qualifier, punctuation) =>
+        `The final composition keeps ${subject.trim()} in view as the visible elements around it continue to shift${punctuation || "."}`
+    );
+
+    repairedLastSentence = repairedLastSentence.replace(
+      /^The final composition holds on\s+(.+?)([.!?])?$/i,
+      (match, subject, punctuation) =>
+        `The final composition keeps ${subject.trim()} in view as the visible elements around it continue to shift${punctuation || "."}`
+    );
+
+    repairedLastSentence = repairedLastSentence.replace(
+      /^The camera holds on\s+(.+?)\s+suspended in slow motion,\s*their shapes(?:\s+are)?\s+([^,.]+?)\s+by\s+(.+?)([.!?])?$/i,
+      (match, subject, change, cause, punctuation) =>
+        `The camera follows ${subject.trim()} as ${cause.trim()} continues to alter their shapes${punctuation || "."}`
+    );
+
+    repairedLastSentence = repairedLastSentence.replace(
+      /^The camera holds on\s+(.+?),\s*their shapes(?:\s+are)?\s+([^,.]+?)\s+by\s+(.+?)([.!?])?$/i,
+      (match, subject, change, cause, punctuation) =>
+        `The camera keeps ${subject.trim()} in view as ${cause.trim()} continues to alter their shapes${punctuation || "."}`
+    );
+
+    repairedLastSentence = repairedLastSentence.replace(
+      /^The camera holds on\s+(.+?)([.!?])?$/i,
+      (match, subject, punctuation) =>
+        `The camera keeps ${subject.trim()} in view as the active movement continues${punctuation || "."}`
+    );
+
+    repairedLastSentence = repairedLastSentence.replace(
+      /\bculminating in suspended\s+([^,.]+?)\s+that hold an unresolved(?:\s+but)?\s+([^,.]+?)\s+rhythm([.!?])?$/i,
+      (match, subject, descriptor, punctuation) => {
+        const cleanedDescriptor =
+          cleanRhythmDescriptor(descriptor) || "measured";
+
+        return `with ${subject.trim()} continuing to shift in a ${cleanedDescriptor} rhythm${punctuation || "."}`;
+      }
+    );
+
+    repairedLastSentence = repairedLastSentence.replace(
+      /^([^,.]+?)\s+hold an unresolved(?:\s+but)?\s+([^,.]+?)\s+rhythm([.!?])?$/i,
+      (match, subject, descriptor, punctuation) => {
+        const cleanedDescriptor =
+          cleanRhythmDescriptor(descriptor) || "measured";
+
+        const normalizedSubject = subject
+          .trim()
+          .replace(/^./, (character) => character.toLowerCase());
+
+        return `The sequence keeps ${normalizedSubject} shifting in a ${cleanedDescriptor} rhythm${punctuation || "."}`;
+      }
+    );
+
+    repairedLastSentence = repairedLastSentence.replace(
+      /,\s*leaving\s+([^,.]+?)\s+unresolved(?:\s+yet\s+[^.!?]+)?([.!?])?$/i,
+      (match, subject, punctuation) =>
+        `, with ${subject.trim()} continuing to change${punctuation || "."}`
+    );
+
+    if (repairedLastSentence === originalLastSentence.trim()) {
+      return source;
+    }
+
+    const leadingWhitespace = originalLastSentence.match(/^\s*/)?.[0] || "";
+    sentences[lastIndex] = `${leadingWhitespace}${repairedLastSentence}`;
+
+    return sentences.join("").replace(/\s+/g, " ").trim();
   };
 
 if (!data.cinematicIdentity) {
@@ -5238,6 +5642,9 @@ if (
 if (
   !data.cinematicIdentity.creativeArchetype ||
   isGenericCreativeArchetype(data.cinematicIdentity.creativeArchetype) ||
+  creativeArchetypeContainsProjectWord(
+    data.cinematicIdentity.creativeArchetype
+  ) ||
   !creativeArchetypeContainsConceptLanguage(
     data.cinematicIdentity.creativeArchetype,
     selectedConceptDNA
@@ -5275,6 +5682,10 @@ if (
     selectedConceptDNA
   );
 
+  data.cinematicIdentity.emotionalTone = repairEmotionalToneList(
+    data.cinematicIdentity.emotionalTone
+  );
+
 
 console.log(
   "FINAL CREATIVE ARCHETYPE:",
@@ -5309,15 +5720,15 @@ const cleanAiVideoPromptText = (value) => {
     [/\bimplying\b/gi, "showing"],
     [/\bevoking\b/gi, "showing"],
     [/\breinforcing\b/gi, "showing"],
-    [/\brewrite(?:s|ing)? physical rules\b/gi, "surfaces continue evolving into a visible arrangement"],
+    [/\brewrite(?:s|ing)? physical rules\b/gi, "surfaces continue changing visibly"],
     [/\bgravity loses its hold\b/gi, "objects continue subtle motion"],
     [/\breality bends\b/gi, "surfaces bend into a visible new shape"],
     [/\btime freezes\b/gi, "movement continues in reduced form"],
-    [/\bthe scene transforms into tension\b/gi, "the materials settle into a visible arrangement"],
-    [/\bthe moment becomes symbolic\b/gi, "the final frame holds on the visible material state"],
-    [/\bthe image captures emotion\b/gi, "the final frame holds on the visible material state"],
+    [/\bthe scene transforms into tension\b/gi, "the material behavior creates a visible consequence"],
+    [/\bthe moment becomes symbolic\b/gi, "the visible consequence emerges through material behavior"],
+    [/\bthe image captures emotion\b/gi, "the image shows the material consequence"],
     [/\bthe frame represents\b/gi, "continues as visible behavior"],
-    [/\bthe shot embodies\b/gi, "the shot holds on"],
+    [/\bthe shot embodies\b/gi, "the shot shows"],
     [/\bthe sequence reveals meaning\b/gi, "the sequence continues through a visible material evolution"],
   ];
 
@@ -7857,9 +8268,1636 @@ if (finalProfessionalHashtags) {
 }
 
 
+if (data?.directorSummary) {
+  data.directorSummary = repairDirectorSummaryEnding(
+    data.directorSummary
+  );
+  data.directorNotes = data.directorSummary;
+}
+
+
+const semanticRepairableFields = new Set([
+  "reelConcept",
+  "directorSummary",
+  "narrativeArc.stage1",
+  "narrativeArc.stage2",
+  "narrativeArc.stage3",
+  "aiVideoPrompt",
+  "cinematicIdentity.emotionalTone",
+  "cinematicIdentity.creativeArchetype",
+  "captions.mainCaption",
+  "captions.instagramCaption",
+  "captions.tiktokCaption",
+  "captions.youtubeShortsCaption",
+]);
+
+const semanticCaptionAliasPaths = new Set([
+  "caption",
+  "mainCaption",
+  "instagramCaption",
+  "tiktokCaption",
+  "youtubeShorts",
+  "youtubeShortsCaption",
+  "youtubeShortsText",
+  "youtubeCaption",
+  "youtubeCaptionText",
+  "youtube",
+  "shorts",
+  "shortsCaption",
+  "shortCaption",
+  "youtube_shorts",
+  "youtube_shorts_caption",
+  "youtube_short",
+  "youtube_short_caption",
+  "captions.main",
+  "captions.instagram",
+  "captions.tiktok",
+  "captions.youtubeShorts",
+  "captions.youtubeCaption",
+  "captions.youtube",
+  "captions.youtubeShortsText",
+  "captions.shorts",
+  "captions.shortsCaption",
+  "captions.shortCaption",
+  "captions.youtube_shorts",
+  "captions.youtube_shorts_caption",
+  "captions.youtube_short",
+  "captions.youtube_short_caption",
+]);
+
+const cloneSemanticCandidate = (value) =>
+  JSON.parse(JSON.stringify(value || {}));
+
+const getPathValue = (source, path) =>
+  String(path || "")
+    .split(".")
+    .filter(Boolean)
+    .reduce(
+      (current, key) =>
+        current && Object.prototype.hasOwnProperty.call(current, key)
+          ? current[key]
+          : undefined,
+      source
+    );
+
+const setPathValue = (target, path, value) => {
+  const keys = String(path || "").split(".").filter(Boolean);
+  let current = target;
+
+  keys.forEach((key, index) => {
+    if (index === keys.length - 1) {
+      current[key] = value;
+      return;
+    }
+
+    if (
+      !current[key] ||
+      typeof current[key] !== "object" ||
+      Array.isArray(current[key])
+    ) {
+      current[key] = {};
+    }
+
+    current = current[key];
+  });
+};
+
+const flattenSemanticCandidate = (value, prefix = "", output = {}) => {
+  if (
+    value === null ||
+    typeof value !== "object" ||
+    Array.isArray(value)
+  ) {
+    output[prefix] = JSON.stringify(value);
+    return output;
+  }
+
+  Object.keys(value)
+    .sort()
+    .forEach((key) => {
+      const nextPath = prefix ? `${prefix}.${key}` : key;
+      flattenSemanticCandidate(value[key], nextPath, output);
+    });
+
+  return output;
+};
+
+const replaceSemanticCandidateContents = (target, source) => {
+  Object.keys(target).forEach((key) => {
+    delete target[key];
+  });
+
+  Object.assign(target, cloneSemanticCandidate(source));
+};
+
+const getSemanticText = (value) => {
+  if (Array.isArray(value)) return value.join(" ");
+  if (value && typeof value === "object") {
+    return Object.values(value).map(getSemanticText).join(" ");
+  }
+  return String(value || "");
+};
+
+const getLastSentence = (value) => {
+  const sentences =
+    String(value || "").trim().match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [];
+  return String(sentences[sentences.length - 1] || "").trim();
+};
+
+const semanticGenericAnchorWords = new Set([
+  "about",
+  "across",
+  "after",
+  "again",
+  "against",
+  "around",
+  "between",
+  "camera",
+  "cinematic",
+  "concept",
+  "condition",
+  "during",
+  "effect",
+  "elements",
+  "final",
+  "frame",
+  "light",
+  "material",
+  "motion",
+  "movement",
+  "scene",
+  "spatial",
+  "stage",
+  "surface",
+  "through",
+  "transformation",
+  "visible",
+  "visual",
+  "while",
+  "with",
+  "world",
+  "tension",
+  "stillness",
+  "suspension",
+  "suspended",
+  "compression",
+  "compressed",
+  "containment",
+  "contained",
+  "pressure",
+  "balance",
+  "anticipation",
+  "release",
+  "unresolved",
+  "kinetic",
+  "atmosphere",
+  "ambient",
+]);
+
+
+const extractSemanticAnchors = (value) =>
+  String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, " ")
+    .split(/[\s-]+/)
+    .map((word) => word.trim())
+    .filter((word) => word.length >= 4)
+    .filter((word) => !semanticGenericAnchorWords.has(word));
+
+const getConceptAnchorSet = (candidate) => {
+  const visualDNA = candidate?.cinematicIdentity?.visualDNA;
+  const stage2 = candidate?.narrativeArc?.stage2;
+  const stage3 = candidate?.narrativeArc?.stage3;
+
+  return new Set(
+    [
+      ...(Array.isArray(visualDNA) ? visualDNA : [visualDNA]),
+      stage2,
+      stage3,
+      selectedConceptDNA,
+      selectedMusicFacingSubjectStrategy,
+      selectedMusicFacingWorldIntelligence,
+    ]
+      .filter(Boolean)
+      .flatMap(extractSemanticAnchors)
+  );
+};
+
+const countAnchorOverlap = (value, anchorSet) =>
+  Array.from(new Set(extractSemanticAnchors(value))).filter((word) =>
+    anchorSet.has(word)
+  ).length;
+
+const getCanonicalCaptionValues = (candidate) => {
+  const captions = candidate?.captions || {};
+
+  return {
+    "captions.mainCaption":
+      captions.mainCaption ||
+      captions.main ||
+      candidate?.mainCaption ||
+      candidate?.caption ||
+      "",
+    "captions.instagramCaption":
+      captions.instagramCaption ||
+      captions.instagram ||
+      candidate?.instagramCaption ||
+      captions.mainCaption ||
+      candidate?.mainCaption ||
+      candidate?.caption ||
+      "",
+    "captions.tiktokCaption":
+      captions.tiktokCaption ||
+      captions.tiktok ||
+      candidate?.tiktokCaption ||
+      "",
+    "captions.youtubeShortsCaption":
+      captions.youtubeShortsCaption ||
+      captions.shortsCaption ||
+      captions.youtubeShorts ||
+      captions.youtubeCaption ||
+      candidate?.youtubeShortsCaption ||
+      candidate?.shortsCaption ||
+      candidate?.youtubeShorts ||
+      "",
+  };
+};
+
+const syncSemanticAliases = (candidate, changedPaths) => {
+  if (changedPaths.has("directorSummary")) {
+    candidate.directorNotes = candidate.directorSummary;
+  }
+
+  const captionChanged = Array.from(changedPaths).some((path) =>
+    path.startsWith("captions.")
+  );
+
+  if (!captionChanged) return;
+
+  const values = getCanonicalCaptionValues(candidate);
+  const mainCaption = String(values["captions.mainCaption"] || "");
+  const instagramCaption = String(
+    values["captions.instagramCaption"] || mainCaption
+  );
+  const tiktokCaption = String(values["captions.tiktokCaption"] || "");
+  const youtubeShortsCaption = String(
+    values["captions.youtubeShortsCaption"] || ""
+  );
+
+  candidate.captions = {
+    ...(candidate.captions || {}),
+    mainCaption,
+    main: mainCaption,
+    instagramCaption,
+    instagram: instagramCaption,
+    tiktokCaption,
+    tiktok: tiktokCaption,
+    youtubeShorts: youtubeShortsCaption,
+    youtubeShortsCaption,
+    youtubeCaption: youtubeShortsCaption,
+    youtube: youtubeShortsCaption,
+    youtubeShortsText: youtubeShortsCaption,
+    shorts: youtubeShortsCaption,
+    shortsCaption: youtubeShortsCaption,
+    shortCaption: youtubeShortsCaption,
+    youtube_shorts: youtubeShortsCaption,
+    youtube_shorts_caption: youtubeShortsCaption,
+    youtube_short: youtubeShortsCaption,
+    youtube_short_caption: youtubeShortsCaption,
+  };
+
+  candidate.caption = mainCaption;
+  candidate.mainCaption = mainCaption;
+  candidate.instagramCaption = instagramCaption;
+  candidate.tiktokCaption = tiktokCaption;
+  candidate.youtubeShorts = youtubeShortsCaption;
+  candidate.youtubeShortsCaption = youtubeShortsCaption;
+  candidate.youtubeShortsText = youtubeShortsCaption;
+  candidate.youtubeCaption = youtubeShortsCaption;
+  candidate.youtubeCaptionText = youtubeShortsCaption;
+  candidate.youtube = youtubeShortsCaption;
+  candidate.shorts = youtubeShortsCaption;
+  candidate.shortsCaption = youtubeShortsCaption;
+  candidate.shortCaption = youtubeShortsCaption;
+  candidate.youtube_shorts = youtubeShortsCaption;
+  candidate.youtube_shorts_caption = youtubeShortsCaption;
+  candidate.youtube_short = youtubeShortsCaption;
+  candidate.youtube_short_caption = youtubeShortsCaption;
+};
+
+const semanticQualityAudit = (candidate) => {
+  const issues = [];
+  const anchorSet = getConceptAnchorSet(candidate);
+  const captions = getCanonicalCaptionValues(candidate);
+
+  const coreFields = {
+    reelConcept: candidate?.reelConcept,
+    directorSummary: candidate?.directorSummary,
+    "narrativeArc.stage3": candidate?.narrativeArc?.stage3,
+    aiVideoPrompt: candidate?.aiVideoPrompt,
+    ...captions,
+  };
+
+  const explicitEndingPattern =
+    /\b(?:final (?:shot|composition|frame)|shot ends|sequence ends|ends with|culminat(?:e|es|ing)|concludes? with)\b/i;
+  const staticClosurePattern =
+    /\b(?:suspend(?:ed|ing)?(?:\s+[a-z-]+){0,3}\s+(?:light|fragments?|ripples?|motion|dust|particles?|trails?|forms?|shapes?)|(?:fragments?|light|motion|dust|particles?|trails?)\s+(?:remain|remains|become|becomes|stay|stays)\s+suspended|(?:light|material|motion|fragments?|particles?)\s+settles?\s+into\s+(?:a\s+)?(?:fixed|static|still|locked)\s+(?:arrangement|formation|state)|unresolved\s+(?:spatial\s+)?balance|without\s+resolution|in\s+stasis|locked\s+(?:arrangement|formation|state)|frozen\s+(?:arrangement|formation|state))\b/i;
+  const persistenceFixationPattern =
+    /\b(?:linger(?:s|ed|ing)?|hold(?:s|ing)?|remain(?:s|ed|ing)?|settle(?:s|d|ing)?|pause(?:s|d|ing)?|anchor(?:s|ed|ing)?)\b/i;
+  const abstractEndStatePattern =
+    /\b(?:balance|tension|transformation|stillness|unresolved\s+(?:visible\s+)?condition|unresolved\s+(?:spatial\s+)?state|rhythm)\b/i;
+  const concreteContinuationPattern =
+    /\b(?:continues?\s+(?:crossing|moving|shifting|spreading|traveling|flowing|weaving|sliding|cascading|changing|circulating|transferring|dispersing)|(?:smoke|particles?|fabric|light|crowd|performer|subject|object|dust|water|wind|shadows?)\s+(?:continues?|keeps?)\s+(?:crossing|moving|shifting|spreading|traveling|flowing|weaving|sliding|cascading|changing|circulating|transferring|dispersing))\b/i;
+  const activeConsequencePattern =
+    /\b(?:continues?|keeps?|moves?|shifts?|changes?|travels?|crosses?|slides?|cascades?|responds?|alters?|opens?|closes?|separates?|regroups?|redirects?|reveals?|passes?|spreads?|weaves?|ripples?|peels?|realigns?|circulates?|transfers?|disperses?)\b/i;
+  const visibleCausePattern =
+    /\b(?:because|caus(?:e|es|ed|ing)|as|when|after|through|under|from|by|forcing|prompting|triggering|driven)\b/i;
+
+  const captionPaths = new Set([
+    "captions.mainCaption",
+    "captions.instagramCaption",
+    "captions.tiktokCaption",
+    "captions.youtubeShortsCaption",
+  ]);
+
+  const fieldSignals = Object.entries(coreFields)
+    .map(([field, value]) => {
+      const textValue = String(value || "").trim();
+      const lastSentence = getLastSentence(textValue);
+      const fieldIsStage3 = field === "narrativeArc.stage3";
+      const fieldIsCaption = captionPaths.has(field);
+      const fieldUsesLastSentenceAsEnding = [
+        "reelConcept",
+        "directorSummary",
+        "narrativeArc.stage3",
+        "aiVideoPrompt",
+      ].includes(field) || fieldIsCaption;
+      const hasExplicitEnding = explicitEndingPattern.test(lastSentence);
+      const staticClosure =
+        staticClosurePattern.test(lastSentence) ||
+        ((fieldIsStage3 || fieldIsCaption) &&
+          staticClosurePattern.test(textValue));
+      const persistenceClosure =
+        (hasExplicitEnding || fieldUsesLastSentenceAsEnding) &&
+        persistenceFixationPattern.test(lastSentence) &&
+        abstractEndStatePattern.test(lastSentence) &&
+        !concreteContinuationPattern.test(lastSentence);
+      const problematicEnding =
+        (staticClosure &&
+          (hasExplicitEnding || fieldIsStage3 || fieldIsCaption)) ||
+        persistenceClosure;
+      const hasActiveConsequence = activeConsequencePattern.test(
+        lastSentence || textValue
+      );
+      const hasVisibleCause =
+        visibleCausePattern.test(textValue) &&
+        activeConsequencePattern.test(textValue);
+
+      return {
+        field,
+        value: textValue,
+        lastSentence,
+        problematicEnding,
+        staticClosure,
+        hasActiveConsequence,
+        hasVisibleCause,
+      };
+    })
+    .filter((entry) => entry.value);
+
+  const emotionalTone = Array.isArray(
+    candidate?.cinematicIdentity?.emotionalTone
+  )
+    ? candidate.cinematicIdentity.emotionalTone
+    : [];
+
+  const abstractBiasTokenPattern =
+    /\b(?:tension|stillness|suspension|suspended|compression|compressed|containment|contained|trapped|unresolved|anticipation|pressure|balance|release|kinetic|stasis)\b/gi;
+  const compoundAbstractBiasPattern =
+    /\b(?:anchored\s+tension\s+within\s+stillness|contained\s+kinetic\s+anticipation|luxury-induced\s+release\s+tension|suspended\s+kinetic\s+balance|elastic\s+spatial\s+compression|ambient\s+solar\s+pressure\s+release|tactile\s+tension\s+through\s+blurred\s+motion)\b/i;
+
+  const abstractToneItems = emotionalTone
+    .map((item, index) => {
+      const value = String(item || "").trim();
+      const biasMatches = (value.match(abstractBiasTokenPattern) || [])
+        .length;
+      const anchorCount = countAnchorOverlap(value, anchorSet);
+
+      return {
+        index,
+        value,
+        biasMatches,
+        anchorCount,
+        compoundBias:
+          compoundAbstractBiasPattern.test(value) || biasMatches >= 2,
+      };
+    })
+    .filter(
+      (item) =>
+        item.compoundBias &&
+        item.anchorCount < 2
+    );
+
+  const moodSource = String(mood || "").toLowerCase();
+  const moodMismatchItems = emotionalTone
+    .map((item, index) => ({
+      index,
+      value: String(item || "").trim(),
+    }))
+    .filter(({ value }) => {
+      const lowerValue = value.toLowerCase();
+
+      if (/dark|nocturnal|cold|elegance|tense/.test(moodSource)) {
+        return /\b(?:euphoric|joyful|uplifting)\b/.test(lowerValue);
+      }
+
+      if (/euphoric|lift|hope|festival|warm/.test(moodSource)) {
+        return /\b(?:dread|oppressive|claustrophobic|despair)\b/.test(
+          lowerValue
+        );
+      }
+
+      return false;
+    });
+
+  const staticFields = fieldSignals.filter(
+    (entry) => entry.problematicEnding
+  );
+
+  const uniqueStaticEvidence = [];
+  const seenStaticEvidence = new Set();
+
+  staticFields.forEach((entry) => {
+    const normalizedExcerpt = entry.lastSentence
+      .toLowerCase()
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (!seenStaticEvidence.has(normalizedExcerpt)) {
+      seenStaticEvidence.add(normalizedExcerpt);
+      uniqueStaticEvidence.push(entry);
+    }
+  });
+
+  if (staticFields.length > 0) {
+    const fields = staticFields.map((entry) => entry.field);
+    const hasProblematicCaption = staticFields.some((entry) =>
+      captionPaths.has(entry.field)
+    );
+
+    if (hasProblematicCaption) {
+      captionPaths.forEach((path) => fields.push(path));
+    }
+
+    if (abstractToneItems.length > 0) {
+      fields.push("cinematicIdentity.emotionalTone");
+    }
+
+    issues.push({
+      code: "CROSS_FIELD_STATIC_CLOSURE",
+      severity: Math.min(
+        8,
+        2 +
+          uniqueStaticEvidence.length +
+          (abstractToneItems.length > 0 ? 1 : 0)
+      ),
+      fields: Array.from(new Set(fields)),
+      evidence: [
+        ...uniqueStaticEvidence.map((entry) => ({
+          field: entry.field,
+          excerpt: entry.lastSentence.slice(0, 240),
+        })),
+        ...abstractToneItems.map((item) => ({
+          field: `cinematicIdentity.emotionalTone.${item.index}`,
+          excerpt: item.value,
+        })),
+      ],
+      signals: {
+        problematicEnding: true,
+        missingObservableContinuation: staticFields.filter(
+          (entry) => !entry.hasActiveConsequence
+        ).length,
+        repeatedAcrossFields: uniqueStaticEvidence.length,
+        stage2Stage3Contradiction: false,
+        missingVisibleCause: staticFields.filter(
+          (entry) => !entry.hasVisibleCause
+        ).length,
+        captionAliasCount: staticFields.filter((entry) =>
+          captionPaths.has(entry.field)
+        ).length,
+        uniqueCaptionEvidenceCount: new Set(
+          staticFields
+            .filter((entry) => captionPaths.has(entry.field))
+            .map((entry) =>
+              entry.value.toLowerCase().replace(/\s+/g, " ").trim()
+            )
+        ).size,
+      },
+    });
+  }
+
+  const stage2 = String(candidate?.narrativeArc?.stage2 || "");
+  const stage3 = String(candidate?.narrativeArc?.stage3 || "");
+  const stage2Active = activeConsequencePattern.test(stage2);
+  const stage3Active = activeConsequencePattern.test(stage3);
+  const stage3Problematic = staticClosurePattern.test(stage3);
+  const stage3AnchorSet = new Set(extractSemanticAnchors(stage3));
+  const sharedStageAnchors = extractSemanticAnchors(stage2).filter(
+    (word) => stage3AnchorSet.has(word)
+  );
+
+  if (
+    stage2Active &&
+    (stage3Problematic || !stage3Active) &&
+    sharedStageAnchors.length < 2
+  ) {
+    issues.push({
+      code: "STAGE_CAUSAL_CONTRADICTION",
+      severity: 5,
+      fields: ["narrativeArc.stage3"],
+      evidenceFields: ["narrativeArc.stage2", "narrativeArc.stage3"],
+      repairFields: ["narrativeArc.stage3"],
+      contextFields: ["narrativeArc.stage2"],
+      evidence: [
+        { field: "narrativeArc.stage2", excerpt: stage2.slice(0, 240) },
+        { field: "narrativeArc.stage3", excerpt: stage3.slice(0, 240) },
+      ],
+      signals: {
+        problematicEnding: stage3Problematic,
+        missingObservableContinuation: !stage3Active,
+        repeatedAcrossFields: 0,
+        stage2Stage3Contradiction: true,
+        missingVisibleCause: !visibleCausePattern.test(stage3),
+      },
+    });
+  }
+
+  const missingCauseFields = fieldSignals.filter(
+    (entry) =>
+      [
+        "reelConcept",
+        "directorSummary",
+        "narrativeArc.stage3",
+        "aiVideoPrompt",
+      ].includes(entry.field) &&
+      !entry.hasVisibleCause &&
+      countAnchorOverlap(entry.value, anchorSet) < 2
+  );
+
+  if (missingCauseFields.length >= 2) {
+    issues.push({
+      code: "MISSING_VISIBLE_CAUSE",
+      severity: Math.min(5, 1 + missingCauseFields.length),
+      fields: missingCauseFields.map((entry) => entry.field),
+      evidence: missingCauseFields.map((entry) => ({
+        field: entry.field,
+        excerpt: entry.value.slice(0, 240),
+      })),
+      signals: {
+        problematicEnding: false,
+        missingObservableContinuation: 0,
+        repeatedAcrossFields: missingCauseFields.length,
+        stage2Stage3Contradiction: false,
+        missingVisibleCause: true,
+      },
+    });
+  }
+
+  if (abstractToneItems.length > 0 || moodMismatchItems.length > 0) {
+    const toneEvidence = [
+      ...abstractToneItems,
+      ...moodMismatchItems.filter(
+        (moodItem) =>
+          !abstractToneItems.some(
+            (biasItem) => biasItem.index === moodItem.index
+          )
+      ),
+    ];
+
+    issues.push({
+      code: "ABSTRACT_EMOTIONAL_TONE",
+      severity: Math.min(
+        6,
+        2 + abstractToneItems.length + (moodMismatchItems.length ? 1 : 0)
+      ),
+      fields: ["cinematicIdentity.emotionalTone"],
+      evidence: toneEvidence.map((item) => ({
+        field: `cinematicIdentity.emotionalTone.${item.index}`,
+        excerpt: item.value,
+      })),
+      signals: {
+        abstractBiasDensity:
+          emotionalTone.length > 0
+            ? abstractToneItems.length / emotionalTone.length
+            : 0,
+        concreteAnchorCount: emotionalTone.reduce(
+          (total, item) => total + countAnchorOverlap(item, anchorSet),
+          0
+        ),
+        moodMismatch: moodMismatchItems.length > 0,
+        failedItemIndexes: abstractToneItems.map((item) => item.index),
+      },
+    });
+  }
+
+  const archetype = String(
+    candidate?.cinematicIdentity?.creativeArchetype || ""
+  ).trim();
+  const archetypeGenericPattern =
+    /\b(?:World Behavior|Visible Condition|Material Response|Surface Drift|Motion Continuity|Visual Sequence|Concept Specific|Transit)\b/i;
+  const archetypeAnchorCount = countAnchorOverlap(archetype, anchorSet);
+
+  if (
+    archetype &&
+    archetypeGenericPattern.test(archetype) &&
+    archetypeAnchorCount < 2
+  ) {
+    issues.push({
+      code: "GENERIC_CREATIVE_ARCHETYPE",
+      severity: 3,
+      fields: ["cinematicIdentity.creativeArchetype"],
+      evidence: [
+        {
+          field: "cinematicIdentity.creativeArchetype",
+          excerpt: archetype,
+        },
+      ],
+      signals: {
+        genericLabel: true,
+        concreteAnchorCount: archetypeAnchorCount,
+      },
+    });
+  }
+
+  return {
+    passed: issues.length === 0,
+    severity: issues.reduce(
+      (total, issue) => total + Number(issue.severity || 0),
+      0
+    ),
+    issues,
+  };
+};
+const getIssueRepairFields = (issue) =>
+  Array.isArray(issue?.repairFields)
+    ? issue.repairFields
+    : Array.isArray(issue?.fields)
+      ? issue.fields
+      : [];
+
+const getAllowedSemanticRepairFields = (audit) => {
+  const allowed = new Set();
+
+  (audit?.issues || []).forEach((issue) => {
+    getIssueRepairFields(issue).forEach((field) => {
+      if (semanticRepairableFields.has(field)) {
+        allowed.add(field);
+      }
+    });
+  });
+
+  return allowed;
+};
+
+const semanticRepairResponseSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["repairs"],
+  properties: {
+    repairs: {
+      type: "array",
+      maxItems: 12,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["path", "valueType", "stringValue", "stringList"],
+        properties: {
+          path: {
+            type: "string",
+            enum: Array.from(semanticRepairableFields),
+          },
+          valueType: {
+            type: "string",
+            enum: ["string", "string_list"],
+          },
+          stringValue: {
+            type: "string",
+          },
+          stringList: {
+            type: "array",
+            items: {
+              type: "string",
+            },
+            maxItems: 3,
+          },
+        },
+      },
+    },
+  },
+};
+
+const validateSemanticRepairPayload = (payload, allowedFields) => {
+  if (
+    !payload ||
+    typeof payload !== "object" ||
+    !Array.isArray(payload.repairs)
+  ) {
+    return { valid: false, repairs: [] };
+  }
+
+  const seenPaths = new Set();
+  const repairs = [];
+
+  for (const repair of payload.repairs) {
+    if (
+      !repair ||
+      typeof repair !== "object" ||
+      !allowedFields.has(repair.path) ||
+      seenPaths.has(repair.path) ||
+      !["string", "string_list"].includes(repair.valueType)
+    ) {
+      return { valid: false, repairs: [] };
+    }
+
+    if (
+      repair.path === "cinematicIdentity.emotionalTone" &&
+      (
+        repair.valueType !== "string_list" ||
+        !Array.isArray(repair.stringList) ||
+        repair.stringList.length !== 3 ||
+        repair.stringList.some(
+          (item) => typeof item !== "string" || !item.trim()
+        )
+      )
+    ) {
+      return { valid: false, repairs: [] };
+    }
+
+    if (
+      repair.path !== "cinematicIdentity.emotionalTone" &&
+      (
+        repair.valueType !== "string" ||
+        typeof repair.stringValue !== "string" ||
+        !repair.stringValue.trim()
+      )
+    ) {
+      return { valid: false, repairs: [] };
+    }
+
+    seenPaths.add(repair.path);
+    repairs.push({
+      path: repair.path,
+      value:
+        repair.valueType === "string_list"
+          ? repair.stringList.map((item) => item.trim())
+          : repair.stringValue.trim(),
+    });
+  }
+
+  return {
+    valid: repairs.length > 0,
+    repairs,
+  };
+};
+
+const buildSemanticRepairContext = (
+  candidate,
+  audit,
+  allowedFields
+) => {
+  const currentValues = {};
+
+  allowedFields.forEach((path) => {
+    currentValues[path] = getPathValue(candidate, path);
+  });
+
+  return {
+    lockedInputs: {
+      artistName,
+      trackName,
+      genre,
+      bpm,
+      mood,
+      visualStyle,
+      directorMode,
+      styleDNA,
+      era,
+      reelPurpose,
+    },
+    lockedConceptDNA: selectedConceptDNA,
+    lockedSubject: selectedMusicFacingSubjectStrategy,
+    lockedWorld: selectedMusicFacingWorldIntelligence,
+    allowedRepairFields: Array.from(allowedFields),
+    auditIssues: audit.issues,
+    currentValues,
+    lockedContext: {
+      reelConcept: candidate?.reelConcept,
+      directorSummary: candidate?.directorSummary,
+      narrativeArc: candidate?.narrativeArc,
+      aiVideoPrompt: candidate?.aiVideoPrompt,
+      cinematicIdentity: candidate?.cinematicIdentity,
+      captions: getCanonicalCaptionValues(candidate),
+    },
+  };
+};
+
+const normalizeSemanticRepairCandidate = (
+  candidate,
+  changedPaths
+) => {
+  if (changedPaths.has("reelConcept")) {
+    candidate.reelConcept = polishMusicFacingGrammar(
+      candidate.reelConcept
+    );
+  }
+
+  if (changedPaths.has("directorSummary")) {
+    candidate.directorSummary = repairDirectorSummaryEnding(
+      polishMusicFacingGrammar(candidate.directorSummary)
+    );
+  }
+
+  ["stage1", "stage2", "stage3"].forEach((stageKey) => {
+    const path = `narrativeArc.${stageKey}`;
+
+    if (
+      changedPaths.has(path) &&
+      candidate?.narrativeArc?.[stageKey]
+    ) {
+      candidate.narrativeArc[stageKey] = polishMusicFacingGrammar(
+        candidate.narrativeArc[stageKey]
+      );
+    }
+  });
+
+  if (changedPaths.has("aiVideoPrompt")) {
+    candidate.aiVideoPrompt = polishMusicFacingGrammar(
+      cleanAiVideoPromptText(candidate.aiVideoPrompt)
+    );
+  }
+
+  if (
+    changedPaths.has("cinematicIdentity.emotionalTone") &&
+    candidate?.cinematicIdentity
+  ) {
+    candidate.cinematicIdentity.emotionalTone =
+      repairEmotionalToneList(
+        candidate.cinematicIdentity.emotionalTone
+      );
+  }
+
+  if (
+    changedPaths.has("cinematicIdentity.creativeArchetype") &&
+    candidate?.cinematicIdentity
+  ) {
+    candidate.cinematicIdentity.creativeArchetype =
+      cleanFinalRepeatedWords(
+        candidate.cinematicIdentity.creativeArchetype
+      );
+  }
+
+  [
+    "captions.mainCaption",
+    "captions.instagramCaption",
+    "captions.tiktokCaption",
+    "captions.youtubeShortsCaption",
+  ].forEach((path) => {
+    if (!changedPaths.has(path)) return;
+
+    const value = getPathValue(candidate, path);
+    const cleanedCaption = removeHashtagsFromCaption(
+      polishMusicFacingGrammar(
+        cleanCaptionOpeningText(String(value || ""))
+      )
+    );
+
+    setPathValue(
+      candidate,
+      path,
+      path === "captions.mainCaption"
+        ? protectMainCaption(cleanedCaption)
+        : cleanedCaption
+    );
+  });
+
+  syncSemanticAliases(candidate, changedPaths);
+};
+
+const getAllowedSemanticMutationPaths = (changedPaths) => {
+  const allowed = new Set(changedPaths);
+
+  if (changedPaths.has("directorSummary")) {
+    allowed.add("directorNotes");
+  }
+
+  if (
+    Array.from(changedPaths).some((path) =>
+      path.startsWith("captions.")
+    )
+  ) {
+    semanticCaptionAliasPaths.forEach((path) => allowed.add(path));
+  }
+
+  return allowed;
+};
+
+const pathIsAllowedSemanticMutation = (path, allowedPaths) =>
+  Array.from(allowedPaths).some(
+    (allowedPath) =>
+      path === allowedPath ||
+      path.startsWith(`${allowedPath}.`) ||
+      allowedPath.startsWith(`${path}.`)
+  );
+
+const hasOnlyAllowedSemanticChanges = (
+  originalCandidate,
+  repairedCandidate,
+  allowedPaths
+) => {
+  const originalFlat = flattenSemanticCandidate(originalCandidate);
+  const repairedFlat = flattenSemanticCandidate(repairedCandidate);
+  const allPaths = new Set([
+    ...Object.keys(originalFlat),
+    ...Object.keys(repairedFlat),
+  ]);
+
+  return Array.from(allPaths).every((path) => {
+    if (originalFlat[path] === repairedFlat[path]) return true;
+    return pathIsAllowedSemanticMutation(path, allowedPaths);
+  });
+};
+
+const getActionSemanticFingerprint = (candidate) => {
+  const actionSource = [
+    artistName,
+    trackName,
+    genre,
+    mood,
+    visualStyle,
+    directorMode,
+    styleDNA,
+    era,
+    reelPurpose,
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  const isActionConcept =
+    /\b(pursuit|banditry|reckoning|getaway|chase|drive|night drive|vehicle|car|motorcycle|road)\b/.test(
+      actionSource
+    );
+
+  if (!isActionConcept) {
+    return {
+      required: false,
+      anchors: [],
+    };
+  }
+
+  const semanticText = [
+    candidate?.reelConcept,
+    candidate?.directorSummary,
+    candidate?.narrativeArc?.stage1,
+    candidate?.narrativeArc?.stage2,
+    candidate?.narrativeArc?.stage3,
+    candidate?.aiVideoPrompt,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  const anchorFamilies = [
+    ["car", "motorcycle", "vehicle"],
+    ["road", "lane", "tunnel", "intersection", "underpass"],
+    ["headlight", "headlights", "taillight", "taillights"],
+    ["chase", "pursuit", "accelerates", "brakes", "turns"],
+  ];
+
+  return {
+    required: true,
+    anchors: anchorFamilies
+      .map((family) => family.find((term) => semanticText.includes(term)))
+      .filter(Boolean),
+  };
+};
+
+const preservesActionSemanticFingerprint = (
+  originalFingerprint,
+  candidate
+) => {
+  if (!originalFingerprint.required) return true;
+
+  const candidateText = [
+    candidate?.reelConcept,
+    candidate?.directorSummary,
+    candidate?.narrativeArc?.stage1,
+    candidate?.narrativeArc?.stage2,
+    candidate?.narrativeArc?.stage3,
+    candidate?.aiVideoPrompt,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return originalFingerprint.anchors.every((anchor) =>
+    candidateText.includes(anchor)
+  );
+};
+
+
+const getSemanticCoreText = (candidate) =>
+  [
+    candidate?.reelConcept,
+    candidate?.directorSummary,
+    candidate?.narrativeArc?.stage1,
+    candidate?.narrativeArc?.stage2,
+    candidate?.narrativeArc?.stage3,
+    candidate?.aiVideoPrompt,
+    candidate?.cinematicIdentity?.creativeArchetype,
+    ...(Array.isArray(candidate?.cinematicIdentity?.emotionalTone)
+      ? candidate.cinematicIdentity.emotionalTone
+      : []),
+    ...Object.values(getCanonicalCaptionValues(candidate)),
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+const conceptPreservationExcludedWords = new Set([
+  "that",
+  "where",
+  "driven",
+  "built",
+  "campaign",
+  "identity",
+  "idea",
+  "frame",
+  "default",
+  "closure",
+  "resolution",
+  "unresolved",
+  "fragmented",
+  "ongoing",
+  "intentionally",
+  "primary",
+  "strategy",
+  "subject",
+  "concept",
+  "output",
+  "selected",
+  "defined",
+  "creative",
+  "visual",
+  "visible",
+  "final",
+  "result",
+  "consequence",
+  "behavior",
+  "condition",
+  "relationship",
+  "system",
+  "world",
+  "music",
+  "artist",
+  "track",
+  "reel",
+  "purpose",
+  "cinematic",
+  "material",
+  "surface",
+  "movement",
+  "motion",
+  "stage",
+  "camera",
+]);
+
+const getConcretePreservationAnchors = (value) =>
+  extractSemanticAnchors(value).filter(
+    (anchor) => !conceptPreservationExcludedWords.has(anchor)
+  );
+
+const buildConcreteAnchorFamily = (
+  sources,
+  { limit = 10, minimumSourceCount = 1 } = {}
+) => {
+  const sourceAnchorSets = sources
+    .filter(Boolean)
+    .map(
+      (source) =>
+        new Set(getConcretePreservationAnchors(source))
+    );
+
+  const counts = new Map();
+  const firstSeenOrder = [];
+
+  sourceAnchorSets.forEach((anchorSet) => {
+    anchorSet.forEach((anchor) => {
+      if (!counts.has(anchor)) firstSeenOrder.push(anchor);
+      counts.set(anchor, (counts.get(anchor) || 0) + 1);
+    });
+  });
+
+  return firstSeenOrder
+    .filter(
+      (anchor) =>
+        (counts.get(anchor) || 0) >= minimumSourceCount
+    )
+    .sort((left, right) => {
+      const countDifference =
+        (counts.get(right) || 0) - (counts.get(left) || 0);
+
+      if (countDifference !== 0) return countDifference;
+
+      return firstSeenOrder.indexOf(left) -
+        firstSeenOrder.indexOf(right);
+    })
+    .slice(0, limit);
+};
+
+const getConceptPreservationFingerprint = (candidate) => {
+  const visualDNA = candidate?.cinematicIdentity?.visualDNA;
+  const visualDNASources = Array.isArray(visualDNA)
+    ? visualDNA
+    : [visualDNA];
+
+  const captions = getCanonicalCaptionValues(candidate);
+  const candidateSources = [
+    candidate?.reelConcept,
+    candidate?.directorSummary,
+    candidate?.narrativeArc?.stage1,
+    candidate?.narrativeArc?.stage2,
+    candidate?.narrativeArc?.stage3,
+    candidate?.aiVideoPrompt,
+    candidate?.thumbnailConcept,
+    candidate?.cinematicIdentity?.creativeArchetype,
+    ...visualDNASources,
+    ...Object.values(captions),
+  ].filter(Boolean);
+
+  const candidateCoreText = candidateSources.join(" ");
+
+  const buildStrategyAnchors = (value, limit = 6) =>
+    buildConcreteAnchorFamily([value], { limit })
+      .filter((anchor) =>
+        new RegExp(`\\b${escapeRegExp(anchor)}\\b`, "i").test(
+          candidateCoreText
+        )
+      );
+
+  const repeatedConceptAnchors =
+    buildConcreteAnchorFamily(candidateSources, {
+      limit: 12,
+      minimumSourceCount: 2,
+    });
+
+  const fallbackConceptAnchors =
+    buildConcreteAnchorFamily(
+      [
+        candidate?.reelConcept,
+        ...visualDNASources,
+        candidate?.thumbnailConcept,
+        candidate?.narrativeArc?.stage2,
+        candidate?.narrativeArc?.stage3,
+      ],
+      {
+        limit: 12,
+        minimumSourceCount: 1,
+      }
+    );
+
+  return {
+    conceptAnchors:
+      repeatedConceptAnchors.length >= 4
+        ? repeatedConceptAnchors
+        : fallbackConceptAnchors,
+    subjectAnchors: buildStrategyAnchors(
+      selectedMusicFacingSubjectStrategy
+    ),
+    worldAnchors: buildStrategyAnchors(
+      selectedMusicFacingWorldIntelligence
+    ),
+    stage2Anchors: Array.from(
+      new Set(
+        getConcretePreservationAnchors(
+          candidate?.narrativeArc?.stage2
+        )
+      )
+    ).slice(0, 8),
+  };
+};
+
+const countPreservedAnchors = (anchors, value) => {
+  const valueAnchors = new Set(
+    getConcretePreservationAnchors(value)
+  );
+
+  return anchors.filter((anchor) => valueAnchors.has(anchor)).length;
+};
+
+const preservesGeneralConceptFingerprint = (
+  fingerprint,
+  originalCandidate,
+  repairedCandidate,
+  changedPaths
+) => {
+  const repairedCoreText = getSemanticCoreText(repairedCandidate);
+  const originalCoreText = getSemanticCoreText(originalCandidate);
+
+  const requiredFamilyPreserved = (
+    anchors,
+    minimumRatio,
+    minimumCount = 1
+  ) => {
+    if (anchors.length === 0) return true;
+
+    const minimumRequired = Math.min(
+      anchors.length,
+      Math.max(
+        minimumCount,
+        Math.ceil(anchors.length * minimumRatio)
+      )
+    );
+
+    return (
+      countPreservedAnchors(anchors, repairedCoreText) >=
+      minimumRequired
+    );
+  };
+
+  const familyPreserved =
+    requiredFamilyPreserved(
+      fingerprint.conceptAnchors,
+      0.5,
+      Math.min(3, fingerprint.conceptAnchors.length)
+    ) &&
+    requiredFamilyPreserved(
+      fingerprint.subjectAnchors,
+      0.4
+    ) &&
+    requiredFamilyPreserved(
+      fingerprint.worldAnchors,
+      0.4
+    );
+
+  const stage2Changed = changedPaths.has("narrativeArc.stage2");
+  const stage2Preserved = stage2Changed
+    ? countPreservedAnchors(
+        fingerprint.stage2Anchors,
+        repairedCandidate?.narrativeArc?.stage2
+      ) >=
+      Math.min(
+        fingerprint.stage2Anchors.length,
+        Math.max(
+          1,
+          Math.ceil(fingerprint.stage2Anchors.length * 0.6)
+        )
+      )
+    : String(repairedCandidate?.narrativeArc?.stage2 || "") ===
+      String(originalCandidate?.narrativeArc?.stage2 || "");
+
+  const originalAnchors = new Set(
+    getConcretePreservationAnchors(originalCoreText)
+  );
+  const repairedAnchors = Array.from(
+    new Set(
+      getConcretePreservationAnchors(repairedCoreText)
+    )
+  );
+  const groundedAnchorRatio =
+    repairedAnchors.length === 0
+      ? 1
+      : repairedAnchors.filter((anchor) =>
+          originalAnchors.has(anchor)
+        ).length / repairedAnchors.length;
+
+  return (
+    familyPreserved &&
+    stage2Preserved &&
+    groundedAnchorRatio >= 0.55
+  );
+};
+
+
+const getAuditIssuePathKeys = (audit) => {
+  const keys = new Set();
+
+  (audit?.issues || []).forEach((issue) => {
+    getIssueRepairFields(issue).forEach((field) => {
+      keys.add(`${issue.code}:${field}`);
+    });
+  });
+
+  return keys;
+};
+
+const getProblemFieldPaths = (audit) =>
+  new Set(
+    (audit?.issues || []).flatMap((issue) =>
+      getIssueRepairFields(issue)
+    )
+  );
+
+const originalIssuePathsImproved = (
+  initialAudit,
+  originalCandidate,
+  repairedCandidate
+) => {
+  const originalProblemPaths = getProblemFieldPaths(initialAudit);
+
+  return Array.from(originalProblemPaths).some((path) => {
+    const originalValue = JSON.stringify(
+      getPathValue(originalCandidate, path)
+    );
+    const repairedValue = JSON.stringify(
+      getPathValue(repairedCandidate, path)
+    );
+
+    return originalValue !== repairedValue;
+  });
+};
+
+const hasShiftedSemanticIssue = (initialAudit, repairedAudit) => {
+  const initialIssueKeys = getAuditIssuePathKeys(initialAudit);
+
+  return (repairedAudit?.issues || []).some((issue) =>
+    getIssueRepairFields(issue).some(
+      (field) => !initialIssueKeys.has(`${issue.code}:${field}`)
+    )
+  );
+};
+
+const hasConsistentSemanticAliases = (candidate) => {
+  if (
+    candidate?.directorSummary &&
+    candidate?.directorNotes &&
+    candidate.directorSummary !== candidate.directorNotes
+  ) {
+    return false;
+  }
+
+  const captions = getCanonicalCaptionValues(candidate);
+  const mainCaption = String(captions["captions.mainCaption"] || "");
+  const tiktokCaption = String(
+    captions["captions.tiktokCaption"] || ""
+  );
+  const youtubeShortsCaption = String(
+    captions["captions.youtubeShortsCaption"] || ""
+  );
+
+  const mainAliases = [
+    candidate?.caption,
+    candidate?.mainCaption,
+    candidate?.captions?.mainCaption,
+    candidate?.captions?.main,
+  ].filter((value) => typeof value === "string" && value);
+
+  const tiktokAliases = [
+    candidate?.tiktokCaption,
+    candidate?.captions?.tiktokCaption,
+    candidate?.captions?.tiktok,
+  ].filter((value) => typeof value === "string" && value);
+
+  const youtubeAliases = [
+    candidate?.youtubeShorts,
+    candidate?.youtubeShortsCaption,
+    candidate?.shortsCaption,
+    candidate?.captions?.youtubeShorts,
+    candidate?.captions?.youtubeShortsCaption,
+    candidate?.captions?.shortsCaption,
+  ].filter((value) => typeof value === "string" && value);
+
+  return (
+    mainAliases.every((value) => value === mainCaption) &&
+    tiktokAliases.every((value) => value === tiktokCaption) &&
+    youtubeAliases.every((value) => value === youtubeShortsCaption)
+  );
+};
+
+const hasNewSevereSemanticIssues = (initialAudit, repairedAudit) => {
+  const initialCodes = new Set(
+    (initialAudit?.issues || []).map((issue) => issue.code)
+  );
+
+  return (repairedAudit?.issues || []).some(
+    (issue) =>
+      Number(issue.severity || 0) >= 5 &&
+      !initialCodes.has(issue.code)
+  );
+};
+
+const runSemanticQualityGate = async () => {
+  const originalCandidate = cloneSemanticCandidate(data);
+  const initialAudit = semanticQualityAudit(originalCandidate);
+  const conceptFingerprint =
+    getConceptPreservationFingerprint(originalCandidate);
+  const qualityLog = {
+    repairAttempted: false,
+    initialSeverity: initialAudit.severity,
+    repairedSeverity: null,
+    selectedCandidate: "original",
+    remainingIssueCodes: initialAudit.issues.map(
+      (issue) => issue.code
+    ),
+    candidateChecks: {
+      onlyAllowedChanges: null,
+      actionPreserved: null,
+      conceptPreserved: null,
+      aliasesConsistent: null,
+      issueNotShifted: null,
+      noNewSevereIssues: null,
+      severityImproved: null,
+    },
+    rejectionReasons: [],
+  };
+
+  if (initialAudit.passed) {
+    console.log("[FRAME-LAB SEMANTIC QUALITY]", qualityLog);
+    return;
+  }
+
+  const allowedFields = getAllowedSemanticRepairFields(initialAudit);
+
+  if (allowedFields.size === 0) {
+    console.log("[FRAME-LAB SEMANTIC QUALITY]", qualityLog);
+    return;
+  }
+
+  qualityLog.repairAttempted = true;
+
+  try {
+    const repairContext = buildSemanticRepairContext(
+      originalCandidate,
+      initialAudit,
+      allowedFields
+    );
+    const repairCompletion = await client.chat.completions.create({
+      model: "gpt-4.1-mini",
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "framelab_semantic_repairs",
+          strict: true,
+          schema: semanticRepairResponseSchema,
+        },
+      },
+      temperature: 0.2,
+      messages: [
+        {
+          role: "system",
+          content:
+            "You repair only explicitly allowed FrameLab fields. Return strict JSON only. Preserve the locked Concept DNA, subject, world, inputs, causal chain and all non-allowed fields. Do not invent a new concept. Do not include audit language in repaired copy.",
+        },
+        {
+          role: "user",
+          content: `Repair the listed semantic quality issues.
+
+Rules:
+- Return only paths listed in allowedRepairFields.
+- Repair only the evidenced issue.
+- Keep Stage 1 and Stage 2 unchanged unless their exact paths are allowed.
+- Preserve action geography when present.
+- Preserve concrete subjects, materials, visible causes and spatial relationships.
+- Do not force static or dynamic closure.
+- Captions must remain platform-ready and concept-specific.
+- creativeArchetype must remain a concise archetype name, not a sentence.
+- emotionalTone must contain exactly three concise items with concrete concept anchors and mood-appropriate tone.
+- Use valueType "string" for text fields and "string_list" only for cinematicIdentity.emotionalTone.
+- For unused value containers, return an empty string or empty list as required by the schema.
+
+CONTEXT:
+${JSON.stringify(repairContext, null, 2)}`,
+        },
+      ],
+    });
+
+    const repairText =
+      repairCompletion?.choices?.[0]?.message?.content || "";
+    const repairPayload = JSON.parse(repairText);
+    const validatedRepair = validateSemanticRepairPayload(
+      repairPayload,
+      allowedFields
+    );
+
+    if (!validatedRepair.valid) {
+      console.log("[FRAME-LAB SEMANTIC QUALITY]", qualityLog);
+      return;
+    }
+
+    const repairedCandidate = cloneSemanticCandidate(
+      originalCandidate
+    );
+    const changedPaths = new Set();
+
+    validatedRepair.repairs.forEach(({ path, value }) => {
+      setPathValue(repairedCandidate, path, value);
+      changedPaths.add(path);
+    });
+
+    normalizeSemanticRepairCandidate(
+      repairedCandidate,
+      changedPaths
+    );
+
+    replaceSemanticCandidateContents(data, repairedCandidate);
+    enforceSubjectSafetyForVisualPrompts();
+    syncSemanticAliases(data, changedPaths);
+
+    const normalizedCandidate = cloneSemanticCandidate(data);
+    const allowedMutationPaths =
+      getAllowedSemanticMutationPaths(changedPaths);
+    const onlyAllowedChanges = hasOnlyAllowedSemanticChanges(
+      originalCandidate,
+      normalizedCandidate,
+      allowedMutationPaths
+    );
+    const actionFingerprint =
+      getActionSemanticFingerprint(originalCandidate);
+    const actionPreserved =
+      preservesActionSemanticFingerprint(
+        actionFingerprint,
+        normalizedCandidate
+      );
+    const aliasesConsistent =
+      hasConsistentSemanticAliases(normalizedCandidate);
+    const conceptPreserved =
+      preservesGeneralConceptFingerprint(
+        conceptFingerprint,
+        originalCandidate,
+        normalizedCandidate,
+        changedPaths
+      );
+    const repairedAudit =
+      semanticQualityAudit(normalizedCandidate);
+    const originalProblemsImproved =
+      originalIssuePathsImproved(
+        initialAudit,
+        originalCandidate,
+        normalizedCandidate
+      );
+    const issueNotShifted =
+      !hasShiftedSemanticIssue(initialAudit, repairedAudit);
+    const noNewSevereIssues =
+      !hasNewSevereSemanticIssues(
+        initialAudit,
+        repairedAudit
+      );
+    const severityImproved =
+      repairedAudit.severity < initialAudit.severity;
+
+    qualityLog.repairedSeverity = repairedAudit.severity;
+    qualityLog.candidateChecks = {
+      onlyAllowedChanges,
+      actionPreserved,
+      conceptPreserved,
+      aliasesConsistent,
+      issueNotShifted,
+      noNewSevereIssues,
+      severityImproved,
+    };
+
+    const candidateValid =
+      onlyAllowedChanges &&
+      actionPreserved &&
+      conceptPreserved &&
+      aliasesConsistent &&
+      originalProblemsImproved &&
+      issueNotShifted &&
+      noNewSevereIssues &&
+      severityImproved;
+
+    if (candidateValid) {
+      qualityLog.selectedCandidate = "repaired";
+      qualityLog.remainingIssueCodes = repairedAudit.issues.map(
+        (issue) => issue.code
+      );
+    } else {
+      qualityLog.rejectionReasons = [
+        !onlyAllowedChanges && "disallowed_changes",
+        !actionPreserved && "action_not_preserved",
+        !conceptPreserved && "concept_not_preserved",
+        !aliasesConsistent && "aliases_inconsistent",
+        !originalProblemsImproved && "no_original_repair_path_changed",
+        !issueNotShifted && "issue_shifted",
+        !noNewSevereIssues && "new_severe_issue",
+        !severityImproved && "severity_not_improved",
+      ].filter(Boolean);
+      replaceSemanticCandidateContents(data, originalCandidate);
+    }
+  } catch (repairError) {
+    replaceSemanticCandidateContents(data, originalCandidate);
+    console.error(
+      "[FRAME-LAB SEMANTIC QUALITY REPAIR ERROR]",
+      repairError
+    );
+  }
+
+  console.log("[FRAME-LAB SEMANTIC QUALITY]", qualityLog);
+};
+
+
 data.previewImage = null;
 enforceMusicFacingActionResponseLock();
 enforceSubjectSafetyForVisualPrompts();
+await runSemanticQualityGate();
 // Disabled as final override: this template lock was narrowing user combinations into repeated Acid/Family outputs.
 // Keep the function available for future targeted use, but do not let it overwrite the global premium interpretation result.
 if (false) enforceMusicFacingGraphicObjectSubjectLock();
