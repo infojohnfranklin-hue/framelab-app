@@ -4931,8 +4931,17 @@ const getCreativeArchetypeProjectWordSet = () =>
       .filter(Boolean)
       .join(" ")
       .split(/[^a-zA-Z0-9]+/)
-      .map((word) => normalizeCreativeIdentityWord(word))
-      .filter((word) => word.length >= 3)
+      .map((word) => ({
+        raw: word,
+        normalized: normalizeCreativeIdentityWord(word),
+      }))
+      .filter(({ raw, normalized }) =>
+        normalized &&
+        (normalized.length >= 4 ||
+          (/[0-9]/.test(raw) && normalized.length >= 2))
+      )
+      .filter(({ normalized }) => !["the", "go"].includes(normalized))
+      .map(({ normalized }) => normalized)
   );
 
 const extractCreativeArchetypeWords = (value) => {
@@ -5138,6 +5147,11 @@ const creativeArchetypeContainsProjectWord = (value) => {
   );
 
   return [...projectWords].some((word) => valueWords.has(word));
+};
+
+
+const identityFieldContainsProjectWord = (value) => {
+  return creativeArchetypeContainsProjectWord(value);
 };
 
 const isGenericCreativeArchetype = (value) => {
@@ -5686,11 +5700,6 @@ if (
     data.cinematicIdentity.emotionalTone
   );
 
-
-console.log(
-  "FINAL CREATIVE ARCHETYPE:",
-  data.cinematicIdentity.creativeArchetype
-);
 
 // -------------------------------
 // AI VIDEO PROMPT OUTPUT SAFETY PATCH
@@ -9894,10 +9903,62 @@ ${JSON.stringify(repairContext, null, 2)}`,
 };
 
 
+const sanitizeFinalCinematicIdentity = () => {
+  if (!data?.cinematicIdentity) return;
+
+  let identityChanged = false;
+
+  if (
+    identityFieldContainsProjectWord(
+      data.cinematicIdentity.projectCodename
+    )
+  ) {
+    data.cinematicIdentity.projectCodename =
+      buildProjectCodenameFallback(selectedConceptDNA);
+    identityChanged = true;
+  }
+
+  if (
+    identityFieldContainsProjectWord(
+      data.cinematicIdentity.creativeArchetype
+    )
+  ) {
+    data.cinematicIdentity.creativeArchetype =
+      buildIdentityFallback(selectedConceptDNA);
+    identityChanged = true;
+  }
+
+  if (
+    identityFieldContainsProjectWord(
+      data.cinematicIdentity.snowflakeSignature
+    )
+  ) {
+    identityChanged = true;
+  }
+
+  if (identityChanged) {
+    data.cinematicIdentity.snowflakeSignature =
+      normalizeSnowflakeSignature(
+        buildSnowflakeSignature(
+          data.cinematicIdentity,
+          selectedConceptDNA
+        ),
+        data.cinematicIdentity,
+        selectedConceptDNA
+      );
+  }
+};
+
 data.previewImage = null;
 enforceMusicFacingActionResponseLock();
 enforceSubjectSafetyForVisualPrompts();
 await runSemanticQualityGate();
+sanitizeFinalCinematicIdentity();
+
+console.log(
+  "FINAL CREATIVE ARCHETYPE:",
+  data.cinematicIdentity.creativeArchetype
+);
 // Disabled as final override: this template lock was narrowing user combinations into repeated Acid/Family outputs.
 // Keep the function available for future targeted use, but do not let it overwrite the global premium interpretation result.
 if (false) enforceMusicFacingGraphicObjectSubjectLock();
