@@ -9080,6 +9080,28 @@ const buildSemanticRepairContext = (
     currentValues[path] = getPathValue(candidate, path);
   });
 
+  const semanticRepairGuidance = audit.issues
+    .map((issue) => {
+      if (issue.code === "STAGE_CAUSAL_CONTRADICTION") {
+        return {
+          code: issue.code,
+          guidance:
+            "Repair only narrativeArc.stage3. Continue at least two concrete semantic anchors from Stage 2 into Stage 3, using a visible cause with a clear causal connection through wording such as as, when, after, through, from, by, or triggering. Develop a new filmically observable active consequence. Do not paraphrase Stage 2, and do not create a frozen, fixed, completed, or static end formation.",
+        };
+      }
+
+      if (issue.code === "CROSS_FIELD_STATIC_CLOSURE") {
+        return {
+          code: issue.code,
+          guidance:
+            "Repair only the fields allowed for this issue. Keep all approved caption aliases consistent when captions are repaired. Make the final statement show a concrete continuing visible consequence with readable cause and effect. Avoid frozen arrangement, locked formation, fixed/static/still state, in stasis, without resolution, unresolved balance, or remain/become suspended language. Preserve Concept DNA, subject, world and action.",
+        };
+      }
+
+      return null;
+    })
+    .filter(Boolean);
+
   return {
     lockedInputs: {
       artistName,
@@ -9098,6 +9120,7 @@ const buildSemanticRepairContext = (
     lockedWorld: selectedMusicFacingWorldIntelligence,
     allowedRepairFields: Array.from(allowedFields),
     auditIssues: audit.issues,
+    semanticRepairGuidance,
     currentValues,
     lockedContext: {
       reelConcept: candidate?.reelConcept,
@@ -9763,6 +9786,7 @@ Rules:
 - Return only paths listed in allowedRepairFields.
 - Repair only the evidenced issue.
 - Keep Stage 1 and Stage 2 unchanged unless their exact paths are allowed.
+- Apply semanticRepairGuidance only for the matching issue code. Do not modify detector logic or fields outside the guidance scope.
 - Preserve action geography when present.
 - Preserve concrete subjects, materials, visible causes and spatial relationships.
 - Do not force static or dynamic closure.
