@@ -764,9 +764,16 @@ const musicFacingConceptDNAParts = [
 
 const musicFacingConceptDNA = musicFacingConceptDNAParts.join(" ");
 
-const selectedConceptDNA = musicFacingReelPurposes.includes(reelPurpose)
-  ? musicFacingConceptDNA
-  : randomItem(conceptDNA);
+const conceptDNARoutingReelPurposes = [
+  ...musicFacingReelPurposes,
+  "Luxury Brand Mood Film",
+  "Editorial Campaign Cut",
+];
+
+const selectedConceptDNA =
+  conceptDNARoutingReelPurposes.includes(reelPurpose)
+    ? musicFacingConceptDNA
+    : randomItem(conceptDNA);
 const directorArchetypes = [
   "ARCHITECT — observes form, proportion, spacing and structure already present in the Concept DNA. Does not invent architecture.",
   "POET — observes softness, pauses, fragments and quiet details already present in the Concept DNA. Does not invent memory, longing or emotion.",
