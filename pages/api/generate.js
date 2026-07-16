@@ -106,6 +106,471 @@ const musicFacingReelPurposes = [
   "Live Visual Intro",
 ];
 
+const conceptDNARoutingReelPurposes = [
+  ...musicFacingReelPurposes,
+  "Luxury Brand Mood Film",
+  "Editorial Campaign Cut",
+];
+
+const getMusicFacingCreativeThesis = () => {
+  const normalizeTokens = (value) =>
+    String(value || "")
+      .normalize("NFKD")
+      .replace(/\p{M}+/gu, "")
+      .toLowerCase()
+      .match(/[\p{L}\p{N}]+/gu) || [];
+
+  const freeSourceValues = [
+    artistName,
+    trackName,
+    genre,
+    mood,
+    visualStyle,
+    directorMode,
+    styleDNA,
+    era,
+  ];
+
+  const freeTokens = new Set(
+    freeSourceValues.flatMap((value) => normalizeTokens(value))
+  );
+  const titleTokens = new Set(normalizeTokens(trackName));
+
+  const families = [
+    "performer_action",
+    "social_coordination",
+    "functional_process",
+    "navigation_passage",
+    "nature_scale_relation",
+    "object_function",
+    "observation_discovery",
+    "graphic_series_logic",
+    "spatial_installation",
+    "material_transformation",
+  ];
+
+  const purposeWeights = {
+    "Artist Identity Reel": {
+      performer_action: 4,
+      observation_discovery: 4,
+      object_function: 2,
+      social_coordination: 1,
+      graphic_series_logic: 1,
+    },
+    "Track Launch Teaser": {
+      navigation_passage: 3,
+      performer_action: 2,
+      graphic_series_logic: 2,
+      material_transformation: 1,
+      observation_discovery: 1,
+    },
+    "Spotify Canvas Direction": {
+      performer_action: 3,
+      object_function: 3,
+      graphic_series_logic: 3,
+      navigation_passage: 2,
+      material_transformation: 1,
+    },
+    "Music Video Concept Seed": {
+      navigation_passage: 4,
+      performer_action: 3,
+      observation_discovery: 3,
+      social_coordination: 2,
+      nature_scale_relation: 2,
+    },
+    "Social Teaser Hook": {
+      graphic_series_logic: 4,
+      performer_action: 3,
+      social_coordination: 2,
+      material_transformation: 1,
+      observation_discovery: 1,
+    },
+    "Album World Reveal": {
+      nature_scale_relation: 4,
+      navigation_passage: 3,
+      observation_discovery: 2,
+      spatial_installation: 1,
+      material_transformation: 1,
+    },
+    "Live Visual Intro": {
+      social_coordination: 4,
+      spatial_installation: 4,
+      graphic_series_logic: 2,
+      navigation_passage: 2,
+      material_transformation: 1,
+    },
+    "Luxury Brand Mood Film": {
+      object_function: 4,
+      observation_discovery: 3,
+      spatial_installation: 3,
+      performer_action: 2,
+      material_transformation: 1,
+    },
+    "Editorial Campaign Cut": {
+      graphic_series_logic: 4,
+      performer_action: 3,
+      social_coordination: 3,
+      spatial_installation: 2,
+      observation_discovery: 2,
+    },
+  };
+
+  const signalAliases = {
+    performer_action: {
+      perform: [
+        "perform",
+        "performs",
+        "performed",
+        "performer",
+        "performers",
+        "performance",
+        "performances",
+      ],
+      artist: ["artist", "artists"],
+      identity: ["identity", "identities"],
+      gesture: ["gesture", "gestures", "gestured", "gesturing"],
+      body: ["body", "bodies"],
+      portrait: ["portrait", "portraits"],
+      fashion: ["fashion"],
+      wardrobe: ["wardrobe", "wardrobes"],
+      dance: ["dance", "dances", "danced", "dancing"],
+    },
+    social_coordination: {
+      group: ["group", "groups"],
+      crew: ["crew", "crews"],
+      ensemble: ["ensemble", "ensembles"],
+      crowd: ["crowd", "crowds"],
+      collective: ["collective", "collectives"],
+      choir: ["choir", "choirs"],
+      band: ["band", "bands"],
+      exchange: ["exchange", "exchanges", "exchanged", "exchanging"],
+      meeting: ["meeting", "meetings"],
+      coordination: [
+        "coordinate",
+        "coordinates",
+        "coordinated",
+        "coordinating",
+        "coordination",
+      ],
+    },
+    functional_process: {
+      work: ["work", "works", "worked", "working"],
+      process: ["process", "processes", "processed", "processing"],
+      studio: ["studio", "studios"],
+      machine: ["machine", "machines"],
+      craft: ["craft", "crafts", "crafted", "crafting"],
+      assemble: ["assemble", "assembles", "assembled", "assembling"],
+      repair: ["repair", "repairs", "repaired", "repairing"],
+      prepare: ["prepare", "prepares", "prepared", "preparing"],
+      operate: [
+        "operate",
+        "operates",
+        "operated",
+        "operation",
+        "operations",
+      ],
+      technical: ["technical"],
+    },
+    navigation_passage: {
+      road: ["road", "roads"],
+      drive: ["drive", "drives", "drove", "driven", "driving"],
+      train: ["train", "trains"],
+      transit: ["transit", "transits"],
+      crossing: ["crossing", "crossings"],
+      migration: ["migration", "migrations"],
+      journey: ["journey", "journeys"],
+      route: ["route", "routes", "routed", "routing"],
+      passage: ["passage", "passages"],
+      entrance: ["entrance", "entrances"],
+      exit: ["exit", "exits", "exited", "exiting"],
+    },
+    nature_scale_relation: {
+      animal: ["animal", "animals"],
+      wolf: ["wolf", "wolves"],
+      bird: ["bird", "birds"],
+      horse: ["horse", "horses"],
+      insect: ["insect", "insects"],
+      forest: ["forest", "forests"],
+      landscape: ["landscape", "landscapes"],
+      field: ["field", "fields"],
+      season: ["season", "seasons"],
+      nature: ["nature"],
+      migration: ["migration", "migrations"],
+      falcon: ["falcon", "falcons"],
+      cedar: ["cedar", "cedars"],
+    },
+    object_function: {
+      object: ["object", "objects"],
+      tool: ["tool", "tools"],
+      instrument: ["instrument", "instruments"],
+      hardware: ["hardware"],
+      accessory: ["accessory", "accessories"],
+      mask: ["mask", "masks"],
+      helmet: ["helmet", "helmets"],
+      speaker: ["speaker", "speakers"],
+      device: ["device", "devices"],
+      mechanism: ["mechanism", "mechanisms"],
+    },
+    observation_discovery: {
+      documentary: ["documentary", "documentaries"],
+      observe: [
+        "observe",
+        "observes",
+        "observed",
+        "observation",
+        "observations",
+      ],
+      archive: ["archive", "archives", "archival"],
+      evidence: ["evidence"],
+      detail: ["detail", "details"],
+      routine: ["routine", "routines"],
+      discover: [
+        "discover",
+        "discovers",
+        "discovered",
+        "discovery",
+        "discoveries",
+      ],
+      trace: ["trace", "traces", "traced", "tracing"],
+      memory: ["memory", "memories"],
+      analog: ["analog", "analogue"],
+    },
+    graphic_series_logic: {
+      editorial: ["editorial"],
+      poster: ["poster", "posters"],
+      graphic: ["graphic", "graphics"],
+      typography: ["typography"],
+      series: ["series"],
+      cover: ["cover", "covers"],
+      layout: ["layout", "layouts"],
+      campaign: ["campaign", "campaigns"],
+      canvas: ["canvas", "canvases"],
+      visualizer: ["visualizer", "visualizers"],
+    },
+    spatial_installation: {
+      installation: ["installation", "installations"],
+      spatial: ["spatial"],
+      architecture: ["architecture"],
+      room: ["room", "rooms"],
+      stage: ["stage", "stages"],
+      threshold: ["threshold", "thresholds"],
+      blocking: ["block", "blocks", "blocked", "blocking"],
+      geometry: ["geometry", "geometries"],
+    },
+    material_transformation: {
+      transform: [
+        "transform",
+        "transforms",
+        "transformed",
+        "transformation",
+        "transformations",
+      ],
+      morph: ["morph", "morphs", "morphed", "morphing"],
+      fracture: ["fracture", "fractures", "fractured", "fracturing"],
+      melt: ["melt", "melts", "melted", "melting"],
+      shift: ["shift", "shifts", "shifted", "shifting"],
+      surface: ["surface", "surfaces"],
+      material: ["material", "materials"],
+      particle: ["particle", "particles"],
+      reflection: ["reflection", "reflections", "reflective"],
+    },
+  };
+
+  const materialNegativeAliases = {
+    documentary_negative: ["documentary", "documentaries"],
+    social_negative: ["social"],
+    performance_negative: ["performance", "performances"],
+    journey_negative: ["journey", "journeys"],
+    process_negative: [
+      "process",
+      "processes",
+      "processed",
+      "processing",
+    ],
+    editorial_negative: ["editorial"],
+    campaign_negative: ["campaign", "campaigns"],
+    identity_negative: ["identity", "identities"],
+  };
+
+  const getCanonicalMatches = (familyAliases, tokenSet) =>
+    new Set(
+      Object.entries(familyAliases)
+        .filter(([, aliases]) =>
+          aliases.some((alias) => tokenSet.has(alias))
+        )
+        .map(([canonical]) => canonical)
+    );
+
+  const freeCanonicalMatches = Object.fromEntries(
+    families.map((family) => [
+      family,
+      getCanonicalMatches(signalAliases[family], freeTokens),
+    ])
+  );
+
+  const titleCanonicalMatches = Object.fromEntries(
+    families.map((family) => [
+      family,
+      getCanonicalMatches(signalAliases[family], titleTokens),
+    ])
+  );
+
+  const scores = Object.fromEntries(
+    families.map((family) => [
+      family,
+      purposeWeights[reelPurpose]?.[family] || 0,
+    ])
+  );
+
+  const familyBlockValues = {
+    performer_action: 4,
+    social_coordination: 5,
+    functional_process: 5,
+    navigation_passage: 5,
+    nature_scale_relation: 5,
+    object_function: 5,
+    observation_discovery: 5,
+    graphic_series_logic: 5,
+    spatial_installation: 5,
+    material_transformation: 3,
+  };
+
+  families.forEach((family) => {
+    if (freeCanonicalMatches[family].size > 0) {
+      scores[family] += familyBlockValues[family];
+    }
+  });
+
+  if (freeCanonicalMatches.functional_process.size > 0) {
+    scores.object_function += 2;
+  }
+
+  const hasMaterialNegativeSignal = Object.values(
+    materialNegativeAliases
+  ).some((aliases) =>
+    aliases.some((alias) => freeTokens.has(alias))
+  );
+
+  if (hasMaterialNegativeSignal) {
+    scores.material_transformation -= 2;
+  }
+
+  const stableSource = [
+    artistName,
+    trackName,
+    genre,
+    bpm,
+    mood,
+    visualStyle,
+    directorMode,
+    styleDNA,
+    era,
+    reelPurpose,
+  ]
+    .map((value) => String(value || ""))
+    .join("|");
+
+  const stableIndex =
+    Array.from(stableSource).reduce(
+      (sum, character) => sum + character.charCodeAt(0),
+      0
+    ) % families.length;
+
+  const stableDistance = (family) =>
+    (families.indexOf(family) - stableIndex + families.length) %
+    families.length;
+
+  const rankedFamilies = [...families].sort((left, right) => {
+    const scoreDifference = scores[right] - scores[left];
+    if (scoreDifference !== 0) return scoreDifference;
+
+    const titleEvidenceDifference =
+      titleCanonicalMatches[right].size -
+      titleCanonicalMatches[left].size;
+    if (titleEvidenceDifference !== 0) {
+      return titleEvidenceDifference;
+    }
+
+    const freeEvidenceDifference =
+      freeCanonicalMatches[right].size -
+      freeCanonicalMatches[left].size;
+    if (freeEvidenceDifference !== 0) {
+      return freeEvidenceDifference;
+    }
+
+    const purposeDifference =
+      (purposeWeights[reelPurpose]?.[right] || 0) -
+      (purposeWeights[reelPurpose]?.[left] || 0);
+    if (purposeDifference !== 0) {
+      return purposeDifference;
+    }
+
+    const hashDistanceDifference =
+      stableDistance(left) - stableDistance(right);
+    if (hashDistanceDifference !== 0) {
+      return hashDistanceDifference;
+    }
+
+    return families.indexOf(left) - families.indexOf(right);
+  });
+
+  const primaryIdeaFamily = rankedFamilies[0];
+  const secondaryIdeaFamily = rankedFamilies.find(
+    (family) =>
+      family !== primaryIdeaFamily &&
+      scores[family] >= scores[primaryIdeaFamily] - 2
+  );
+
+  const progressionByFamily = {
+    performer_action: "action, interruption or repeated gesture",
+    social_coordination: "exchange, coordination or changed relationship",
+    functional_process: "task progression, handoff or operational consequence",
+    navigation_passage: "passage, route choice or changed spatial information",
+    nature_scale_relation: "orientation, group behavior or environmental passage",
+    object_function: "use, transfer, failure, resistance or practical response",
+    observation_discovery: "accumulated evidence, recognition or quiet discovery",
+    graphic_series_logic: "edition, sequence, repetition or controlled variation",
+    spatial_installation: "blocking, access, distance or spatial reorientation",
+    material_transformation: "physical transformation when it is the strongest input-native idea",
+  };
+
+  const endingByFamily = {
+    performer_action: "continue the action, interrupt it or return to a repeatable gesture",
+    social_coordination: "leave the relationship changed, unresolved or still in motion",
+    functional_process: "show the task continuing, transferring or encountering resistance",
+    navigation_passage: "leave the route open, redirected or newly understood",
+    nature_scale_relation: "leave movement, orientation or group behavior active",
+    object_function: "show the object still being used, transferred, resisted or reset",
+    observation_discovery: "end on accumulated evidence or a specific understanding",
+    graphic_series_logic: "return to a repeatable edition point or continue the sequence",
+    spatial_installation: "leave access, distance or arrangement actively contested",
+    material_transformation: "end on an observable material condition without forcing closure",
+  };
+
+  return {
+    primaryIdeaFamily,
+    secondaryIdeaFamily: secondaryIdeaFamily || "",
+    familyScore: scores[primaryIdeaFamily],
+    progressionMode: progressionByFamily[primaryIdeaFamily],
+    endingMode: endingByFamily[primaryIdeaFamily],
+  };
+};
+
+const selectedMusicFacingCreativeThesis =
+  conceptDNARoutingReelPurposes.includes(reelPurpose)
+    ? {
+        ...getMusicFacingCreativeThesis(),
+        isActive: true,
+      }
+    : {
+        isActive: false,
+        primaryIdeaFamily: "",
+        secondaryIdeaFamily: "",
+        familyScore: 0,
+        progressionMode: "",
+        endingMode: "",
+      };
+
 const musicFacingCompositionStrategies = [
   "single ownable reel image where the strongest motif carries the campaign identity",
   "environment-led frame where space, behavior and final composition define the release world",
@@ -142,25 +607,39 @@ const getMusicFacingCompositionStrategy = () => {
     return "medium-wide vehicle-led night-drive action frame with a visible car or visible motorcycle, readable road geography, headlights and taillights attached to the vehicle, clear pursuit direction, running or riding body language, artist in motion and no close-up portrait as the primary frame";
   }
 
-  let score = 0;
+  const family =
+    selectedMusicFacingCreativeThesis.primaryIdeaFamily;
 
-  for (let index = 0; index < indexSource.length; index += 1) {
-    score += indexSource.charCodeAt(index) * (index + 1);
-  }
+  const strategies = {
+    performer_action:
+      "composition strategy: frame one readable performer action, decision, interruption or repeated gesture as the identity carrier. Camera and materials support the action rather than replacing it.",
+    social_coordination:
+      "composition strategy: stage multiple figures through exchange, spacing, handoff, collective timing or changed relationship. The social behavior must remain readable in the frame.",
+    functional_process:
+      "composition strategy: center a real task, preparation, operation or craft process. Show hands, tools, sequence and practical consequence before atmosphere.",
+    navigation_passage:
+      "composition strategy: organize the reel around route, crossing, entry, exit, pursuit, migration or directional choice. Preserve readable geography and ongoing passage.",
+    nature_scale_relation:
+      "composition strategy: frame believable group movement, orientation, seasonal passage or subject-to-environment relationship without turning nature into decorative spectacle.",
+    object_function:
+      "composition strategy: make one object, instrument, accessory or mechanism readable through use, transfer, resistance, failure or reset rather than passive display.",
+    observation_discovery:
+      "composition strategy: build recognition through close evidence, routine, repetition and accumulated detail. Discovery must emerge from observation rather than a final reveal.",
+    graphic_series_logic:
+      "composition strategy: use editions, repeated framings, graphic sequence, cover logic or controlled visual variation as the main campaign identity.",
+    spatial_installation:
+      "composition strategy: use blocking, access, distance, negative space or installation behavior to define the idea without requiring surfaces to transform.",
+    material_transformation:
+      "composition strategy: use one concept-native material change only when it is the strongest project-specific idea, with the camera observing rather than automatically tracking the transformation.",
+  };
 
-  return musicFacingCompositionStrategies[
-    score % musicFacingCompositionStrategies.length
-  ];
+  return (
+    strategies[family] ||
+    musicFacingCompositionStrategies[0]
+  );
 };
 
 const getMusicFacingWorldIntelligence = () => {
-  const subjectGravity = Math.random();
-  const cameraVariance = Math.random();
-  const worldResponseMode = (() => {
-    const modes = ["resistance", "absorption", "echo", "collapse", "expansion"];
-    return modes[Math.floor(Math.random() * modes.length)];
-  })();
-
   const source = [
     artistName,
     trackName,
@@ -172,377 +651,227 @@ const getMusicFacingWorldIntelligence = () => {
     era,
     reelPurpose,
   ]
+    .filter(Boolean)
     .join(" ")
     .toLowerCase();
 
-  const hasAny = (terms) =>
-    terms.some((term) => source.includes(term));
+  const titleSource = [artistName, trackName]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
 
-  const fractureBias = (() => { if (genre === "Ambient") return 0.75; if (genre === "Jazz") return 0.65; if (genre === "Electronic") return 0.55; return 0.5; })() * Math.random();
-  const scoreWorld = (signals) => // WORLD DOMINANCE ENGINE (primary cinematic reality selector)
-    signals.reduce((score, signal) => {
-      return source.includes(signal) ? score + 1 + (fractureBias > 0.65 ? 0.5 : 0) : score;
-    }, 0);
+  const escapeSignalPattern = (value) =>
+    String(value || "").replace(
+      /[.*+?^${}()|[\]\\]/g,
+      "\\$&"
+    );
 
-    
-    
+  const createSignalPattern = (term) => {
+    const tokens = String(term || "")
+      .trim()
+      .split(/[\s-]+/)
+      .filter(Boolean)
+      .map(escapeSignalPattern);
 
-  const worldScores = {
-    // VARIANCE CONNECT LAYER (SAFE)
-    
-    
+    if (!tokens.length) {
+      return null;
+    }
 
-    studio: scoreWorld(["studio", "recording", "signal", "monitor", "producer", "technical"]),
-    live: scoreWorld(["jazz", "ensemble", "live", "stage", "microphone", "audience"]),
-    street: scoreWorld(["street", "cafe", "funk", "disco", "1970", "retro", "vintage"]),
-    action: scoreWorld(["action", "drama", "chase", "danger", "vehicle", "road"]),
-    transit: scoreWorld(["car", "train", "motorcycle", "subway", "drive", "transit"]),
-    duo: scoreWorld(["romantic", "duo", "kiss", "desire", "velvet", "intimacy"]),
-    nature: scoreWorld(["animal", "nature", "forest", "horse", "bird", "wolf", "field"]),
-    club: scoreWorld(["club", "festival", "rave", "techno", "dance", "crowd"]),
-    body: scoreWorld(["silence", "stillness", "breath", "hands", "skin", "pressure"]),
-    campaign: 1,
+    const phrasePattern = tokens.join("(?:[\\s-]+)");
+
+    return new RegExp(
+      `(^|[^\\p{L}\\p{N}])${phrasePattern}(?=$|[^\\p{L}\\p{N}])`,
+      "iu"
+    );
   };
 
-  if (
-    hasAny([
-      "frequency",
-      "phase",
-      "impedance",
-      "transient",
-      "signal",
-      "phantom power",
-      "open channel",
-      "mute relay",
-      "preamp",
-      "monitor",
-      "zero crossing",
-      "hard sync",
-      "latency",
-      "voltage",
-      "ground loop",
-      "magnetic",
-      "oscillation",
-      "system ready",
-      "recording",
-    ])
-  ) {
-    return "Studio / technical signal world: recording room, mixer surface, cables, monitor glow, LED meters, headphones, producer focus and signal behavior before abstraction.";
+  const countSignals = (terms, value = source) =>
+    terms.reduce((count, term) => {
+      const pattern = createSignalPattern(term);
+
+      return count + (pattern?.test(value) ? 1 : 0);
+    }, 0);
+
+  const studioSignalCount = countSignals([
+    "recording",
+    "signal",
+    "monitor",
+    "preamp",
+    "mixer",
+    "phantom power",
+    "impedance",
+    "transient",
+    "latency",
+    "voltage",
+    "ground loop",
+    "oscillation",
+  ]);
+
+  if (studioSignalCount >= 2) {
+    return "world intelligence: a precise studio and signal environment with recording hardware, monitoring behavior, cables, meters and operator decisions. Technical cause and response remain readable without turning the signal into abstract spectacle.";
   }
 
+  const jazzSignalCount = countSignals([
+    "jazz",
+    "sax",
+    "brass",
+    "reed",
+    "ensemble",
+    "improvisation",
+    "session",
+    "microphone",
+  ]);
+
   if (
-    hasAny([
+    jazzSignalCount >= 2 &&
+    countSignals([
       "jazz",
       "sax",
       "brass",
       "reed",
       "ensemble",
       "improvisation",
-      "groove study",
-      "lantern groove",
-      "club",
-      "session",
-      "notes",
-    ])
+    ]) >= 1
   ) {
-    return "Jazz / live ensemble world: small stage, brass instruments, sax detail, players, microphone stands, warm room light, audience presence and live musical exchange.";
+    return "world intelligence: a live jazz or ensemble environment with players, instruments, microphones, room response and visible musical exchange. Performance relation and timing carry the world.";
   }
 
-  if (
-    hasAny([
-      "cafe",
-      "coffee",
-      "boulevard",
-      "soleil",
-      "creme",
-      "lumiere",
-      "minuit",
-      "maison",
-      "champagne",
-      "baiser",
-      "paris",
-      "french touch",
-      "filter",
-      "funk",
-      "disco",
-      "swing",
-    ])
-  ) {
-    return "French cafe / funk street world: sidewalk tables, warm morning or midnight street light, people, espresso cups, vintage scooters, soft fashion movement and playful groove.";
-  }
+  const transitSignalCount = countSignals([
+    "transit",
+    "rail",
+    "platform",
+    "station",
+    "crossing",
+    "subway",
+    "drive",
+    "motorcycle",
+    "vehicle",
+    "train",
+    "car",
+    "road",
+  ]);
 
   if (
-    hasAny([
-      "pursuit",
-      "banditry",
-      "reckoning",
-      "fable",
-      "marquee",
-      "getaway",
-      "chase",
-      "danger",
-      "drama",
-    ])
-  ) {
-    return "Cinematic action / drama world: night road, vehicle motion, two-person tension, decisive glances, running movement, headlights, street pressure and filmic consequence.";
-  }
-
-  if (
-    hasAny([
+    transitSignalCount >= 2 &&
+    countSignals([
       "transit",
       "rail",
       "platform",
       "station",
-      "passage",
-      "avenue",
-      "boulevard",
-      "lane",
-      "crossing",
-      "waypoint",
       "subway",
-      "harbor",
-      "riverfront",
-      "drive",
-      "motor",
-      "car",
       "motorcycle",
-      "boat",
-      "train",
       "vehicle",
-    ])
+      "train",
+      "car",
+    ]) >= 1
   ) {
-    return "Vehicle / transit motion world: cars, trains, motorcycles, boats or platforms used as readable movement anchors, with travel, timing, street light and artist presence.";
+    return "world intelligence: a vehicle or transit environment with readable route, timing, infrastructure and directional movement. The world is defined by passage and spatial consequence rather than generic action atmosphere.";
   }
 
-  if (
-    hasAny([
-      "flame",
-      "desire",
-      "hearts",
-      "heart",
-      "shadow",
-      "whisper",
-      "veil",
-      "twilight",
-      "crimson",
-      "velour",
-      "velvet",
-      "hidden",
-      "sable",
-      "kiss",
-      "romantic",
-      "duo",
-    ])
-  ) {
-    return "Romantic duo story world: two-person tension, backstage distance, close glances, hands almost touching, club shadows, wardrobe texture and emotionally readable restraint.";
-  }
-
-  if (
-    hasAny([
-      "cedar",
-      "willow",
-      "briar",
-      "elmwood",
-      "sequoia",
-      "pinecone",
-      "walnut",
-      "canopy",
+  const titleNatureSignalCount = countSignals(
+    [
       "animal",
-      "horse",
       "wolf",
       "fox",
       "deer",
       "bird",
       "falcon",
-      "panther",
-      "tiger",
+      "horse",
       "whale",
-      "insect",
-      "butterfly",
-    ])
-  ) {
-    return "Animal / nature symbol world: animals or natural presences may appear when title-native, with fur, feathers, movement, weather, trees or field scale supporting the artist instead of replacing them.";
-  }
+      "forest",
+      "field",
+      "canopy",
+      "cedar",
+      "migration",
+      "season",
+    ],
+    titleSource
+  );
+
+  const titleAnimalSignalCount = countSignals(
+    [
+      "wolf",
+      "fox",
+      "deer",
+      "bird",
+      "falcon",
+      "horse",
+      "whale",
+      "animal",
+    ],
+    titleSource
+  );
 
   if (
-    hasAny([
-      "festival",
-      "party",
-      "rave",
-      "house",
-      "techno",
-      "dance",
-      "launch teaser",
-      "live visual",
-      "crowd",
-      "afterhours",
-      "underground",
-    ])
+    titleNatureSignalCount >= 2 &&
+    titleAnimalSignalCount >= 1
   ) {
-    return "Club / festival / party world: rhythm, collective energy, light behavior, sound-system pressure, dance-floor geometry, social motion, release-campaign atmosphere or environment-led nightlife identity. Do not default to backstage rooms, walking performer corridors, generic crowd shots or predictable club interiors.";
+    return "world intelligence: a title-native animal or nature environment based on believable orientation, group movement, seasonal behavior, distance or passage. The natural subject remains specific and observable rather than symbolic decoration.";
   }
 
-  if (
-    hasAny([
-      "under load",
-      "barely moving",
-      "material state",
-      "held open",
-      "residual",
-      "internal weather",
-      "no clear release",
-      "nothing",
-      "silence",
-      "stillness",
-      "pressure",
-      "held",
-      "unspoken",
-      "unmarked",
-      "unheard",
-      "without sound",
-    ])
-  ) {
-    return "Minimal real-life body state world: quiet room, restrained posture, breath, hands, shoulders, skin detail, empty space and subtle physical pressure instead of spectacle.";
-  }
+  const family =
+    selectedMusicFacingCreativeThesis.primaryIdeaFamily;
 
-  return "Realistic artist campaign world: choose a specific lived campaign reality from the full input combination before selecting location or material behavior. Vary between broad anchor families such as movement infrastructure, work or process spaces, public thresholds, domestic or exterior everyday spaces, nature or animal scale, group or crowd fragments, object-led tasks and environment-led social behavior. Do not repeatedly choose the same anchor family across outputs. Listed examples must not become default motifs. Use cafe, studio, street corner, pier, fog, wet pavement, ferry, transit barrier, latch or generic club settings only when the input combination clearly makes them native.";
+  const worlds = {
+    performer_action:
+      "world intelligence: a performer-led campaign world where stance, task, movement, refusal, repetition or interaction creates identity. Avoid generic beauty portraiture and avoid making material reaction the primary event.",
+    social_coordination:
+      "world intelligence: a social world defined by group behavior, exchange, spacing, attention, cooperation, disagreement or collective timing. The relation between people is the visible engine.",
+    functional_process:
+      "world intelligence: a real process world with preparation, operation, craft, maintenance, rehearsal or production behavior. Practical sequence and consequence carry the reel.",
+    navigation_passage:
+      "world intelligence: a passage world with readable route, direction, distance, crossing, pursuit, migration or arrival. The scene remains active rather than resolving into a final arrangement.",
+    nature_scale_relation:
+      "world intelligence: a believable nature or animal relation based on orientation, group movement, seasonal behavior, distance or environmental passage. Do not force metaphor or spectacle.",
+    object_function:
+      "world intelligence: an object-led world where use, handling, transfer, resistance, malfunction, repetition or reset creates the concept. The object must do something concrete.",
+    observation_discovery:
+      "world intelligence: an observational world where real details, routine, traces, evidence or repeated behavior gradually change what is understood. Avoid grand reveals.",
+    graphic_series_logic:
+      "world intelligence: an editorial or campaign series world shaped by editions, framing variation, graphic order, repetition, casting logic or controlled contrast.",
+    spatial_installation:
+      "world intelligence: a spatial world where access, blocking, distance, negative space, placement or movement through an installation defines the idea.",
+    material_transformation:
+      "world intelligence: a material world where one input-native physical change is allowed as a primary event, but only when action, relation, process, navigation or observation are less strongly supported.",
+  };
+
+  return (
+    worlds[family] ||
+    "world intelligence: a specific lived campaign reality selected from the full input combination, with readable subject behavior, location logic and social or functional context before material effects."
+  );
 };
 
 const getMusicFacingConcreteSceneAnchor = () => {
-  const source = [
-    artistName,
-    trackName,
-    genre,
-    mood,
-    visualStyle,
-    directorMode,
-    styleDNA,
-    era,
-    reelPurpose,
-  ]
-    .join(" ")
-    .toLowerCase();
+  const family =
+    selectedMusicFacingCreativeThesis.primaryIdeaFamily;
 
-  const hasAny = (terms) =>
-    terms.some((term) => source.includes(term));
+  const anchors = {
+    performer_action:
+      "concrete scene anchor: one original performer completing, refusing, repeating or interrupting a specific action in a readable location.",
+    social_coordination:
+      "concrete scene anchor: two or more original figures exchanging, coordinating, separating, waiting, passing or redirecting attention.",
+    functional_process:
+      "concrete scene anchor: hands, tools, equipment, materials and a visible work sequence with a practical next step.",
+    navigation_passage:
+      "concrete scene anchor: route markers, directional movement, entry or exit points, distance and a visible choice of path.",
+    nature_scale_relation:
+      "concrete scene anchor: one believable animal, group movement, orientation cue, seasonal trace or subject-to-landscape relationship when title-native.",
+    object_function:
+      "concrete scene anchor: one object or instrument shown in use, transfer, resistance, failure, reset or repeated operation.",
+    observation_discovery:
+      "concrete scene anchor: one ordinary detail, recurring trace, routine or piece of evidence observed closely enough to change interpretation.",
+    graphic_series_logic:
+      "concrete scene anchor: a set of related framings, editions, cast variations, graphic arrangements or repeated visual units.",
+    spatial_installation:
+      "concrete scene anchor: a room, stage, threshold or installation with readable access, distance, blocking and movement through space.",
+    material_transformation:
+      "concrete scene anchor: one clearly identified material and one physically local change directly supported by the Concept DNA.",
+  };
 
-  if (
-    hasAny([
-      "pursuit",
-      "banditry",
-      "reckoning",
-      "getaway",
-      "chase",
-      "drive",
-      "night drive",
-      "vehicle",
-      "car",
-      "motorcycle",
-      "road",
-    ])
-  ) {
-    return "a visible car or visible motorcycle as an actual object in the frame, headlights and taillights attached to that vehicle, readable road geography such as lane, tunnel, intersection or underpass, acceleration, braking or turning motion, two-person chase tension, running or riding body language and the artist moving through a readable night-drive action setup";
-  }
-
-  if (
-    hasAny([
-      "festival",
-      "party",
-      "rave",
-      "club",
-      "techno",
-      "dance",
-      "afterhours",
-      "underground",
-      "live visual",
-    ])
-  ) {
-    return "crowd bodies, stage light, speakers, raised hands, backstage edge, dance-floor movement and visible release energy";
-  }
-
-  if (
-    hasAny([
-      "animal",
-      "horse",
-      "wolf",
-      "fox",
-      "deer",
-      "bird",
-      "falcon",
-      "panther",
-      "tiger",
-      "whale",
-      "butterfly",
-    ])
-  ) {
-    return "one readable animal presence with believable movement, scale, fur, feathers or body behavior supporting the artist";
-  }
-
-  if (
-    hasAny([
-      "jazz",
-      "sax",
-      "brass",
-      "reed",
-      "ensemble",
-      "improvisation",
-      "session",
-    ])
-  ) {
-    return "live instruments, microphone stands, musician hands, brass or sax detail, room light and small-stage audience presence";
-  }
-
-  if (
-    hasAny([
-      "frequency",
-      "phase",
-      "signal",
-      "preamp",
-      "monitor",
-      "voltage",
-      "recording",
-      "phantom power",
-      "open channel",
-    ])
-  ) {
-    return "recording console, cables, LED meters, headphones, monitor speakers, producer hands and studio signal light";
-  }
-
-  if (
-    hasAny([
-      "coffee",
-      "cafe",
-      "boulevard",
-      "soleil",
-      "creme",
-      "maison",
-      "paris",
-      "french touch",
-      "funk",
-      "disco",
-      "swing",
-    ])
-  ) {
-    return "sidewalk cafe tables, espresso cups, vintage scooter, street fashion, passersby and warm retro city movement";
-  }
-
-  if (
-    hasAny([
-      "flame",
-      "desire",
-      "hearts",
-      "shadow",
-      "whisper",
-      "veil",
-      "twilight",
-      "hidden",
-      "duo",
-    ])
-  ) {
-    return "two people, close glances, hands almost touching, backstage distance, club doorway light and restrained romantic body language";
-  }
-
-  return "one concrete real-world anchor with an observable function, not a generic location. Choose from broad anchor families: movement or passage systems, work and repair processes, public threshold spaces, domestic or exterior everyday settings, nature or animal movement, group or crowd fragments, object-led physical tasks or environment-led social action. Do not repeatedly choose the same anchor family. Listed examples must not become default motifs. Use cafe, studio, street corner, pier, fog, ferry, transit barrier, latch or generic room setups only when the input combination clearly makes them native.";
+  return (
+    anchors[family] ||
+    "concrete scene anchor: one specific subject, action, object or spatial relation made readable in a real campaign setting."
+  );
 };
 
 const getMusicFacingActionFinalFrameRequirement = () => {
@@ -572,17 +901,17 @@ const getMusicFacingActionFinalFrameRequirement = () => {
 };
 
 const selectedMusicFacingCompositionStrategy =
-  musicFacingReelPurposes.includes(reelPurpose)
+  conceptDNARoutingReelPurposes.includes(reelPurpose)
     ? getMusicFacingCompositionStrategy()
     : "";
 
 const selectedMusicFacingWorldIntelligence =
-  musicFacingReelPurposes.includes(reelPurpose)
+  conceptDNARoutingReelPurposes.includes(reelPurpose)
     ? getMusicFacingWorldIntelligence()
     : "";
 
 const selectedMusicFacingConcreteSceneAnchor =
-  musicFacingReelPurposes.includes(reelPurpose)
+  conceptDNARoutingReelPurposes.includes(reelPurpose)
     ? getMusicFacingConcreteSceneAnchor()
     : "";
 
@@ -592,136 +921,116 @@ const selectedMusicFacingActionFinalFrameRequirement =
     : "";
 
 const getMusicFacingSubjectStrategy = () => {
-  const source = [
-    artistName,
-    trackName,
-    genre,
-    mood,
-    visualStyle,
-    directorMode,
-    styleDNA,
-    era,
-    reelPurpose,
-  ]
-    .join(" ")
-    .toLowerCase();
+  const family =
+    selectedMusicFacingCreativeThesis.primaryIdeaFamily;
 
-  if (/\b(acid|303|smile|smiley|rave|sticker|graphic|cartoon|mascot|icon|symbol)\b/.test(source)) {
-    return "primary subject strategy: interpret acid as a creative culture rather than a fixed icon. Choose the strongest subject logic from the full input combination. Possible primary subjects include an original performer, ensemble, graphic system, typography behavior, motion rule, spatial installation, environment, symbolic object, crowd fragment, abstract phenomenon or cinematic interaction. Do not default to acid-smiley graphics, 303 hardware, chrome machines, melting stickers or one recurring visual motif. Select the subject that best expresses the combined Director Mode, Cinematic DNA, Mood and Reel Purpose.";
-  }
+  const subjects = {
+    performer_action:
+      "primary subject strategy: an original performer whose action, stance, refusal, repetition or interaction carries the identity. Avoid passive centered portraiture.",
+    social_coordination:
+      "primary subject strategy: a duo, ensemble, group or crowd fragment whose relationship and spacing create the idea.",
+    functional_process:
+      "primary subject strategy: a worker, maker, musician, operator or participant completing a concrete process with visible tools and sequence.",
+    navigation_passage:
+      "primary subject strategy: a moving subject, group, vehicle or animal following, crossing, choosing or resisting a route.",
+    nature_scale_relation:
+      "primary subject strategy: a title-native animal, group behavior, natural presence or human-to-environment relationship with believable movement and scale.",
+    object_function:
+      "primary subject strategy: one object, instrument, accessory, device or mechanism whose practical behavior is the visual lead.",
+    observation_discovery:
+      "primary subject strategy: a real detail, routine, trace, repeated behavior or observational subject that rewards close attention.",
+    graphic_series_logic:
+      "primary subject strategy: casting, styling, typography, cover-art behavior, repeated image unit or editorial series structure.",
+    spatial_installation:
+      "primary subject strategy: people, objects or light positioned through a room, threshold, stage or installation where access and distance matter.",
+    material_transformation:
+      "primary subject strategy: one concept-native material phenomenon, used only when the project signals make it more specific than action, relation, process, navigation or observation.",
+  };
 
-  if (/\b(daft|robot|helmet|machine|synth|modular|sequencer|drum machine|hardware|chrome)\b/.test(source)) {
-    return "primary subject strategy: object-led electronic hardware world, robotic silhouette abstraction, chrome machine detail, circular motion system or club-equipment ritual. Avoid copying trademark helmets, exact costumes or recognizable duo likeness.";
-  }
-
-  if (/\b(kids|block|boys|band|group|collective|crew|choir|ensemble|orchestra)\b/.test(source)) {
-    return "primary subject strategy: fictional ensemble or group logic with multiple original performers, wide blocking, staggered silhouettes, collective motion or crowd-fragment composition. Avoid reducing the concept to one solo fashion performer or one romantic duo hand-contact scene.";
-  }
-
-  if (/\b(cat|dog|wolf|horse|bird|snake|tiger|lion|animal|creature|insect|butterfly)\b/.test(source)) {
-    return "primary subject strategy: animal-led symbolic visual with original creature behavior, physical motion, environment interaction and cinematic detail. Human performers are optional and secondary.";
-  }
-
-  if (/\b(club|festival|dancefloor|warehouse|speaker|strobe|laser|crowd|booth|dj|rave)\b/.test(source)) {
-    return "primary subject strategy: club environment, crowd fragment, speaker system, lighting rig, dancefloor object, booth detail or festival atmosphere. Avoid defaulting to a single centered performer unless the project clearly requires a portrait.";
-  }
-
-  if (/\b(sunglasses|glasses|jacket|fashion|accessory|mask|veil|coat|wardrobe)\b/.test(source)) {
-    return "primary subject strategy: accessory-led fashion identity with original fictional styling, distinctive object detail and varied casting. The accessory or wardrobe behavior must carry the concept, not a repeated generic beauty portrait.";
-  }
-
-  return "primary subject strategy: choose a distinct subject logic from the project signals before writing the concept. Do not automatically default to a solo human performer, harbor, pier, fog, mist, wet street, water surface, dock, archival table, film strip, tape reel or condensation scene. Consider fictional solo performer, duo, group, ensemble, animal-led subject, object-led subject, wardrobe-led subject, vehicle-led subject, room behavior, crowd fragment, club equipment, festival scene, landscape, transit setting, tactile prop, physical task, performance action, mascot or abstract visual system. Avoid repeating backstage rooms, near-touch hands, moody young performer portraits, romantic corridor blocking, ocean-edge moisture scenes and generic analog archive surfaces unless explicitly required.";
+  return (
+    subjects[family] ||
+    "primary subject strategy: one project-specific subject or relationship chosen from the full input combination, with readable behavior and no automatic fallback to a generic solo portrait."
+  );
 };
 
 const selectedMusicFacingSubjectStrategy =
-  musicFacingReelPurposes.includes(reelPurpose)
+  conceptDNARoutingReelPurposes.includes(reelPurpose)
     ? getMusicFacingSubjectStrategy()
     : "";
 
 const getMusicFacingCampaignIdeaFrame = () => {
-  const signal = [
-    directorMode,
-    styleDNA,
-    mood,
-    visualStyle,
-    genre,
-    era,
-    reelPurpose,
-  ]
-    .join(" ")
-    .toLowerCase();
+  const family =
+    selectedMusicFacingCreativeThesis.primaryIdeaFamily;
+  const purpose = reelPurpose || "music reel";
 
-  if (/\b(neo noir|sci-fi|neo tokyo|cyberpunk|future city)\b/.test(signal)) {
-    return "campaign idea frame: urban-system identity where city behavior, light logic, distance, surveillance tension, signage, movement rules or social space may carry the reel identity. Do not default to corridor, studio, walking pose, chrome jacket, 303 object, performer close-up or typography emerging from reflections.";
-  }
+  const purposeRules = {
+    "Artist Identity Reel":
+      "prioritize a repeatable signature action, world rule, attitude or relationship that can identify the artist across future outputs",
+    "Track Launch Teaser":
+      "prioritize one immediately legible release signal, action or visual interruption that creates anticipation without resolving the full campaign world",
+    "Luxury Brand Mood Film":
+      "prioritize controlled behavior, casting, object function, spatial precision or material restraint without forcing product-display grammar",
+    "Editorial Campaign Cut":
+      "prioritize casting, styling, blocking, image-series logic, edition structure or visual attitude",
+    "Spotify Canvas Direction":
+      "prioritize one immediately readable loopable action, relation or visual rule",
+    "Social Teaser Hook":
+      "prioritize one immediate scroll-stopping action, relation or contradiction that remains understandable without exposition",
+    "Music Video Concept Seed":
+      "prioritize an expandable scene, relationship, passage, conflict or discovery",
+    "Album World Reveal":
+      "prioritize an expandable world rule, recurring subject relation or spatial system that can support multiple campaign assets",
+    "Live Visual Intro":
+      "prioritize entrance, collective energy, spatial event, repeated cue or system activation",
+  };
 
-  if (/\b(spatial|architecture|architectural|brutalist|room|installation)\b/.test(signal)) {
-    return "campaign idea frame: spatial identity where arrangement, distance, scale, negative space, geometry or room behavior carries the reel identity. Do not default to object close-up or performer portrait.";
-  }
-
-  if (/\b(analog|vhs|archive|film|memory|1970s|90s|nostalgic)\b/.test(signal)) {
-    return "campaign idea frame: temporal-world behavior where era, grain, delay and cultural residue shape camera texture, pacing and atmosphere without defaulting to archive objects, film strips, tape reels, paper fragments, memory systems or identity carriers.";
-  }
-
-  if (/\b(romantic|intimacy|distance|longing|melancholic|tender)\b/.test(signal)) {
-    return "campaign idea frame: emotional-distance identity where separation, withheld contact, delayed response, absence, restraint or unresolved movement carries the reel identity. Do not default to near-touch hands or corridor romance.";
-  }
-
-  if (/\b(graphic|typography|poster|symbol|logo|canvas|visualizer)\b/.test(signal)) {
-    return "campaign idea frame: graphic identity where typography, symbol logic, cover-art behavior or graphic motion may carry the reel identity only when it is the strongest input-driven choice. Do not use typography as a generic fallback.";
-  }
-
-  return "campaign idea frame: choose one ownable social reel idea from the full input combination before choosing subject, material or location. The idea must be campaign-ready, visually memorable and structurally open-ended. Do not default to closure, emblem formation, locking, stabilization or final symbolic resolution. The idea may remain unresolved, fragmented, ongoing or intentionally incomplete if that better serves the campaign identity.";
+  return [
+    `campaign idea frame: ${family.replace(/_/g, " ")}`,
+    `for ${purpose},`,
+    purposeRules[purpose] ||
+      "prioritize one ownable project-specific visual premise",
+    "and preserve at least two plausible execution variations so the purpose does not become a fixed template.",
+  ].join(" ");
 };
 
 
 const getMusicFacingWorldBehaviorMechanic = () => {
-  const signal = [
-    directorMode,
-    styleDNA,
-    mood,
-    visualStyle,
-    genre,
-    era,
-    reelPurpose,
-  ]
-    .join(" ")
-    .toLowerCase();
+  const family =
+    selectedMusicFacingCreativeThesis.primaryIdeaFamily;
 
-  if (/\b(sync|rhythm|beat|pulse|timing|tempo)\b/.test(signal)) {
-    return "world behavior mechanic: synchronization — movement, light, material and camera rhythm respond to the track timing without resolving into a symbol or fixed identity mark.";
-  }
+  const mechanics = {
+    performer_action:
+      "world behavior mechanic: action — a gesture, task, refusal, interruption or repeated performance changes what can happen next.",
+    social_coordination:
+      "world behavior mechanic: relationship — exchange, spacing, attention, cooperation or disagreement changes the social condition.",
+    functional_process:
+      "world behavior mechanic: process — preparation, operation, handoff, failure or repair changes the practical sequence.",
+    navigation_passage:
+      "world behavior mechanic: navigation — route choice, crossing, pursuit, migration or redirected movement changes spatial information.",
+    nature_scale_relation:
+      "world behavior mechanic: orientation — group behavior, distance, seasonal cue or environmental passage changes direction or relation.",
+    object_function:
+      "world behavior mechanic: function — use, transfer, resistance, malfunction, repetition or reset changes the object's role.",
+    observation_discovery:
+      "world behavior mechanic: discovery — accumulated evidence or repeated detail changes understanding without requiring a reveal.",
+    graphic_series_logic:
+      "world behavior mechanic: edition — repetition, sequencing, variation or juxtaposition changes how the campaign identity is read.",
+    spatial_installation:
+      "world behavior mechanic: access — blocking, distance, movement or placement changes who or what can enter, cross or connect.",
+    material_transformation:
+      "world behavior mechanic: transformation — one physically supported material change alters the scene without becoming the default solution.",
+  };
 
-  if (/\b(transform|change|shift|evolve|morph)\b/.test(signal)) {
-    return "world behavior mechanic: transformation — visible change alters the scene condition over time without requiring identity formation, symbolic payoff or final meaning.";
-  }
-
-  if (/\b(fragment|break|crack|split)\b/.test(signal)) {
-    return "world behavior mechanic: fragmentation — separation or distribution changes how the world behaves without turning fragments into a logo, portrait, emblem or message.";
-  }
-
-  if (/\b(lock|seal|freeze|hold|stop)\b/.test(signal)) {
-    return "world behavior mechanic: suspension — motion may slow, hold or remain unresolved without becoming an iconic final state, identity lock or meaning-lock composition.";
-  }
-
-  if (/\b(layer|stack|depth|overlap)\b/.test(signal)) {
-    return "world behavior mechanic: layering — stacked surfaces, depth and occlusion create observable pressure without revealing hidden meaning, text, symbol or identity.";
-  }
-
-  if (/\b(repeat|loop|cycle|echo)\b/.test(signal)) {
-    return "world behavior mechanic: repetition — repeated actions change rhythm, pressure or spatial behavior without building a readable sign, symbol or final explanation.";
-  }
-
-  return "world behavior mechanic: emergence — a world condition becomes observable through interaction, but it does not need to become identity, symbolism or closure.";
+  return mechanics[family];
 };
 
 const selectedMusicFacingWorldBehaviorMechanic =
-  musicFacingReelPurposes.includes(reelPurpose)
+  conceptDNARoutingReelPurposes.includes(reelPurpose)
     ? getMusicFacingWorldBehaviorMechanic()
     : "";
 
 const selectedMusicFacingCampaignIdeaFrame =
-  musicFacingReelPurposes.includes(reelPurpose)
+  conceptDNARoutingReelPurposes.includes(reelPurpose)
     ? getMusicFacingCampaignIdeaFrame()
     : "";
 
@@ -732,9 +1041,34 @@ const musicFacingConceptDNAParts = [
   trackName || "Untitled Track",
   "built as",
   reelPurpose || "music reel",
+  ...(selectedMusicFacingCreativeThesis.isActive
+    ? [
+        "with primary idea family",
+        selectedMusicFacingCreativeThesis.primaryIdeaFamily.replace(
+          /_/g,
+          " "
+        ),
+        selectedMusicFacingCreativeThesis.secondaryIdeaFamily
+          ? "and secondary option"
+          : "",
+        selectedMusicFacingCreativeThesis.secondaryIdeaFamily
+          ? selectedMusicFacingCreativeThesis.secondaryIdeaFamily.replace(
+              /_/g,
+              " "
+            )
+          : "",
+        "using progression",
+        selectedMusicFacingCreativeThesis.progressionMode,
+        "and ending logic",
+        selectedMusicFacingCreativeThesis.endingMode,
+      ]
+    : []),
+  "with world behavior mechanic",
+  selectedMusicFacingWorldBehaviorMechanic ||
+    "world behavior mechanic: emergence",
   "with campaign idea frame",
-  selectedMusicFacingWorldBehaviorMechanic || "world behavior mechanic: emergence",
-  selectedMusicFacingCampaignIdeaFrame || "ownable social reel idea selected from the full input combination",
+  selectedMusicFacingCampaignIdeaFrame ||
+    "ownable social reel idea selected from the full input combination",
   "where the core idea is driven first by",
   directorMode || "defined director mode",
   styleDNA || "defined cinematic DNA",
@@ -750,25 +1084,24 @@ const musicFacingConceptDNAParts = [
   "and",
   era || "defined era",
   "with subject strategy",
-  selectedMusicFacingSubjectStrategy || "distinct subject strategy chosen from project signals",
+  selectedMusicFacingSubjectStrategy ||
+    "distinct subject strategy chosen from project signals",
   "inside",
-  selectedMusicFacingWorldIntelligence || "campaign world context",
+  selectedMusicFacingWorldIntelligence ||
+    "campaign world context",
   "with concrete scene anchors",
-  selectedMusicFacingConcreteSceneAnchor || "real-world music identity details",
+  selectedMusicFacingConcreteSceneAnchor ||
+    "real-world music identity details",
   "with final frame requirement",
-  selectedMusicFacingActionFinalFrameRequirement || "final frame remains concept-native and campaign-ready",
+  selectedMusicFacingActionFinalFrameRequirement ||
+    "final frame remains concept-native and campaign-ready",
   "using",
-  selectedMusicFacingCompositionStrategy || "ownable reel image",
+  selectedMusicFacingCompositionStrategy ||
+    "ownable reel image",
   "as the primary reel composition",
 ];
 
 const musicFacingConceptDNA = musicFacingConceptDNAParts.join(" ");
-
-const conceptDNARoutingReelPurposes = [
-  ...musicFacingReelPurposes,
-  "Luxury Brand Mood Film",
-  "Editorial Campaign Cut",
-];
 
 const selectedConceptDNA =
   conceptDNARoutingReelPurposes.includes(reelPurpose)
@@ -827,8 +1160,26 @@ const creativeDecisionLayer = {
   worldDriver: selectedMusicFacingWorldIntelligence || "World route not selected",
   identityDriver: `${artistName || "Unknown Artist"} — ${trackName || "Unknown Track"}`,
   outputShape: reelPurpose || "Reel Purpose not selected",
-  decisionRule:
-    "Build the core reel idea from primaryDriver + secondaryDriver + emotionalDriver + outputShape + eraDriver first. Use materialDriver and energyDriver as shaping forces. Use identityDriver and the selected subject strategy as active identity context, not as automatic literal subject.",
+  ...(selectedMusicFacingCreativeThesis.isActive
+    ? {
+        primaryIdeaFamily:
+          selectedMusicFacingCreativeThesis.primaryIdeaFamily,
+        secondaryIdeaFamily:
+          selectedMusicFacingCreativeThesis.secondaryIdeaFamily ||
+          "none",
+        progressionMode:
+          selectedMusicFacingCreativeThesis.progressionMode,
+        endingMode:
+          selectedMusicFacingCreativeThesis.endingMode,
+        decisionRule:
+          "Choose the primary idea family before material, camera or final frame. Build the reel from the combined identity, purpose, director, cinematic, mood, era, genre, BPM and visual-style signals. Treat action, relationship, process, navigation, observation, edition logic, spatial behavior and material transformation as equal possible strategies. Use material transformation only when it wins the input-driven family selection.",
+        selfCritiqueRule:
+          "Before finalizing, reject any concept that could preserve its structure after swapping the subject, that defaults to pressure-causes-change, surface-shifts, reflections-cascade or camera-tracks-transformation, or that resolves automatically through settling, realignment or reconfiguration. Replace it with a more input-native family or progression.",
+      }
+    : {
+        decisionRule:
+          "Build the core reel idea from primaryDriver + secondaryDriver + emotionalDriver + outputShape + eraDriver first. Use materialDriver and energyDriver as shaping forces. Use identityDriver and the selected subject strategy as active identity context, not as automatic literal subject.",
+      }),
 };
 
 const creativeDecisionLayerText = JSON.stringify(creativeDecisionLayer, null, 2);
@@ -2326,20 +2677,54 @@ Project Codename rules:
   Signal
   Memory
 
-Creative Archetype rules:
-- must not describe a person, role, profession, faction or group
-- must not end in role-like suffixes such as:
-  -er
-  -ist
-  -or
-  -ian
-  -wright
-  -maker
-  -keeper
-  -borne
-  -bound
-- must describe a concept-native visual identity condition
-- must feel impossible to reuse for another Concept DNA
+${selectedMusicFacingCreativeThesis.isActive
+  ? [
+      "Creative Archetype rules:",
+      "- must be 2-4 words",
+      "- must not describe a person, role, profession, faction or group",
+      "- must not end in role-like suffixes such as:",
+      "  -er",
+      "  -ist",
+      "  -or",
+      "  -ian",
+      "  -wright",
+      "  -maker",
+      "  -keeper",
+      "  -borne",
+      "  -bound",
+      `- primary idea family: ${selectedMusicFacingCreativeThesis.primaryIdeaFamily}`,
+      `- Concept DNA: ${selectedConceptDNA}`,
+      `- subject strategy: ${selectedMusicFacingSubjectStrategy}`,
+      `- world behavior mechanic: ${selectedMusicFacingWorldBehaviorMechanic}`,
+      `- Reel Purpose: ${reelPurpose || "music reel"}`,
+      "- must derive one concise public-facing identity from the primary idea family + Concept DNA + subject strategy + world behavior mechanic + Reel Purpose",
+      "- must contain at least two distinct concept-native anchor words from the Concept DNA so the existing Concept-Language validation remains satisfied",
+      "- may use action, relationship, function, observation, edition, passage, access or material language only when it is native to the active primary idea family",
+      '- material transformation may dominate only when primaryIdeaFamily is exactly "material_transformation"',
+      "- for every other primary idea family, material, surface reaction and physical change may support the identity but must not define it",
+      "- must not default to generic transformation, final formation, locking, settling, realignment, reconfiguration, emblem creation, symbol formation or stable arrangement",
+      "- must not merely combine one material adjective with one final-state noun",
+      "- must not include Artist or Track words",
+      "- must remain impossible to reuse unchanged after swapping the Concept DNA, subject strategy or Reel Purpose",
+      "- before finalizing, reject any archetype whose structure could fit an unrelated project or whose identity depends mainly on a final visible consequence",
+    ].join("\n")
+  : [
+      "Creative Archetype rules:",
+      "- must not describe a person, role, profession, faction or group",
+      "- must not end in role-like suffixes such as:",
+      "  -er",
+      "  -ist",
+      "  -or",
+      "  -ian",
+      "  -wright",
+      "  -maker",
+      "  -keeper",
+      "  -borne",
+      "  -bound",
+      "- must describe a concept-native visual identity condition",
+      "- must feel impossible to reuse for another Concept DNA",
+      "",
+    ].join("\n")}
 
 Visual DNA rules:
 - exactly 3 items
@@ -4119,63 +4504,149 @@ Everything must belong to the same coherent world.
 
 The entire reel must be built around it.
 
-Reel Concept Quality Rule:
-
-Premium Reel Concept Output Rule:
-
-The reelConcept must feel like a finished premium creative pitch.
-
-Write the reelConcept in exactly 2 sentences.
-
-Sentence 1:
-Establish the Concept DNA as a cinematic visual world with concrete objects, materials, spatial relationships and atmosphere.
-
-Sentence 2:
-Describe the transformation and its direct observable result.
-
-The reelConcept must not exceed 65 words.
-
-The reelConcept must not explain too much.
-
-The reelConcept must not sound like technical documentation.
-
-Avoid repeating the same noun more than twice.
-
-Avoid overusing:
-- system
-- structure
-- dynamics
-- interplay
-- tension
-- hierarchy
-- subtle
-- shifting
-
-Prefer:
-- one vivid visual setup
-- one clear concept-native change
-- one memorable visible outcome
-- a static conclusion only when it follows naturally from the preceding action
-
-The reelConcept should make the user immediately think:
-"I can picture this reel."
-
-The reelConcept must never be only the raw Concept DNA.
-
-Bad:
-"desert signal temple"
-"ancient lunar archive"
-"underwater cathedral"
-
-Good:
-A concept-specific cinematic premise that explains what is happening inside the Concept DNA world.
-
-The reelConcept must include:
-
-- the Concept DNA
-- one visible narrative condition
-- one visible progression
-- one direct consequence emerging from the Concept DNA
+${selectedMusicFacingCreativeThesis.isActive
+  ? [
+      "Reel Concept Quality Rule:",
+      "",
+      "Premium Reel Concept Output Rule:",
+      "",
+      "The reelConcept must feel like a finished premium creative pitch.",
+      "",
+      "Apply the active Creative Thesis:",
+      "",
+      `- primary idea family: ${selectedMusicFacingCreativeThesis.primaryIdeaFamily}`,
+      `- secondary idea family: ${selectedMusicFacingCreativeThesis.secondaryIdeaFamily || "none"}`,
+      `- progression mode: ${selectedMusicFacingCreativeThesis.progressionMode}`,
+      `- ending mode: ${selectedMusicFacingCreativeThesis.endingMode}`,
+      `- self-critique rule: ${creativeDecisionLayer.selfCritiqueRule}`,
+      "",
+      "Write the reelConcept in exactly 2 sentences.",
+      "",
+      "Sentence 1:",
+      "Establish the Concept DNA as one concrete cinematic situation governed by the primary idea family. The subject, relationship, process, route, observation, edition logic, spatial behavior or material event must remain physically inside the Concept DNA world.",
+      "",
+      "Sentence 2:",
+      "Advance that situation through the active progression mode and end according to the active ending mode. The progression may change action, relationship, practical sequence, spatial information, understanding, edition structure, access or physical condition.",
+      "",
+      "The reelConcept must not exceed 65 words.",
+      "",
+      "The reelConcept must not explain too much.",
+      "",
+      "The reelConcept must not sound like technical documentation.",
+      "",
+      "Avoid repeating the same noun more than twice.",
+      "",
+      "Avoid overusing:",
+      "- system",
+      "- structure",
+      "- dynamics",
+      "- interplay",
+      "- tension",
+      "- hierarchy",
+      "- subtle",
+      "- shifting",
+      "",
+      "Prefer:",
+      "- one vivid visual setup",
+      "- one primary idea that is specific to the full input combination",
+      "- one observable progression native to the selected idea family",
+      "- an ending that may continue, loop, interrupt, redirect, resist, reveal evidence or remain unresolved",
+      "",
+      "Do not force:",
+      "- pressure causes change",
+      "- surface shifts",
+      "- reflections cascade",
+      "- camera tracks the transformation",
+      "- settling",
+      "- realignment",
+      "- reconfiguration",
+      "- stable arrangement",
+      "- locked formation",
+      "- final symbolic resolution",
+      "",
+      "Before finalizing, apply the self-critique rule. Reject the concept if it could preserve the same structure after swapping the subject, if it defaults to a material reaction without input support, or if it resolves automatically through a final visible arrangement. Use the secondary idea family only as a supporting option and never as a second world.",
+      "",
+      "The reelConcept should make the user immediately think:",
+      "\"I can picture this reel.\"",
+      "",
+      "The reelConcept must never be only the raw Concept DNA.",
+      "",
+      "Bad:",
+      "\"desert signal temple\"",
+      "\"ancient lunar archive\"",
+      "\"underwater cathedral\"",
+      "",
+      "Good:",
+      "A concept-specific cinematic premise that explains what is happening inside the Concept DNA world.",
+      "",
+      "The reelConcept must include:",
+      "",
+      "- the Concept DNA",
+      "- the active primary idea family",
+      "- one visible narrative condition",
+      "- one visible progression matching progressionMode",
+      "- one ending decision matching endingMode",
+      "- no unsupported second world",
+    ].join("\n")
+  : [
+      "Reel Concept Quality Rule:",
+      "",
+      "Premium Reel Concept Output Rule:",
+      "",
+      "The reelConcept must feel like a finished premium creative pitch.",
+      "",
+      "Write the reelConcept in exactly 2 sentences.",
+      "",
+      "Sentence 1:",
+      "Establish the Concept DNA as a cinematic visual world with concrete objects, materials, spatial relationships and atmosphere.",
+      "",
+      "Sentence 2:",
+      "Describe the transformation and its direct observable result.",
+      "",
+      "The reelConcept must not exceed 65 words.",
+      "",
+      "The reelConcept must not explain too much.",
+      "",
+      "The reelConcept must not sound like technical documentation.",
+      "",
+      "Avoid repeating the same noun more than twice.",
+      "",
+      "Avoid overusing:",
+      "- system",
+      "- structure",
+      "- dynamics",
+      "- interplay",
+      "- tension",
+      "- hierarchy",
+      "- subtle",
+      "- shifting",
+      "",
+      "Prefer:",
+      "- one vivid visual setup",
+      "- one clear concept-native change",
+      "- one memorable visible outcome",
+      "- a static conclusion only when it follows naturally from the preceding action",
+      "",
+      "The reelConcept should make the user immediately think:",
+      "\"I can picture this reel.\"",
+      "",
+      "The reelConcept must never be only the raw Concept DNA.",
+      "",
+      "Bad:",
+      "\"desert signal temple\"",
+      "\"ancient lunar archive\"",
+      "\"underwater cathedral\"",
+      "",
+      "Good:",
+      "A concept-specific cinematic premise that explains what is happening inside the Concept DNA world.",
+      "",
+      "The reelConcept must include:",
+      "",
+      "- the Concept DNA",
+      "- one visible narrative condition",
+      "- one visible progression",
+      "- one direct consequence emerging from the Concept DNA",
+    ].join("\n")}
 
 The reelConcept must not introduce
 objects,
@@ -5038,7 +5509,28 @@ const creativeArchetypeBehaviorPatterns = [
   [/\b(opens|opened|opening)\b/i, "Opening"]
 ];
 
+const creativeArchetypeFamilyBehaviorLabels = {
+  performer_action: "Action",
+  social_coordination: "Relation",
+  functional_process: "Process",
+  navigation_passage: "Passage",
+  nature_scale_relation: "Orientation",
+  object_function: "Function",
+  observation_discovery: "Discovery",
+  graphic_series_logic: "Edition",
+  spatial_installation: "Access",
+  material_transformation: "Transformation",
+};
+
 const getCreativeArchetypeBehaviorLabel = () => {
+  if (selectedMusicFacingCreativeThesis.isActive) {
+    return (
+      creativeArchetypeFamilyBehaviorLabels[
+        selectedMusicFacingCreativeThesis.primaryIdeaFamily
+      ] || ""
+    );
+  }
+
   const stage3Source =
     data?.narrativeArc && typeof data.narrativeArc === "object"
       ? String(data.narrativeArc.stage3 || "")
@@ -5062,6 +5554,54 @@ const getCreativeArchetypeBehaviorLabel = () => {
 };
 
 const buildIdentityFallback = (concept) => {
+  if (selectedMusicFacingCreativeThesis.isActive) {
+    const anchorWords = getCreativeArchetypeAnchorWords(concept);
+    const reservedAnchorWords = [];
+
+    anchorWords.forEach((word) => {
+      if (reservedAnchorWords.length >= 2) return;
+
+      const titleWord = toTitleWord(word);
+      const normalizedWord = normalizeCreativeIdentityWord(titleWord);
+
+      if (
+        !normalizedWord ||
+        normalizedWord.length < 3 ||
+        reservedAnchorWords.some(
+          (existingWord) =>
+            normalizeCreativeIdentityWord(existingWord) ===
+            normalizedWord
+        )
+      ) {
+        return;
+      }
+
+      reservedAnchorWords.push(titleWord);
+    });
+
+    if (reservedAnchorWords.length < 2) {
+      return "";
+    }
+
+    const behaviorLabel = getCreativeArchetypeBehaviorLabel();
+    const normalizedBehaviorLabel =
+      normalizeCreativeIdentityWord(behaviorLabel);
+    const selectedWords = [...reservedAnchorWords];
+
+    if (
+      normalizedBehaviorLabel &&
+      !selectedWords.some(
+        (word) =>
+          normalizeCreativeIdentityWord(word) ===
+          normalizedBehaviorLabel
+      )
+    ) {
+      selectedWords.push(toTitleWord(behaviorLabel));
+    }
+
+    return selectedWords.slice(0, 3).join(" ");
+  }
+
   const visualDNA = data?.cinematicIdentity?.visualDNA;
   const visualDNAText = Array.isArray(visualDNA)
     ? visualDNA.join(" ")
@@ -5179,18 +5719,24 @@ const isGenericCreativeArchetype = (value) => {
 };
 
 const creativeArchetypeContainsConceptLanguage = (value, concept) => {
-  const normalizedValue = normalizeCreativeIdentityWord(value);
+  const normalizedValueWords = new Set(
+    String(value || "")
+      .split(/\s+/)
+      .map((word) => normalizeCreativeIdentityWord(word))
+      .filter(Boolean)
+  );
+
   const anchorWords = getCreativeArchetypeAnchorWords(concept)
     .map((word) => normalizeCreativeIdentityWord(word))
-    .filter((word) => word.length >= 4);
+    .filter((word) => word.length >= 3);
 
   const meaningfulWords = getMeaningfulCreativeArchetypeWords(value);
 
-  if (!normalizedValue || anchorWords.length < 2) return false;
+  if (!normalizedValueWords.size || anchorWords.length < 2) return false;
   if (meaningfulWords.length < 2) return false;
 
   const matchedAnchorWords = anchorWords.filter((word) =>
-    normalizedValue.includes(word)
+    normalizedValueWords.has(word)
   );
 
   const uniqueMatches = [...new Set(matchedAnchorWords)];
