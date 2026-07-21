@@ -5482,6 +5482,341 @@ const getCreativeArchetypeAnchorWords = (concept) =>
     getCreativeArchetypeSourceText(concept)
   ).slice(0, 16);
 
+const p1AnchorRoleStopWords = {
+  codename: new Set([
+    "action",
+    "artist",
+    "character",
+    "edition",
+    "figure",
+    "figures",
+    "performer",
+    "person",
+    "series",
+    "subject",
+    "orientation",
+    "transformation",
+    "relation",
+    "process",
+    "function",
+    "discovery",
+    "access",
+    "navigate",
+    "navigates",
+    "navigated",
+    "navigating",
+    "frame",
+    "framed",
+    "framing",
+    "tight",
+    "tightly",
+  ]),
+  archetype: new Set([
+    "artist",
+    "character",
+    "figure",
+    "figures",
+    "performer",
+    "person",
+    "series",
+    "subject",
+    "vault",
+    "archive",
+    "chamber",
+    "sequence",
+    "relic",
+    "index",
+    "capsule",
+    "blueprint",
+    "cipher",
+  ]),
+  audience: new Set([
+    "artist",
+    "character",
+    "figure",
+    "figures",
+    "performer",
+    "person",
+    "series",
+    "subject",
+    "vault",
+    "archive",
+    "chamber",
+    "sequence",
+    "relic",
+    "index",
+    "capsule",
+    "blueprint",
+    "cipher",
+    "action",
+    "edition",
+    "orientation",
+    "transformation",
+    "relation",
+    "process",
+    "function",
+    "discovery",
+    "access",
+  ]),
+  hashtags: new Set([
+    "artist",
+    "character",
+    "figure",
+    "figures",
+    "performer",
+    "person",
+    "series",
+    "subject",
+    "final",
+    "frame",
+    "state",
+    "surface",
+    "surfaces",
+    "visible",
+    "visual",
+    "identity",
+    "cinematic",
+  ]),
+};
+
+const p1VerbOrAdverbFragments = new Set([
+  "appear",
+  "appears",
+  "appeared",
+  "appearing",
+  "become",
+  "becomes",
+  "became",
+  "becoming",
+  "change",
+  "changes",
+  "changed",
+  "changing",
+  "cross",
+  "crosses",
+  "crossed",
+  "crossing",
+  "emerge",
+  "emerges",
+  "emerged",
+  "emerging",
+  "filter",
+  "filters",
+  "filtered",
+  "filtering",
+  "fold",
+  "folds",
+  "folded",
+  "folding",
+  "frame",
+  "frames",
+  "framed",
+  "framing",
+  "guide",
+  "guides",
+  "guided",
+  "guiding",
+  "hold",
+  "holds",
+  "held",
+  "holding",
+  "move",
+  "moves",
+  "moved",
+  "moving",
+  "navigate",
+  "navigates",
+  "navigated",
+  "navigating",
+  "pulse",
+  "pulses",
+  "pulsed",
+  "pulsing",
+  "reach",
+  "reaches",
+  "reached",
+  "reaching",
+  "repeat",
+  "repeats",
+  "repeated",
+  "repeating",
+  "respond",
+  "responds",
+  "responded",
+  "responding",
+  "resolve",
+  "resolves",
+  "resolved",
+  "resolving",
+  "reveal",
+  "reveals",
+  "revealed",
+  "revealing",
+  "shift",
+  "shifts",
+  "shifted",
+  "shifting",
+  "stand",
+  "stands",
+  "stood",
+  "standing",
+  "tight",
+  "tightly",
+  "transform",
+  "transforms",
+  "transformed",
+  "transforming",
+]);
+
+const isP1TypedAnchorWord = (word, role) => {
+  const normalizedWord = normalizeCreativeIdentityWord(word);
+
+  if (
+    !normalizedWord ||
+    normalizedWord.length < 3 ||
+    p1VerbOrAdverbFragments.has(normalizedWord) ||
+    /ly$/i.test(normalizedWord)
+  ) {
+    return false;
+  }
+
+  if (
+    role === "codename" &&
+    /(?:ates|izes|ifies)$/i.test(normalizedWord)
+  ) {
+    return false;
+  }
+
+  return true;
+};
+
+const getP1IdentityFieldWordSet = (fieldNames = []) => {
+  const words = new Set();
+
+  fieldNames.forEach((fieldName) => {
+    const value = data?.cinematicIdentity?.[fieldName];
+
+    String(Array.isArray(value) ? value.join(" ") : value || "")
+      .split(/[^a-zA-Z0-9]+/)
+      .map((word) => normalizeCreativeIdentityWord(word))
+      .filter((word) => word.length >= 3)
+      .forEach((word) => words.add(word));
+  });
+
+  return words;
+};
+
+const getP1AnchorWords = (concept, role) => {
+  const roleStopWords = p1AnchorRoleStopWords[role] || new Set();
+  const reservedFieldWords =
+    role === "archetype"
+      ? getP1IdentityFieldWordSet(["projectCodename"])
+      : role === "audience"
+        ? getP1IdentityFieldWordSet([
+            "projectCodename",
+            "creativeArchetype",
+          ])
+        : role === "hashtags"
+          ? getP1IdentityFieldWordSet([
+              "projectCodename",
+              "creativeArchetype",
+            ])
+          : new Set();
+
+  const selectedWords = [];
+
+  getCreativeArchetypeAnchorWords(concept).forEach((word) => {
+    const normalizedWord = normalizeCreativeIdentityWord(word);
+
+    if (
+      !isP1TypedAnchorWord(word, role) ||
+      roleStopWords.has(normalizedWord) ||
+      reservedFieldWords.has(normalizedWord) ||
+      selectedWords.some(
+        (existingWord) =>
+          normalizeCreativeIdentityWord(existingWord) === normalizedWord
+      )
+    ) {
+      return;
+    }
+
+    selectedWords.push(word);
+  });
+
+  return selectedWords;
+};
+
+const getP1ConceptAnchorWords = (concept, role) => {
+  const roleStopWords = p1AnchorRoleStopWords[role] || new Set();
+  const selectedWords = [];
+
+  getCreativeArchetypeAnchorWords(concept).forEach((word) => {
+    const normalizedWord = normalizeCreativeIdentityWord(word);
+
+    if (
+      !isP1TypedAnchorWord(word, role) ||
+      roleStopWords.has(normalizedWord) ||
+      selectedWords.some(
+        (existingWord) =>
+          normalizeCreativeIdentityWord(existingWord) === normalizedWord
+      )
+    ) {
+      return;
+    }
+
+    selectedWords.push(word);
+  });
+
+  return selectedWords;
+};
+
+const creativeArchetypeMechanismLabels = {
+  performer_action: "Gesture Progression",
+  social_coordination: "Relational Choreography",
+  functional_process: "Process Escalation",
+  navigation_passage: "Guided Passage",
+  nature_scale_relation: "Scale Orientation",
+  object_function: "Functional Reveal",
+  observation_discovery: "Progressive Discovery",
+  graphic_series_logic: "Sequential Variation",
+  spatial_installation: "Spatial Access",
+  material_transformation: "Material Reconfiguration",
+};
+
+const creativeArchetypeMechanismSynonyms = new Set([
+  "access",
+  "alignment",
+  "choreography",
+  "coordination",
+  "discovery",
+  "escalation",
+  "evolution",
+  "gesture",
+  "interaction",
+  "inversion",
+  "navigation",
+  "orientation",
+  "passage",
+  "progression",
+  "reconfiguration",
+  "relation",
+  "reveal",
+  "sequence",
+  "transition",
+  "transformation",
+  "variation",
+]);
+
+const getCreativeArchetypeMechanismLabel = () => {
+  const family = selectedMusicFacingCreativeThesis?.primaryIdeaFamily;
+
+  return (
+    creativeArchetypeMechanismLabels[family] ||
+    getCreativeArchetypeBehaviorLabel() ||
+    "Visible Progression"
+  );
+};
+
 const getMeaningfulCreativeArchetypeWords = (value) =>
   extractCreativeArchetypeWords(value);
 
@@ -5554,78 +5889,13 @@ const getCreativeArchetypeBehaviorLabel = () => {
 };
 
 const buildIdentityFallback = (concept) => {
-  if (selectedMusicFacingCreativeThesis.isActive) {
-    const anchorWords = getCreativeArchetypeAnchorWords(concept);
-    const reservedAnchorWords = [];
-
-    anchorWords.forEach((word) => {
-      if (reservedAnchorWords.length >= 2) return;
-
-      const titleWord = toTitleWord(word);
-      const normalizedWord = normalizeCreativeIdentityWord(titleWord);
-
-      if (
-        !normalizedWord ||
-        normalizedWord.length < 3 ||
-        reservedAnchorWords.some(
-          (existingWord) =>
-            normalizeCreativeIdentityWord(existingWord) ===
-            normalizedWord
-        )
-      ) {
-        return;
-      }
-
-      reservedAnchorWords.push(titleWord);
-    });
-
-    if (reservedAnchorWords.length < 2) {
-      return "";
-    }
-
-    const behaviorLabel = getCreativeArchetypeBehaviorLabel();
-    const normalizedBehaviorLabel =
-      normalizeCreativeIdentityWord(behaviorLabel);
-    const selectedWords = [...reservedAnchorWords];
-
-    if (
-      normalizedBehaviorLabel &&
-      !selectedWords.some(
-        (word) =>
-          normalizeCreativeIdentityWord(word) ===
-          normalizedBehaviorLabel
-      )
-    ) {
-      selectedWords.push(toTitleWord(behaviorLabel));
-    }
-
-    return selectedWords.slice(0, 3).join(" ");
-  }
-
-  const visualDNA = data?.cinematicIdentity?.visualDNA;
-  const visualDNAText = Array.isArray(visualDNA)
-    ? visualDNA.join(" ")
-    : String(visualDNA || "");
-
-  const subjectWords = extractCreativeArchetypeWords(
-    [
-      data?.reelConcept,
-      visualDNAText,
-      data?.thumbnailConcept,
-      data?.concept,
-      concept
-    ]
-      .filter(Boolean)
-      .join(" ")
-  );
-
-  const stage3Text =
-    data?.narrativeArc && typeof data.narrativeArc === "object"
-      ? String(data.narrativeArc.stage3 || "")
-      : String(data?.narrativeArc || "");
-
-  const consequenceWords = extractCreativeArchetypeWords(stage3Text);
-  const behaviorLabel = getCreativeArchetypeBehaviorLabel();
+  const mechanismLabel = getCreativeArchetypeMechanismLabel();
+  const mechanismWords = String(mechanismLabel || "")
+    .split(/[^a-zA-Z0-9]+/)
+    .map((word) => toTitleWord(word))
+    .filter(Boolean);
+  const anchorWords = getP1AnchorWords(concept, "archetype");
+  const conceptAnchorWords = getP1ConceptAnchorWords(concept, "archetype");
   const selectedWords = [];
 
   const addUniqueWord = (word) => {
@@ -5645,25 +5915,29 @@ const buildIdentityFallback = (concept) => {
     selectedWords.push(titleWord);
   };
 
-  subjectWords.slice(0, 2).forEach(addUniqueWord);
-  addUniqueWord(behaviorLabel);
+  const preferredAnchor = anchorWords.find((word) =>
+    isP1TypedAnchorWord(word, "archetype")
+  );
+  const secondaryConceptAnchor = conceptAnchorWords.find((word) =>
+    isP1TypedAnchorWord(word, "archetype")
+  );
 
-  if (selectedWords.length < 3) {
-    consequenceWords.forEach((word) => {
-      if (selectedWords.length < 3) addUniqueWord(word);
-    });
+  if (preferredAnchor) {
+    addUniqueWord(preferredAnchor);
+  } else if (secondaryConceptAnchor) {
+    addUniqueWord(secondaryConceptAnchor);
   }
 
+  mechanismWords.forEach(addUniqueWord);
+
   if (selectedWords.length < 2) {
-    getCreativeArchetypeAnchorWords(concept).forEach((word) => {
+    anchorWords.forEach((word) => {
       if (selectedWords.length < 2) addUniqueWord(word);
     });
   }
 
   if (selectedWords.length < 2) {
-    extractCreativeArchetypeWords(
-      data?.cinematicIdentity?.projectCodename
-    ).forEach((word) => {
+    conceptAnchorWords.forEach((word) => {
       if (selectedWords.length < 2) addUniqueWord(word);
     });
   }
@@ -5726,22 +6000,29 @@ const creativeArchetypeContainsConceptLanguage = (value, concept) => {
       .filter(Boolean)
   );
 
-  const anchorWords = getCreativeArchetypeAnchorWords(concept)
+  const anchorWords = getP1ConceptAnchorWords(concept, "archetype")
     .map((word) => normalizeCreativeIdentityWord(word))
     .filter((word) => word.length >= 3);
-
+  const familyMechanismWords = String(
+    getCreativeArchetypeMechanismLabel() || ""
+  )
+    .split(/[^a-zA-Z0-9]+/)
+    .map((word) => normalizeCreativeIdentityWord(word))
+    .filter((word) => word.length >= 3);
   const meaningfulWords = getMeaningfulCreativeArchetypeWords(value);
 
-  if (!normalizedValueWords.size || anchorWords.length < 2) return false;
-  if (meaningfulWords.length < 2) return false;
+  if (!normalizedValueWords.size || meaningfulWords.length < 2) return false;
 
-  const matchedAnchorWords = anchorWords.filter((word) =>
+  const hasAnchorWord = anchorWords.some((word) =>
     normalizedValueWords.has(word)
   );
+  const hasMechanismWord =
+    familyMechanismWords.some((word) => normalizedValueWords.has(word)) ||
+    Array.from(creativeArchetypeMechanismSynonyms).some((word) =>
+      normalizedValueWords.has(word)
+    );
 
-  const uniqueMatches = [...new Set(matchedAnchorWords)];
-
-  return uniqueMatches.length >= 2;
+  return hasAnchorWord && hasMechanismWord;
 };
 
 const projectCodenameHasRepeatedWord = (codename = "") => {
@@ -5768,36 +6049,73 @@ const projectCodenameHasRepeatedWord = (codename = "") => {
   return false;
 };
 
-const buildProjectCodenameFallback = (concept) => {
-  const anchorWords = getCreativeArchetypeAnchorWords(concept);
+const projectCodenameEndings = new Set([
+  "vault",
+  "archive",
+  "chamber",
+  "sequence",
+  "relic",
+  "index",
+  "capsule",
+  "blueprint",
+  "cipher",
+]);
 
+const projectCodenameLooksNatural = (codename = "") => {
+  const words = String(codename || "")
+    .replace(/[^a-zA-Z0-9\s-]/g, " ")
+    .split(/[\s-]+/)
+    .map((word) => word.trim())
+    .filter(Boolean);
+
+  if (words.length < 2 || words.length > 4) return false;
+
+  const finalWord = normalizeCreativeIdentityWord(words[words.length - 1]);
+  const lexicalWords = projectCodenameEndings.has(finalWord)
+    ? words.slice(0, -1)
+    : words;
+
+  if (lexicalWords.length < 1) return false;
+
+  return lexicalWords.every((word) => {
+    const normalizedWord = normalizeCreativeIdentityWord(word);
+
+    return (
+      isP1TypedAnchorWord(word, "codename") &&
+      !p1VerbOrAdverbFragments.has(normalizedWord) &&
+      !p1AnchorRoleStopWords.codename.has(normalizedWord)
+    );
+  });
+};
+
+const buildProjectCodenameFallback = (concept) => {
+  const anchorWords = getP1AnchorWords(concept, "codename");
   const selectedWords = [];
   const seenWords = new Set();
 
   for (const word of anchorWords) {
     const titleWord = toTitleWord(word);
-    const normalizedWord = titleWord.toLowerCase();
+    const normalizedWord = normalizeCreativeIdentityWord(titleWord);
 
-    if (!normalizedWord || seenWords.has(normalizedWord)) {
+    if (
+      !normalizedWord ||
+      seenWords.has(normalizedWord) ||
+      !isP1TypedAnchorWord(titleWord, "codename")
+    ) {
       continue;
     }
 
     selectedWords.push(titleWord);
     seenWords.add(normalizedWord);
 
-    if (selectedWords.length >= 3) {
+    if (selectedWords.length >= 2) {
       break;
     }
   }
 
   if (selectedWords.length < 1) {
-    selectedWords.push("Frame");
-    seenWords.add("frame");
-  }
-
-  if (selectedWords.length < 2) {
-    selectedWords.push("Lab");
-    seenWords.add("lab");
+    selectedWords.push("Signal");
+    seenWords.add("signal");
   }
 
   const codenameEndings = [
@@ -5815,15 +6133,12 @@ const buildProjectCodenameFallback = (concept) => {
   const safeEndings = codenameEndings.filter(
     (ending) => !seenWords.has(ending.toLowerCase())
   );
-
-  const availableEndings = safeEndings.length > 0 ? safeEndings : codenameEndings;
-
+  const availableEndings =
+    safeEndings.length > 0 ? safeEndings : codenameEndings;
   const source = `${concept || ""}${selectedWords.join("")}`;
-
   const endingIndex =
     Array.from(source).reduce((sum, char) => sum + char.charCodeAt(0), 0) %
     availableEndings.length;
-
   const ending = availableEndings[endingIndex];
 
   return `${selectedWords.join(" ")} ${ending}`;
@@ -5941,31 +6256,243 @@ const buildSnowflakeSignature = (identity, concept) => {
   };
 
   const buildAudienceEmotionFallbacks = (concept) => {
-    const anchorWords = getCreativeArchetypeAnchorWords(concept)
-      .map((word) => word.toLowerCase())
-      .filter(Boolean);
+    const moodSource = String(mood || "").toLowerCase();
+    const conceptSource = String(concept || "");
+    const conceptIndex =
+      Array.from(conceptSource).reduce(
+        (sum, character, index) =>
+          sum + character.charCodeAt(0) * (index + 1),
+        0
+      ) % 3;
 
-    const focusPhrase = anchorWords.slice(0, 2).join(" ") || "main subject";
+    const moodFamily =
+      /luxury|premium|elegant|refined/.test(moodSource)
+        ? "luxuryCalm"
+        : /warm|hope|romantic|tender/.test(moodSource)
+          ? "warmHope"
+          : /confident|arrival|assured/.test(moodSource)
+            ? "confidentArrival"
+            : /hypnotic|trance|mesmeric/.test(moodSource)
+              ? "hypnoticMotion"
+              : /surreal|stillness|uncanny/.test(moodSource)
+                ? "surrealStillness"
+                : /euphoric|release|lift|festival/.test(moodSource)
+                  ? "euphoricRelease"
+                  : /dark|nocturnal|cold|tense/.test(moodSource)
+                    ? "darkTense"
+                    : /melancholic|lonely|nostalgia/.test(moodSource)
+                      ? "reflective"
+                      : "measured";
+
+    const fallbackFamilies = {
+      warmHope: [
+        [
+          "Warmth settles into the scene as small changes begin to feel reassuring",
+          "Hope grows quietly as the central movement opens toward connection",
+          "A gentle calm takes hold as the visible tension begins to soften",
+        ],
+        [
+          "The surrounding space feels welcoming without losing its sense of anticipation",
+          "Subtle shifts between subject and environment create a tender sense of possibility",
+          "Distance and light work together to create a quiet feeling of trust",
+        ],
+        [
+          "The closing image leaves behind warmth, calm, and a believable sense of hope",
+          "A soft afterglow remains, suggesting that the moment can still open outward",
+          "The final state feels settled yet alive with restrained possibility",
+        ],
+      ],
+      confidentArrival: [
+        [
+          "Presence sharpens as the central movement begins to feel deliberate and assured",
+          "Confidence builds as the subject claims more space within the scene",
+          "A clear sense of arrival forms as hesitation gives way to control",
+        ],
+        [
+          "The surrounding space feels charged with focused anticipation",
+          "Each visible shift reinforces a strong sense of purpose and command",
+          "The balance between movement and stillness creates poised expectation",
+        ],
+        [
+          "The closing image leaves a firm impression of readiness and forward momentum",
+          "A controlled final beat holds the promise of decisive action",
+          "The last frame feels composed, present, and ready for what follows",
+        ],
+      ],
+      hypnoticMotion: [
+        [
+          "Rhythm draws the body inward as repeated movement begins to feel inescapable",
+          "Motion gathers into a pulse that feels physical before it feels conscious",
+          "A trance-like pull develops as each shift echoes through the surrounding space",
+        ],
+        [
+          "The scene seems to breathe through cycles of pressure, release, and return",
+          "Repeated movement creates an immersive sensation of drifting inside the image",
+          "The changing spatial rhythm produces a bodily sense of suspension",
+        ],
+        [
+          "The closing image leaves a slow pulse lingering beneath conscious thought",
+          "A residual rhythm remains, as though the body is still following the motion",
+          "The final state holds the senses inside a quiet, continuous trance",
+        ],
+      ],
+      surrealStillness: [
+        [
+          "Stillness becomes strange as familiar relationships begin to feel quietly displaced",
+          "An uncanny calm settles over the scene as ordinary space loses certainty",
+          "The absence of movement creates a suspended feeling that is difficult to place",
+        ],
+        [
+          "The surrounding space feels weightless, distant, and subtly unreal",
+          "Small visual differences create the sensation of standing inside a paused dream",
+          "Silence and separation combine into an atmosphere of floating unease",
+        ],
+        [
+          "The closing image leaves behind a stillness that feels unresolved but complete",
+          "A quiet strangeness remains after the visible action has stopped",
+          "The final state lingers like a dream held just before waking",
+        ],
+      ],
+      luxuryCalm: [
+        [
+          "Control settles over the scene as every visible change feels precise and intentional",
+          "Calm confidence grows through restrained movement and carefully held space",
+          "A refined stillness takes hold as the image resists unnecessary urgency",
+        ],
+        [
+          "The surrounding details create a composed sense of comfort and exclusivity",
+          "Measured spatial shifts produce a quiet feeling of confidence and ease",
+          "The balance of restraint and detail creates a polished sense of presence",
+        ],
+        [
+          "The closing image leaves a controlled impression of calm, quality, and permanence",
+          "A refined aftereffect remains without demanding attention or overstating the moment",
+          "The final state feels effortless, composed, and quietly valuable",
+        ],
+      ],
+      euphoricRelease: [
+        [
+          "Energy opens outward as the central movement breaks free of restraint",
+          "Relief surges through the scene as contained pressure finally gives way",
+          "A widening sense of freedom takes hold as the image expands",
+        ],
+        [
+          "The surrounding space feels larger, faster, and charged with possibility",
+          "Movement and distance combine into a physical sensation of release",
+          "Each visible shift adds momentum to an increasingly liberating rhythm",
+        ],
+        [
+          "The closing image leaves an expansive rush of freedom and renewed energy",
+          "A bright aftershock remains, carrying the feeling beyond the final beat",
+          "The final state feels open, airborne, and fully released",
+        ],
+      ],
+      darkTense: [
+        [
+          "Pressure gathers as small changes begin to feel threatening rather than reassuring",
+          "Unease sharpens as the central relationship becomes harder to trust",
+          "A restrained tension takes hold as the visible space begins to close inward",
+        ],
+        [
+          "The surrounding space feels watchful, compressed, and increasingly unstable",
+          "Distance between elements creates a physical sense of isolation and risk",
+          "Each visual shift adds weight without offering meaningful relief",
+        ],
+        [
+          "The closing image leaves behind tension, uncertainty, and a persistent sense of danger",
+          "A cold aftereffect remains, refusing comfort or emotional resolution",
+          "The final state feels controlled on the surface but unstable underneath",
+        ],
+      ],
+      reflective: [
+        [
+          "Memory seems to gather around the scene as each change feels quietly personal",
+          "A reflective sadness grows as distance becomes more emotionally significant",
+          "The visible movement carries a sense of something already slipping away",
+        ],
+        [
+          "The surrounding space feels intimate, distant, and touched by absence",
+          "Subtle changes create a quiet ache without turning the moment dramatic",
+          "The balance of closeness and separation produces a restrained sense of longing",
+        ],
+        [
+          "The closing image leaves a tender trace of loss and remembrance",
+          "A muted afterglow remains, carrying the weight of what cannot return",
+          "The final state feels calm while preserving a quiet emotional ache",
+        ],
+      ],
+      measured: [
+        [
+          "Interest grows steadily as the central change begins to carry greater weight",
+          "Attention settles into the scene as visible relationships become more significant",
+          "A measured sense of involvement develops through restrained visual change",
+        ],
+        [
+          "The surrounding space creates a balanced feeling of curiosity and anticipation",
+          "Subtle shifts between elements produce a quiet physical awareness",
+          "The relation between movement and stillness creates a controlled emotional pull",
+        ],
+        [
+          "The closing image leaves a clear but restrained emotional impression",
+          "A quiet aftereffect remains without forcing a single interpretation",
+          "The final state feels complete while preserving room for reflection",
+        ],
+      ],
+    };
+
+    const selectedFamily = fallbackFamilies[moodFamily];
 
     return [
-      `the viewer follows the visible change around the ${focusPhrase}`,
-      `the viewer notices how nearby elements respond to the ${focusPhrase}`,
-      `the viewer reads the concluding relationship between the ${focusPhrase} and its surroundings`,
+      selectedFamily[0][conceptIndex],
+      selectedFamily[1][(conceptIndex + 1) % 3],
+      selectedFamily[2][(conceptIndex + 2) % 3],
     ];
+  };
+
+  const audienceEmotionLooksComplete = (value = "") => {
+    const text = String(value || "").trim();
+    const words = text.split(/\s+/).filter(Boolean);
+
+    if (words.length < 8) return false;
+    if (/^the viewer\b/i.test(text)) return false;
+    if (/\bmotif\b/i.test(text)) return false;
+    if (/\bacross the sequence\b/i.test(text)) return false;
+    if (/\bfinal composition\b/i.test(text)) return false;
+    if (/\b(its|their) surroundings\b/i.test(text)) return false;
+    if (/\bthe\s+(?:series|flock|figures)\s+\w+\s+and\s+its\b/i.test(text)) {
+      return false;
+    }
+
+    return true;
   };
 
   const repairAudienceEmotionList = (items, concept) => {
     const fallbackItems = buildAudienceEmotionFallbacks(concept);
     const sourceItems = Array.isArray(items) ? items : [];
+    const acceptedItems = [];
 
     return [0, 1, 2].map((index) => {
       const item = String(sourceItems[index] || "").trim();
+      const normalizedItem = item.toLowerCase();
+      const duplicatesEarlierItem = acceptedItems.some((acceptedItem) => {
+        const acceptedWords = new Set(
+          acceptedItem.toLowerCase().split(/\s+/).filter(Boolean)
+        );
+        const itemWords = normalizedItem.split(/\s+/).filter(Boolean);
+        const overlap = itemWords.filter((word) => acceptedWords.has(word));
 
-      if (!item || hasBannedAudienceEmotionTerm(item) || item.split(/\s+/).length < 4) {
-        return fallbackItems[index];
-      }
+        return overlap.length >= Math.min(6, Math.floor(itemWords.length * 0.7));
+      });
 
-      return item;
+      const repairedItem =
+        !audienceEmotionLooksComplete(item) ||
+        hasBannedAudienceEmotionTerm(item) ||
+        duplicatesEarlierItem
+          ? fallbackItems[index]
+          : item;
+
+      acceptedItems.push(repairedItem);
+      return repairedItem;
     });
   };
 
@@ -6200,8 +6727,8 @@ if (
   !data.cinematicIdentity.projectCodename ||
   containsForbiddenTerm(data.cinematicIdentity.projectCodename) ||
   containsForbiddenRoleTerm(data.cinematicIdentity.projectCodename) ||
-    projectCodenameHasRepeatedWord(data.cinematicIdentity.projectCodename)
-) {
+  projectCodenameHasRepeatedWord(data.cinematicIdentity.projectCodename) ||
+  !projectCodenameLooksNatural(data.cinematicIdentity.projectCodename)) {
   data.cinematicIdentity.projectCodename =
     buildProjectCodenameFallback(selectedConceptDNA);
 }
@@ -7527,8 +8054,7 @@ const enforceMusicFacingActionScene = () => {
     ...(data.cinematicIdentity || {}),
     projectCodename: "Night Drive Pursuit",
     creativeArchetype: artist + " Vehicle Chase Signal",
-    visualDNA: [selectedFamily + " primary world", secondaryFamily + " subtle perceptual distortion",
-      //
+    visualDNA: [
       "visible vehicle and wet road direction",
       "headlights and taillights defining chase geography",
       "medium-wide night-drive action composition",
@@ -8063,9 +8589,25 @@ const enforceMusicFacingGraphicObjectSubjectLock = () => {
     .join(" ")
     .toLowerCase();
 
+  const strongAcidMusicSource = [
+    artistName,
+    trackName,
+    genre
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  const hasStrongAcidSignal =
+    /\b(acid|303)\b/.test(strongAcidMusicSource);
+
+  const hasActionSignal =
+    /\b(pursuit|banditry|reckoning|getaway|chase|drive|night drive|vehicle|car|motorcycle|road)\b/.test(source);
+
   const isAcidRelatedMusicFacing =
     musicFacingReelPurposes.includes(reelPurpose) &&
-    /\b(acid|303|smile|smiley|rave|sticker|graphic|cartoon|mascot|icon|symbol)\b/.test(source);
+    hasStrongAcidSignal &&
+    !hasActionSignal;
 
   if (!isAcidRelatedMusicFacing) return;
 
@@ -8194,8 +8736,8 @@ const enforceMusicFacingGraphicObjectSubjectLock = () => {
     add("crowd", 1);
   }
 
-const creativeState = { scores, fractureBias };
-const resolveCreativeState = (state) => { const weighted = Object.entries(state.scores).map(([k,v]) => ({ key:k, score:v + (state.fractureBias > 0.65 ? 0.5 : 0) })); return weighted.sort((a,b)=>b.score-a.score)[0].key; };
+const creativeState = { scores };
+const resolveCreativeState = (state) => { const weighted = Object.entries(state.scores).map(([k,v]) => ({ key:k, score:v })); return weighted.sort((a,b)=>b.score-a.score)[0].key; };
 let selectedFamily = resolveCreativeState(creativeState);
   if (!selectedFamily || scores[selectedFamily] <= 0) selectedFamily = "graphic";
 
@@ -8551,22 +9093,24 @@ let selectedFamily = resolveCreativeState(creativeState);
     return output;
   };
 
-// === FRAME-LAB OUTPUT OBSERVATION (LIGHT MODE SAFE) ===
-const outputTrace = {
-  raw: selected.prompt,
-  afterRender: data.aiVideoPrompt,
-  timestamp: Date.now()
-};
-console.log("[FRAME-LAB OUTPUT TRACE]", outputTrace);
+  const lockedVideoPrompt = polishMusicFacingGrammar(
+    cleanAiVideoPromptText(selected.prompt)
+  );
 
-  data.videoPrompt = selected.prompt;
+  data.aiVideoPrompt = lockedVideoPrompt;
+  data.videoPrompt = lockedVideoPrompt;
+
   data.thumbnailPrompt = selected.thumbnail;
   data.thumbnailConcept = selected.thumbnail;
 
   data.cinematicIdentity = {
     projectCodename: selected.codename,
     creativeArchetype: selected.archetype,
-    visualDNA: [selectedFamily + " primary world", secondaryFamily + " subtle perceptual distortion",selected.subject, selected.world, selectedFamily + " interpretation family"],
+    visualDNA: [
+      selectedFamily + " primary world",
+      selected.subject,
+      selected.world,
+    ],
       //
     emotionalTone: [
       moodLabel + " through acid culture",
@@ -8705,6 +9249,15 @@ const cleanFinalAudienceEmotion = (items = []) => {
       .replace(/\bfinal\s+artist\s+state\b/gi, "final visible state")
       .replace(/\bfinal\s+performer\s+state\b/gi, "final visible state")
       .replace(/\bthe final visible state locks\b/gi, "the final visible arrangement locks")
+      .replace(/\bthe viewer reads\b/gi, "the viewer understands")
+      .replace(
+        /\brelationship between (.+?) and (?:its|their) surroundings\b/gi,
+        "relationship between $1 and the surrounding composition"
+      )
+      .replace(
+        /\bconnection between (.+?) and (?:its|their) surroundings\b/gi,
+        "connection between $1 and the surrounding composition"
+      )
       .replace(/\s+/g, " ")
       .trim();
 
@@ -8748,46 +9301,17 @@ const buildFinalProfessionalHashtags = () => {
     "originalperformer",
   ];
 
-  const conceptWords = String(
-    data?.cinematicIdentity?.visualDNA?.join?.(" ") ||
-      data?.reelConcept ||
-      selectedConceptDNA ||
-      ""
-  )
-    .replace(/[^a-zA-Z0-9\s-]/g, " ")
-    .split(/\s+/)
-    .map((word) => word.trim())
-    .filter((word) => word.length >= 5)
-    .filter(
-      (word) =>
-        ![
-          "under",
-          "through",
-          "their",
-          "there",
-          "these",
-          "those",
-          "final",
-          "frame",
-          "state",
-          "surfaces",
-          "surface",
-        ].includes(word.toLowerCase())
-    )
-    .slice(0, 4);
-
   const candidates = [
     artistName,
-    trackName,
+    ...(reelPurpose === "Artist Identity Reel" ? [] : [trackName]),
     genre,
     reelPurpose,
-    "Artist Identity",
-    "Visual Identity",
+    visualStyle,
+    styleDNA,
     "Cinematic Reel",
-    "AI Video Prompt",
     "Music Video Concept",
-    ...conceptWords,
     "FrameLab",
+    "Visual Identity",
   ];
 
   const tags = [];
@@ -10527,6 +11051,7 @@ const sanitizeFinalCinematicIdentity = () => {
 };
 
 data.previewImage = null;
+enforceMusicFacingGraphicObjectSubjectLock();
 enforceMusicFacingActionResponseLock();
 enforceSubjectSafetyForVisualPrompts();
 await runSemanticQualityGate();
@@ -10536,9 +11061,6 @@ console.log(
   "FINAL CREATIVE ARCHETYPE:",
   data.cinematicIdentity.creativeArchetype
 );
-// Disabled as final override: this template lock was narrowing user combinations into repeated Acid/Family outputs.
-// Keep the function available for future targeted use, but do not let it overwrite the global premium interpretation result.
-if (false) enforceMusicFacingGraphicObjectSubjectLock();
 
 return res.status(200).json(data);
   } catch (error) {
