@@ -4995,6 +4995,8 @@ Different input combinations must create clearly different:
 - emotional tension
 - final frame
 
+For each Premium output, when the active controls meaningfully support it, make the primary creative mechanism visibly consequential: establish a concept-native cause, interaction, response or transformation that produces a meaningful observable state change or progression and materially drives the concept forward; repeated pose, gesture, styling, framing, lighting, texture or surface variation alone does not satisfy this unless it carries that functional consequence. Preserve control coherence and do not force novelty.
+
 Never solve a new combination by reusing the same motif with different color, lighting or texture.
 
 If the user changes Genre, BPM, Mood, Visual Style, Director Mode, Cinematic DNA, Era or Reel Purpose, the core image idea must change.
