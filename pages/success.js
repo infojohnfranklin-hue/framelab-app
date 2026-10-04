@@ -1,17 +1,63 @@
 import { useEffect } from "react";
-import { useRouter } from "next/router";
 
-export default function Success() {
-  const router = useRouter();
+export default function Success({ ui, t }) {
+  const _t =
+    typeof t === "function"
+      ? t
+      : (value) => value;
 
   useEffect(() => {
-    localStorage.setItem("isPro", "true");
-    localStorage.setItem("credits", "999");
+    let cancelled = false;
 
-    setTimeout(() => {
-      router.push("/");
-    }, 1500);
-  }, [router]);
+    const sleep = (ms) =>
+      new Promise((resolve) =>
+        setTimeout(resolve, ms)
+      );
+
+    async function waitForServerPlan() {
+      for (let attempt = 0; attempt < 20; attempt += 1) {
+        if (cancelled) return;
+
+        try {
+          const res = await fetch(
+            `/api/me-plan?ts=${Date.now()}`,
+            {
+              cache: "no-store",
+              headers: {
+                "Cache-Control": "no-cache",
+              },
+            }
+          );
+
+          if (res.ok) {
+            const data = await res.json();
+
+            if (data.plan === "pro") {
+              window.location.href = "/";
+              return;
+            }
+          }
+        } catch (error) {
+          console.error(
+            "Failed to confirm Pro activation:",
+            error
+          );
+        }
+
+        await sleep(500);
+      }
+
+      if (!cancelled) {
+        window.location.href = "/";
+      }
+    }
+
+    waitForServerPlan();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <main
@@ -27,8 +73,8 @@ export default function Success() {
       }}
     >
       <div>
-        <h1>Welcome to FrameLab Pro 🚀</h1>
-        <p>Your subscription is active. Redirecting...</p>
+        <h1>{ui.success.title}</h1>
+        <p>{ui.success.redirecting}</p>
       </div>
     </main>
   );

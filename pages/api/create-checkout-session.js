@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { getAuth } from "@clerk/nextjs/server";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -8,10 +9,28 @@ export default async function handler(req, res) {
   }
 
   try {
+    const { userId } = getAuth(req);
+
+    if (!userId) {
+      return res.status(401).json({
+        error: "You must be logged in to upgrade",
+      });
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
 
       payment_method_types: ["card"],
+
+      metadata: {
+        clerkUserId: userId,
+      },
+
+      subscription_data: {
+        metadata: {
+          clerkUserId: userId,
+        },
+      },
 
       line_items: [
         {

@@ -4,7 +4,8 @@ import { useUser } from "@clerk/nextjs";
 import { supabase } from "../lib/supabaseClient";
 import Layout from "../components/Layout";
 
-export default function History() {
+export default function History({ ui, t }) {
+  const _t = typeof t === "function" ? t : (value) => value;
   const router = useRouter();
   const { user } = useUser();
   const [generations, setGenerations] = useState([]);
@@ -49,7 +50,7 @@ setGenerations(data || []);
     console.log("DELETE RESULT:", result);
 
     if (!response.ok) {
-      alert(result.error || "Delete failed");
+      alert(result.error || ui.history.deleteFailed);
       return;
     }
 
@@ -92,7 +93,7 @@ setGenerations(data || []);
     }
 
     if (!item.video_url) {
-      alert("No export file available.");
+      alert(ui.history.noExportFile);
       return;
     }
 
@@ -100,7 +101,7 @@ setGenerations(data || []);
       const response = await fetch(item.video_url);
 
       if (!response.ok) {
-        throw new Error("Preview file could not be loaded.");
+        throw new Error(ui.history.previewLoadFailed);
       }
 
       const blob = await response.blob();
@@ -115,19 +116,19 @@ setGenerations(data || []);
 
       URL.revokeObjectURL(objectUrl);
     } catch (error) {
-      alert("Export failed. The saved file may no longer be available.");
+      alert(ui.history.exportFailed);
     }
   }
   
   return (
     <Layout>
       <main style={content}>
-        <p style={eyebrow}>GENERATION ARCHIVE</p>
+        <p style={eyebrow}>{ui.history.archiveEyebrow}</p>
 
-        <h1 style={headline}>Your cinematic memory system.</h1>
+        <h1 style={headline}>{ui.history.memoryHeadline}</h1>
 
         <p style={subtitle}>
-          Reopen, export and manage your saved AI cinematic frames.
+          {ui.history.memoryIntro}
         </p>
 
         {generations.length === 0 && (
@@ -139,9 +140,7 @@ setGenerations(data || []);
                 marginBottom: "12px",
                 color: "#fff",
               }}
-            >
-              No cinematic memories yet.
-            </h3>
+            >{ui.history.noMemories}</h3>
 
             <p
               style={{
@@ -151,8 +150,7 @@ setGenerations(data || []);
                 maxWidth: "520px",
               }}
             >
-              Generate your first AI-directed cinematic frame and save it to
-              your archive.
+              {ui.history.firstFrameHint}
             </p>
           </div>
         )}
@@ -171,10 +169,10 @@ setGenerations(data || []);
                     ? "translateY(-8px) scale(1.015)"
                     : "translateY(0) scale(1)",
                   boxShadow: isHovered
-                    ? "0 0 90px rgba(168,85,247,0.28)"
-                    : "0 0 46px rgba(124,58,237,0.14)",
+                    ? "0 24px 70px rgba(0,0,0,0.34)"
+                    : "0 18px 46px rgba(0,0,0,0.22)",
                   border: isHovered
-                    ? "1px solid rgba(168,85,247,0.35)"
+                    ? "1px solid rgba(216,181,106,0.18)"
                     : "1px solid rgba(255,255,255,0.08)",
                 }}
                 onMouseEnter={() => setHoveredId(item.id)}
@@ -190,7 +188,7 @@ setGenerations(data || []);
     }}
   >
     <p style={smallLabel}>
-{item.director_mode || "Dream Cinema"}
+{item.director_mode || ui.history.dreamCinemaFallback}
     </p>
 
     <div
@@ -200,30 +198,30 @@ setGenerations(data || []);
         letterSpacing: "0.12em",
         padding: "6px 10px",
         borderRadius: "999px",
-        background: "rgba(168,85,247,0.15)",
-        border: "1px solid rgba(168,85,247,0.3)",
-        color: "#c084fc",
+        background: "rgba(255,255,255,0.055)",
+        border: "1px solid rgba(216,181,106,0.16)",
+        color: "#E7CC91",
       }}
     >
-{item.era || "Blueprint"}
+{item.era || ui.history.blueprintFallback}
     </div>
   </div>
   
 <h2 style={title}>
-{item.title || `${item.director_mode} Sequence`}
+{item.title || `${item.director_mode} ${ui.history.sequenceFallback}`}
 </h2>
 
 <p
   style={{
     marginTop: "8px",
-    color: "#a855f7",
+    color: "#E7CC91",
     fontSize: "11px",
     fontWeight: "700",
     letterSpacing: "0.08em",
     textTransform: "uppercase",
   }}
 >
-{item.director_mode || "Unknown Director"} · {item.style_dna || item.director_mode || "Cinematic"} · {item.era || "Blueprint"}
+{item.director_mode || ui.history.unknownDirectorFallback} · {item.style_dna || item.director_mode || ui.history.cinematicFallback} · {item.era || ui.history.blueprintFallback}
 </p>
 
 <p style={promptText}>
@@ -246,10 +244,10 @@ setGenerations(data || []);
         height: "420px",
         padding: "22px",
         borderRadius: "18px",
-        border: "1px solid rgba(168,85,247,0.24)",
+        border: "1px solid rgba(246,243,235,0.08)",
         background:
-          "linear-gradient(135deg, rgba(15,23,42,0.96), rgba(88,28,135,0.22))",
-        boxShadow: "inset 0 0 40px rgba(124,58,237,0.12)",
+          "linear-gradient(135deg, rgba(20,21,23,0.96), rgba(10,11,13,0.98))",
+        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.035)",
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
@@ -259,7 +257,7 @@ setGenerations(data || []);
       <div>
         <div
           style={{
-            color: "#c4b5fd",
+            color: "#E7CC91",
             fontSize: "11px",
             fontWeight: "900",
             letterSpacing: "0.16em",
@@ -267,7 +265,7 @@ setGenerations(data || []);
             marginBottom: "14px",
           }}
         >
-          Production Blueprint
+          {ui.history.productionBlueprint}
         </div>
 
         <pre
@@ -294,9 +292,7 @@ setGenerations(data || []);
           letterSpacing: "0.16em",
           textTransform: "uppercase",
         }}
-      >
-        TXT Export Ready
-      </div>
+      >{ui.history.txtExportReady}</div>
     </div>
   ) : item.video_url ? (
     <img
@@ -305,7 +301,7 @@ setGenerations(data || []);
       style={{
         ...video,
         borderRadius: "18px",
-        border: "1px solid rgba(168,85,247,0.22)",
+        border: "1px solid rgba(246,243,235,0.08)",
       }}
     />
   ) : (
@@ -317,19 +313,19 @@ setGenerations(data || []);
         alignItems: "center",
         justifyContent: "center",
         textAlign: "center",
-        color: "rgba(196,181,253,0.7)",
+        color: "rgba(226,196,128,0.72)",
         padding: "20px",
         background:
-          "linear-gradient(135deg, rgba(15,23,42,0.98), rgba(88,28,135,0.28))",
-        border: "1px solid rgba(168,85,247,0.18)",
-        fontSize: "11px",
-        fontWeight: "700",
-        letterSpacing: "0.12em",
+          "radial-gradient(circle at 50% 38%, rgba(216,181,106,0.10) 0%, rgba(216,181,106,0.025) 32%, transparent 58%), linear-gradient(145deg, rgba(20,19,17,0.99) 0%, rgba(10,11,13,0.99) 62%, rgba(7,8,10,1) 100%)",
+        border: "1px solid rgba(216,181,106,0.16)",
+        boxShadow:
+          "inset 0 0 0 1px rgba(246,243,235,0.025), inset 0 0 48px rgba(0,0,0,0.42)",
+        fontSize: "10px",
+        fontWeight: "800",
+        letterSpacing: "0.18em",
         textTransform: "uppercase",
       }}
-    >
-      No preview available
-    </div>
+    >{ui.history.noPreview}</div>
   )}
 </div>
 
@@ -340,9 +336,7 @@ setGenerations(data || []);
       e.stopPropagation();
       reopenGeneration(item);
     }}
-  >
-    Reopen Project
-  </button>
+  >{ui.history.reopenProject}</button>
 
   <button
     style={buttonGhost}
@@ -350,9 +344,7 @@ setGenerations(data || []);
       e.stopPropagation();
       downloadImage(item);
     }}
-  >
-    Export Preview
-  </button>
+  >{ui.history.exportPreview}</button>
 
   <button
     style={buttonDanger}
@@ -360,9 +352,7 @@ setGenerations(data || []);
       e.stopPropagation();
       setPendingDeleteId(item.id);
     }}
-  >
-    Remove
-  </button>
+  >{ui.history.remove}</button>
 </div>
               </div>
             );
@@ -387,56 +377,52 @@ setGenerations(data || []);
             onClick={(e) => e.stopPropagation()}
             style={{
               width: "100%",
-              maxWidth: "460px",
-              padding: "28px",
-              borderRadius: "28px",
+              maxWidth: "480px",
+              padding: "34px",
+              borderRadius: "24px",
               background:
-                "linear-gradient(180deg, rgba(18,18,32,0.98), rgba(8,8,16,0.98))",
-              border: "1px solid rgba(248,113,113,0.24)",
+                "linear-gradient(145deg, rgba(22,21,18,0.985) 0%, rgba(13,13,13,0.99) 58%, rgba(8,9,10,0.995) 100%)",
+              border: "1px solid rgba(216,181,106,0.18)",
               boxShadow:
-                "0 30px 100px rgba(0,0,0,0.62), 0 0 80px rgba(127,29,29,0.22)",
-              color: "white",
+                "0 32px 90px rgba(0,0,0,0.68), inset 0 1px 0 rgba(246,243,235,0.035)",
+              color: "rgba(246,243,235,0.96)",
             }}
           >
             <div
               style={{
-                color: "#fca5a5",
-                fontSize: "11px",
-                fontWeight: "900",
-                letterSpacing: "0.18em",
+                color: "rgba(216,181,106,0.78)",
+                fontSize: "10px",
+                fontWeight: "800",
+                letterSpacing: "0.2em",
                 textTransform: "uppercase",
-                marginBottom: "14px",
+                marginBottom: "16px",
               }}
-            >
-              Delete Memory
-            </div>
+            >{ui.history.deleteMemory}</div>
 
             <h3
               style={{
                 fontSize: "30px",
-                lineHeight: "1.05",
+                lineHeight: "1.08",
                 fontWeight: "900",
-                margin: "0 0 14px",
+                margin: "0 0 16px",
               }}
-            >
-              Remove this saved project?
-            </h3>
+            >{ui.history.removeSavedProject}</h3>
 
             <p
               style={{
-                color: "rgba(255,255,255,0.68)",
+                color: "rgba(246,243,235,0.62)",
                 fontSize: "15px",
-                lineHeight: "1.7",
-                margin: "0 0 24px",
+                lineHeight: "1.75",
+                margin: "0 0 30px",
               }}
             >
-              This will permanently remove the selected FrameLab history item from your archive.
+              {ui.history.deleteArchiveWarning}
             </p>
 
             <div
               style={{
                 display: "flex",
-                gap: "12px",
+                gap: "10px",
                 justifyContent: "flex-end",
                 flexWrap: "wrap",
               }}
@@ -445,16 +431,16 @@ setGenerations(data || []);
                 type="button"
                 onClick={() => setPendingDeleteId(null)}
                 style={{
-                  padding: "12px 18px",
-                  borderRadius: "999px",
-                  border: "1px solid rgba(255,255,255,0.14)",
-                  background: "rgba(255,255,255,0.06)",
-                  color: "rgba(255,255,255,0.86)",
+                  padding: "11px 18px",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(246,243,235,0.12)",
+                  background: "rgba(246,243,235,0.045)",
+                  color: "rgba(246,243,235,0.76)",
                   fontWeight: "800",
                   cursor: "pointer",
                 }}
               >
-                Cancel
+                {ui.history.cancel}
               </button>
 
               <button
@@ -465,19 +451,17 @@ setGenerations(data || []);
                   await deleteGeneration(idToDelete);
                 }}
                 style={{
-                  padding: "12px 18px",
-                  borderRadius: "999px",
-                  border: "1px solid rgba(248,113,113,0.38)",
+                  padding: "11px 18px",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(248,113,113,0.34)",
                   background:
-                    "linear-gradient(90deg, rgba(127,29,29,0.95), rgba(239,68,68,0.88))",
-                  color: "white",
+                    "linear-gradient(180deg, rgba(153,27,27,0.92), rgba(111,20,20,0.96))",
+                  color: "rgba(255,245,245,0.96)",
                   fontWeight: "900",
                   cursor: "pointer",
-                  boxShadow: "0 14px 44px rgba(239,68,68,0.22)",
+                  boxShadow: "0 10px 28px rgba(127,29,29,0.18)",
                 }}
-              >
-                Delete Permanently
-              </button>
+              >{ui.history.deletePermanently}</button>
             </div>
           </div>
         </div>
@@ -492,15 +476,16 @@ const content = {
   flex: 1,
   padding: "70px",
   background:
-    "radial-gradient(circle at top, rgba(124,58,237,0.28) 0%, #050507 58%)",
+    "linear-gradient(90deg, rgba(7,7,8,0.94) 0%, rgba(7,7,8,0.80) 40%, rgba(7,7,8,0.54) 72%, rgba(7,7,8,0.46) 100%), linear-gradient(180deg, rgba(9,8,6,0.18) 0%, rgba(9,8,6,0.36) 58%, rgba(9,8,6,0.78) 100%), url('/framelab-premium-History-assets/ChatGPT Image 24. Sept. 2026, 14_37_35.png') center top / cover no-repeat, #090A0C",
   minWidth: 0,
   maxWidth: "100%",
   overflow: "hidden",
 };
 
 const eyebrow = {
-  color: "#a78bfa",
-  letterSpacing: "4px",
+  color: "#E7CC91",
+  fontSize: "13px",
+  letterSpacing: "0.28em",
   fontWeight: "800",
   marginBottom: "22px",
 };
@@ -516,7 +501,7 @@ const headline = {
 
 const subtitle = {
   color: "rgba(255,255,255,0.7)",
-  fontSize: "20px",
+  fontSize: "19px",
   lineHeight: "1.6",
   maxWidth: "100%",
   marginBottom: "48px",
@@ -526,10 +511,10 @@ const emptyBox = {
   padding: "34px",
   borderRadius: "28px",
   background:
-    "linear-gradient(135deg, rgba(15,23,42,0.92), rgba(88,28,135,0.18))",
-  border: "1px solid rgba(168,85,247,0.2)",
+    "linear-gradient(135deg, rgba(20,21,23,0.94), rgba(10,11,13,0.98))",
+  border: "1px solid rgba(246,243,235,0.08)",
   color: "rgba(255,255,255,0.7)",
-  boxShadow: "0 0 50px rgba(124,58,237,0.12)",
+  boxShadow: "0 20px 54px rgba(0,0,0,0.24)",
 };
 
 const grid = {
@@ -556,13 +541,13 @@ const card = {
 };
 
 const textArea = {
-  height: "300px",
+  minHeight: "300px",
   maxWidth: "100%",
   overflow: "hidden",
 };
 
 const smallLabel = {
-  color: "#c4b5fd",
+  color: "#E7CC91",
   fontWeight: "800",
   marginBottom: "16px",
 };
@@ -620,8 +605,8 @@ const buttonPrimary = {
 padding: "10px 12px",
   borderRadius: "14px",
   border: "none",
-  background: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
-  color: "white",
+  background: "linear-gradient(90deg, #B88A3B, #E7CC91)",
+  color: "#17130C",
   fontSize: "12px",
   fontWeight: "800",
   cursor: "pointer",

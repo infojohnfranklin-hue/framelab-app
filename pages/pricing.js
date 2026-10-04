@@ -1,7 +1,8 @@
 import { useState } from "react";
 import Link from "next/link";
 
-export default function PricingPage() {
+export default function PricingPage({ ui, t }) {
+  const _t = typeof t === "function" ? t : (value) => value;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -27,12 +28,12 @@ export default function PricingPage() {
       const data = await res.json();
 
       if (!res.ok || !data.url) {
-        throw new Error(data.error || "Checkout konnte nicht gestartet werden.");
+        throw new Error(data.error || ui.pricing.checkoutCouldNotStart);
       }
 
       window.location.href = data.url;
     } catch (err) {
-      setError(err.message || "Checkout konnte nicht gestartet werden.");
+      setError(err.message || ui.pricing.checkoutCouldNotStart);
       setLoading(false);
     }
   }
@@ -58,9 +59,7 @@ export default function PricingPage() {
             fontWeight: 800,
             marginBottom: "28px",
           }}
-        >
-          FrameLab Pricing
-        </div>
+        >{ui.pricing.title}</div>
 
         <h1
           style={{
@@ -70,9 +69,7 @@ export default function PricingPage() {
             fontWeight: 900,
             letterSpacing: "-0.05em",
           }}
-        >
-          Upgrade your cinematic workflow.
-        </h1>
+        >{ui.pricing.headline}</h1>
 
         <p
           style={{
@@ -177,9 +174,7 @@ export default function PricingPage() {
           <section style={sideCardStyle}>
             <h2 style={cardTitle}>Current Restore Status</h2>
 
-            <p style={cardText}>
-              Pricing is restored as a safe visual route so FrameLab no longer sends users to a missing page.
-            </p>
+            <p style={cardText}>{ui.pricing.restoreText}</p>
 
             <div style={miniList}>
               <div style={miniItem}>✓ Premium page exists</div>

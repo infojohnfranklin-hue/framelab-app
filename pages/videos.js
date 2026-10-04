@@ -9,11 +9,13 @@ import {
   buildCinematicPrompt,
 } from "../lib/promptEngine.js";
 
-export default function VideosPage() {
+export default function VideosPage({ ui, t }) {
+  const _t = typeof t === "function" ? t : (value) => value;
   const eyebrow = {
-  color: "#a78bfa",
-  letterSpacing: "4px",
-  fontWeight: "700",
+  color: "#E7CC91",
+  fontSize: "13px",
+  letterSpacing: "0.28em",
+  fontWeight: "800",
   marginBottom: "20px",
 };
 
@@ -21,32 +23,37 @@ const headline = {
   fontSize: "88px",
   lineHeight: "0.95",
   fontWeight: "900",
-  maxWidth: "920px",
-  marginBottom: "30px",
+  maxWidth: "980px",
+  margin: "0 auto 24px",
+  textAlign: "center",
 };
 
 const subline = {
   color: "rgba(255,255,255,0.7)",
-  fontSize: "30px",
-  lineHeight: "1.7",
-  maxWidth: "760px",
-  marginBottom: "60px",
+  fontSize: "19px",
+  lineHeight: "1.6",
+  maxWidth: "820px",
+  margin: "0 auto 60px",
+  textAlign: "center",
 };
 
 const generatorBox = {
-  marginBottom: "60px",
+  margin: "0 0 60px 72px",
   padding: "40px",
   borderRadius: "34px",
-  minWidth: "360px",
+  minWidth: "min(360px, calc(100% - 72px))",
+  width: "calc(100% - 72px)",
+  maxWidth: "1180px",
+  boxSizing: "border-box",
   background:
-    "linear-gradient(180deg, rgba(20,20,35,0.96), rgba(10,10,20,0.98))",
-  border: "1px solid rgba(168,85,247,0.14)",
-  boxShadow: "0 0 80px rgba(124,58,237,0.12)",
+    "linear-gradient(180deg, rgba(20,21,23,0.97), rgba(10,11,13,0.98))",
+  border: "1px solid rgba(216,181,106,0.16)",
+  boxShadow: "0 24px 80px rgba(0,0,0,0.30)",
   backdropFilter: "blur(16px)",
 };
 
 const generatorEyebrow = {
-  color: "#a78bfa",
+  color: "#E7CC91",
   fontWeight: "800",
   letterSpacing: "3px",
   marginBottom: "18px",
@@ -61,12 +68,13 @@ const audioUploadBox = {
   marginBottom: "16px",
   padding: "12px",
   borderRadius: "20px",
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(168,85,247,0.18)",
+  background:
+    "linear-gradient(180deg, rgba(20,21,23,0.92), rgba(10,11,13,0.96))",
+  border: "1px solid rgba(216,181,106,0.16)",
 };
 
 const audioUploadLabel = {
-  color: "#c4b5fd",
+  color: "#E7CC91",
   fontSize: "11px",
   fontWeight: "800",
   letterSpacing: "2px",
@@ -93,25 +101,25 @@ const moodSuggestionRow = {
 const moodSuggestionChip = {
   padding: "10px 14px",
   borderRadius: "999px",
-  border: "1px solid rgba(168,85,247,0.28)",
-  background: "rgba(168,85,247,0.14)",
+  border: "1px solid rgba(216,181,106,0.14)",
+  background: "rgba(255,255,255,0.045)",
   color: "white",
   fontSize: "13px",
   fontWeight: "800",
   cursor: "pointer",
   transition: "all 0.22s ease",
-  boxShadow: "0 0 18px rgba(168,85,247,0.08)",
+  boxShadow: "none",
 };
 const hookBox = {
   marginBottom: "24px",
   padding: "24px",
   borderRadius: "24px",
-  border: "1px solid rgba(168,85,247,0.16)",
-  background: "rgba(168,85,247,0.08)",
+  border: "1px solid rgba(216,181,106,0.16)",
+  background: "rgba(255,255,255,0.04)",
 };
 
 const hookLabel = {
-  color: "#a78bfa",
+  color: "#E7CC91",
   fontSize: "12px",
   fontWeight: "800",
   letterSpacing: "2px",
@@ -132,9 +140,9 @@ const textareaStyle = {
   height: "260px",
   padding: "42px",
   borderRadius: "26px",
-  border: "1px solid rgba(168,85,247,0.12)",
+  border: "1px solid rgba(255,255,255,0.10)",
   background:
-    "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
+    "linear-gradient(180deg, rgba(20,21,23,0.92), rgba(10,11,13,0.96))",
   color: "white",
   fontSize: "20px",
   lineHeight: "1.8",
@@ -145,7 +153,7 @@ const textareaStyle = {
   scrollbarWidth: "none",
   msOverflowStyle: "none",
   marginBottom: "30px",
-  boxShadow: "inset 0 0 30px rgba(124,58,237,0.05)",
+  boxShadow: "none",
   backdropFilter: "blur(10px)",
 };
 
@@ -160,7 +168,7 @@ const modeRow = {
 const modeButton = {
   padding: "16px 20px",
   borderRadius: "999px",
-  border: "1px solid rgba(168,85,247,0.18)",
+  border: "1px solid rgba(255,255,255,0.10)",
   color: "white",
   fontWeight: "800",
   cursor: "pointer",
@@ -185,7 +193,7 @@ const modeButton = {
   backdropFilter: "blur(10px)",
   transition: "all 0.35s ease",
   animation: "none",
-  boxShadow: "0 0 20px rgba(124,58,237,0.08)",
+  boxShadow: "none",
 };
 
 const buttonRow = {
@@ -205,16 +213,16 @@ const generateButton = {
   borderRadius: "999px",
   border: "none",
   background:
-    "linear-gradient(90deg, #7c3aed, #c084fc)",
-  color: "white",
+    "linear-gradient(90deg, #B88A3B 0%, #D8B56A 50%, #E7CC91 100%)",
+  color: "#17130C",
   fontSize: "16px",
   fontWeight: "950",
   cursor: "pointer",
   transition: "all 0.22s ease",
   boxShadow:
-    "0 20px 78px rgba(168,85,247,0.48), 0 0 120px rgba(168,85,247,0.20)",
+    "0 20px 78px rgba(216,181,106,0.24), 0 0 90px rgba(216,181,106,0.12)",
   letterSpacing: "-0.02em",
-  textShadow: "0 1px 12px rgba(255,255,255,0.16)",
+  textShadow: "none",
   backdropFilter: "blur(14px)",
 };
 
@@ -223,9 +231,9 @@ const saveButton = {
   minWidth: "180px",
   padding: "10px 18px",
   borderRadius: "999px",
-  border: "1px solid rgba(196,181,253,0.18)",
-  background: "rgba(124,58,237,0.08)",
-  color: "#d8b4fe",
+  border: "1px solid rgba(216,181,106,0.16)",
+  background: "rgba(255,255,255,0.045)",
+  color: "#E7CC91",
   fontWeight: "800",
   fontSize: "13px",
   cursor: "pointer",
@@ -239,7 +247,7 @@ const resultBox = {
 };
 
 const resultEyebrow = {
-  color: "#c4b5fd",
+  color: "#E7CC91",
   fontWeight: "800",
   marginBottom: "14px",
 };
@@ -257,28 +265,29 @@ const resultMeta = {
 
 const expandedPromptText = {
   marginTop: "24px",
-  color: "#d8ccff",
+  color: "rgba(255,255,255,0.82)",
   lineHeight: "1.9",
   fontSize: "15px",
   whiteSpace: "pre-wrap",
   padding: "22px",
   borderRadius: "18px",
-  background: "rgba(255,255,255,0.03)",
-  border: "1px solid rgba(168,85,247,0.12)",
+  background:
+    "linear-gradient(180deg, rgba(20,21,23,0.92), rgba(10,11,13,0.96))",
+  border: "1px solid rgba(255,255,255,0.10)",
   fontFamily: "monospace",
 };
 
 const shotMetaBadge = {
   padding: "7px 12px",
   borderRadius: "999px",
-  background: "rgba(255,255,255,0.05)",
-  border: "1px solid rgba(168,85,247,0.12)",
+  background: "rgba(20,21,23,0.92)",
+  border: "1px solid rgba(255,255,255,0.10)",
   color: "rgba(255,255,255,0.72)",
   fontSize: "11px",
   fontWeight: "800",
 };
 const shotsTitle = {
-  color: "#a78bfa",
+  color: "#E7CC91",
   fontWeight: "800",
   marginBottom: "18px",
   letterSpacing: "2px",
@@ -289,9 +298,9 @@ const shotCard = {
   borderRadius: "24px",
   marginBottom: "18px",
   background:
-    "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
-  border: "1px solid rgba(168,85,247,0.18)",
-  boxShadow: "0 0 40px rgba(124,58,237,0.12)",
+    "linear-gradient(180deg, rgba(20,21,23,0.94), rgba(10,11,13,0.98))",
+  border: "1px solid rgba(216,181,106,0.16)",
+  boxShadow: "0 18px 48px rgba(0,0,0,0.22)",
   backdropFilter: "blur(16px)",
   transition: "all 0.3s ease",
   position: "relative",
@@ -300,7 +309,7 @@ overflowX: "hidden",
 };
 
 const shotLabel = {
-  color: "#c084fc",
+  color: "#E7CC91",
   fontWeight: "900",
   marginBottom: "14px",
   letterSpacing: "3px",
@@ -321,15 +330,15 @@ const premiumCopyButton = {
   height: "34px",
   padding: "0 14px",
   borderRadius: "999px",
-  border: "1px solid rgba(168,85,247,0.36)",
+  border: "1px solid rgba(216,181,106,0.24)",
   background:
-    "linear-gradient(180deg, rgba(168,85,247,0.18), rgba(76,29,149,0.24))",
-  color: "#f5f3ff",
+    "linear-gradient(180deg, rgba(216,181,106,0.16), rgba(184,138,59,0.12))",
+  color: "#F6F3EB",
   fontSize: "12px",
   fontWeight: "850",
   letterSpacing: "0.01em",
   cursor: "pointer",
-  boxShadow: "0 0 18px rgba(168,85,247,0.12)",
+  boxShadow: "0 0 18px rgba(216,181,106,0.10)",
   whiteSpace: "nowrap",
 };
 
@@ -345,9 +354,9 @@ const premiumCopyButtonCopied = {
 const premiumSecondaryButton = {
   ...premiumCopyButton,
   minWidth: "154px",
-  border: "1px solid rgba(196,181,253,0.24)",
+  border: "1px solid rgba(216,181,106,0.16)",
   background: "rgba(255,255,255,0.055)",
-  color: "#e9d5ff",
+  color: "#F6F3EB",
   boxShadow: "none",
 };
 
@@ -390,7 +399,7 @@ const videoText = {
 };
 
 const featuredLabel = {
-  color: "#c4b5fd",
+  color: "#E7CC91",
   fontWeight: "800",
   letterSpacing: "3px",
   marginBottom: "16px",
@@ -402,7 +411,7 @@ const featuredHeadline = {
   fontWeight: "900",
   maxWidth: "820px",
   letterSpacing: "-2px",
-  textShadow: "0 0 40px rgba(124,58,237,0.25)",
+  textShadow: "0 0 36px rgba(216,181,106,0.12)",
 };
 
 const grid = {
@@ -417,18 +426,18 @@ const reelCard = {
   overflow: "hidden",
   background:
     "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
-  border: "1px solid rgba(168,85,247,0.12)",
+  border: "1px solid rgba(216,181,106,0.12)",
   transition: "0.35s ease",
   cursor: "pointer",
-  boxShadow: "0 0 40px rgba(124,58,237,0.08)",
+  boxShadow: "0 18px 48px rgba(0,0,0,0.22)",
   backdropFilter: "blur(12px)",
 };
 
 const reelPreview = {
   height: "240px",
   background: `
-    radial-gradient(circle at top, rgba(168,85,247,0.35), transparent 60%),
-    linear-gradient(180deg, rgba(25,25,40,0.2), rgba(5,5,10,1))
+    radial-gradient(circle at top, rgba(255,255,255,0.055), transparent 60%),
+    linear-gradient(180deg, rgba(20,21,23,0.38), rgba(7,8,10,1))
   `,
   position: "relative",
   overflow: "hidden",
@@ -471,7 +480,7 @@ const loadingBar = {
   overflow: "hidden",
   background: "rgba(255,255,255,0.07)",
   marginTop: "22px",
-  border: "1px solid rgba(168,85,247,0.18)",
+  border: "1px solid rgba(216,181,106,0.16)",
 };
 
 const loadingProgress = {
@@ -479,15 +488,15 @@ const loadingProgress = {
   height: "100%",
   borderRadius: "999px",
   background:
-    "linear-gradient(90deg, #7c3aed 0%, #a855f7 50%, #22d3ee 100%)",
-  boxShadow: "0 0 28px rgba(168,85,247,0.45)",
+    "linear-gradient(90deg, #B88A3B 0%, #D8B56A 50%, #E7CC91 100%)",
+  boxShadow: "0 0 28px rgba(216,181,106,0.24)",
   animation: "pulse 1.8s ease-in-out infinite",
 };
 const spinner = {
   width: "60px",
   height: "60px",
   border: "4px solid rgba(255,255,255,0.1)",
-  borderTop: "4px solid #a855f7",
+  borderTop: "4px solid #D8B56A",
   borderRadius: "999px",
   animation: "spin 1s linear infinite",
 };
@@ -557,10 +566,10 @@ const hasAccess =
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [copyLabel, setCopyLabel] = useState("Copy Blueprint");
-  const [shotCopyLabel, setShotCopyLabel] = useState("Copy Director Notes");
+  const [copyLabel, setCopyLabel] = useState(ui.blueprints.copyBlueprint);
+  const [shotCopyLabel, setShotCopyLabel] = useState(ui.blueprints.copyDirectorNotes);
   const [assetCopyLabel, setAssetCopyLabel] = useState("");
-  const [shotPromptCopyLabel, setShotPromptCopyLabel] = useState("Copy AI Video Prompt");
+  const [shotPromptCopyLabel, setShotPromptCopyLabel] = useState(ui.blueprints.copyVideoPrompt);
   const [selectedShot, setSelectedShot] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
@@ -682,12 +691,12 @@ function handleVisualReferenceUpload(file) {
   if (!file) return;
 
   if (!file.type || !file.type.startsWith("image/")) {
-    setVisualReferenceError("Please upload a portrait, product or mood image.");
+    setVisualReferenceError(ui.blueprints.uploadImage);
     return;
   }
 
   if (file.size > 10 * 1024 * 1024) {
-    setVisualReferenceError("Image is too large. Please use an image under 10 MB.");
+    setVisualReferenceError(ui.blueprints.imageTooLarge);
     return;
   }
 
@@ -859,9 +868,7 @@ Resolve with a restrained final memory frame.`;
     await audioContext.close();
   } catch (error) {
     console.error("Audio analysis error:", error);
-    setAudioAnalysisError(
-      "Audio could not be analyzed locally. The blueprint will continue without audio influence."
-    );
+    setAudioAnalysisError(ui.blueprints.audioAnalysisFailed);
   } finally {
     setAudioAnalyzing(false);
   }
@@ -2620,7 +2627,7 @@ localStorage.setItem(
 }, 1200);
   } catch (error) {
     console.log("Generate error:", error);
-    alert("Something went wrong while generating.");
+    alert(ui.blueprints.generateError);
     setGenerating(false);
   }
 }
@@ -2630,13 +2637,13 @@ async function handleSaveToHistory() {
   setSaving(true);
 
   if (!generated) {
-    alert("Please generate a blueprint first.");
+    alert(ui.blueprints.generateFirst);
     setSaving(false);
     return;
   }
 
   if (!user) {
-    alert("Please login first.");
+    alert(ui.blueprints.loginFirst);
     setSaving(false);
     return;
   }
@@ -2859,30 +2866,81 @@ div[style*="space-between"] {
 }
     `}</style>
 
-<p style={eyebrow}>DIRECTOR AI SYSTEM</p>
+<div
+  style={{
+    backgroundImage:
+      "linear-gradient(90deg, rgba(5,5,6,0.96) 0%, rgba(5,5,6,0.78) 36%, rgba(5,5,6,0.30) 68%, rgba(5,5,6,0.10) 100%), linear-gradient(180deg, rgba(5,5,6,0.06) 48%, rgba(5,5,6,0.92) 100%), url('/framelab-premium-blueprints-assets/01_FrameLab_Blueprints_Hero_Studio_Wide.png')",
+    backgroundSize: "100% 100%, 100% 100%, cover",
+    backgroundPosition: "center, center, center center",
+    backgroundRepeat: "no-repeat, no-repeat, no-repeat",
+    backgroundAttachment: "scroll, scroll, fixed",
+  }}
+>
+  <div
+    style={{
+      position: "relative",
+      marginBottom: "56px",
+      display: "flex",
+      alignItems: "flex-start",
+    }}
+  >
+    <div
+      style={{
+        position: "relative",
+        zIndex: 1,
+        width: "min(760px, 78%)",
+        padding: "72px 72px 24px",
+      }}
+    >
+      <p
+        style={{
+          ...eyebrow,
+          margin: "0 0 22px",
+        }}
+      >
+        DIRECTOR AI SYSTEM
+      </p>
 
-      <h1 style={headline}>Director-grade cinematic blueprints.</h1>
+      <h1
+        style={{
+          ...headline,
+          fontSize: "68px",
+          margin: "0",
+          textAlign: "left",
+          maxWidth: "720px",
+        }}
+      >
+        {ui.blueprints.heroHeadline}
+      </h1>
 
-<p style={subline}>
-  Craft director-grade cinematic blueprints, visual systems,
-  shot structures and production-ready creative direction.
-</p>
+      <p
+        style={{
+          ...subline,
+          margin: "24px 0 0",
+          maxWidth: "650px",
+          textAlign: "left",
+        }}
+      >
+        {ui.blueprints.heroSubtitle}
+      </p>
+    </div>
+  </div>
 
-<div style={generatorBox}>
-<p style={generatorEyebrow}>DIRECTOR BLUEPRINT GENERATOR</p>
+  <div style={generatorBox}>
+<p style={generatorEyebrow}>{ui.blueprints.generatorEyebrow}</p>
 <div
   style={{
     marginBottom: "26px",
     padding: "22px",
     borderRadius: "24px",
     background: "rgba(255,255,255,0.035)",
-    border: `1px solid ${accentColor}22`,
-    boxShadow: `0 0 40px ${accentColor}12`,
+    border: "1px solid rgba(216,181,106,0.16)",
+    boxShadow: "0 24px 80px rgba(0,0,0,0.30)",
   }}
 >
 <p
   style={{
-    color: accentColor,
+    color: "#E7CC91",
     fontSize: "38px",
     marginBottom: "14px",
   }}
@@ -2905,7 +2963,7 @@ div[style*="space-between"] {
       fontWeight: "900",
     }}
   >
-    Director System: {selectedDirectorMode?.name}
+    {ui.blueprints.directorSystem}: {selectedDirectorMode?.name}
   </div>
 
   <div
@@ -2949,14 +3007,14 @@ style={{
   display: "block",
   padding: "10px",
   borderRadius: "18px",
-  border: "1px dashed rgba(168,85,247,0.45)",
+  border: "1px dashed rgba(216,181,106,0.22)",
   background:
-    "linear-gradient(180deg, rgba(168,85,247,0.12), rgba(255,255,255,0.03))",
+    "linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025))",
   cursor: "pointer",
   textAlign: "center",
   transform: "scale(1)",
   transition: "all 0.25s ease",
-  boxShadow: "0 0 30px rgba(168,85,247,0.08)",
+  boxShadow: "0 18px 42px rgba(0,0,0,0.18)",
 }}
   >
 <div
@@ -2967,9 +3025,9 @@ style={{
     margin: "0 auto 8px",
     borderRadius: "16px",
     background: isDragging
-      ? "linear-gradient(180deg, rgba(168,85,247,0.38), rgba(168,85,247,0.18))"
-      : "linear-gradient(180deg, rgba(168,85,247,0.22), rgba(168,85,247,0.08))",
-    border: "1px solid rgba(168,85,247,0.32)",
+      ? "linear-gradient(180deg, rgba(216,181,106,0.18), rgba(255,255,255,0.055))"
+      : "linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.035))",
+    border: "1px solid rgba(216,181,106,0.18)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -2979,7 +3037,7 @@ style={{
       : "scale(1) translateY(0px)",
     animation: isDragging ? "iconPulse 0.9s infinite" : "none",
     boxShadow: isDragging
-      ? "0 0 30px rgba(168,85,247,0.28)"
+      ? "0 0 30px rgba(216,181,106,0.18)"
       : "none",
   }}
 >
@@ -2990,7 +3048,7 @@ style={{
     borderRadius: "999px",
     border: "2px solid rgba(255,255,255,0.9)",
     position: "relative",
-    boxShadow: "0 0 18px rgba(168,85,247,0.35)",
+    boxShadow: "0 0 18px rgba(216,181,106,0.18)",
   }}
 >
   <div
@@ -3031,14 +3089,14 @@ style={{
             0.5 + index * 0.08
           }s ease-in-out infinite`,
           animationDelay: `${index * 0.08}s`,
-          boxShadow: "0 0 12px rgba(168,85,247,0.35)",
+          boxShadow: "0 0 12px rgba(216,181,106,0.18)",
         }}
       />
     ))}
   </div>
 )}
 
-<p style={audioUploadLabel}>OPTIONAL AUDIO REFERENCE</p>
+<p style={audioUploadLabel}>{ui.blueprints.optionalAudioReference}</p>
 
     <p
       style={{
@@ -3048,7 +3106,7 @@ style={{
         marginBottom: "18px",
       }}
     >
-Add a track if you want the sequence to follow a mood or rhythm.
+{ui.blueprints.audioReferenceHelp}
     </p>
 
     <input
@@ -3071,7 +3129,7 @@ Add a track if you want the sequence to follow a mood or rhythm.
           padding: "14px",
           borderRadius: "16px",
           background: "rgba(255,255,255,0.045)",
-          border: "1px solid rgba(168,85,247,0.22)",
+          border: "1px solid rgba(216,181,106,0.14)",
         }}
       >
         <p style={audioFileName}>
@@ -3081,7 +3139,7 @@ Add a track if you want the sequence to follow a mood or rhythm.
         {audioAnalyzing && (
           <p
             style={{
-              color: "#c4b5fd",
+              color: "#E7CC91",
               fontSize: "13px",
               marginTop: "8px",
             }}
@@ -3143,14 +3201,14 @@ style={{
   display: "block",
   padding: "10px",
   borderRadius: "18px",
-  border: "1px dashed rgba(168,85,247,0.45)",
+  border: "1px dashed rgba(216,181,106,0.22)",
   background:
-    "linear-gradient(180deg, rgba(168,85,247,0.12), rgba(255,255,255,0.03))",
+    "linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025))",
   cursor: "pointer",
   textAlign: "center",
   transform: "scale(1)",
   transition: "all 0.25s ease",
-  boxShadow: "0 0 30px rgba(168,85,247,0.08)",
+  boxShadow: "0 18px 42px rgba(0,0,0,0.18)",
 }}
 >
   {visualReferencePreview ? (
@@ -3173,14 +3231,14 @@ style={{
           backgroundImage: `url(${visualReferencePreview})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          border: "1px solid rgba(168,85,247,0.36)",
-          boxShadow: "0 0 24px rgba(168,85,247,0.16)",
+          border: "1px solid rgba(216,181,106,0.20)",
+          boxShadow: "0 0 24px rgba(216,181,106,0.10)",
           flexShrink: 0,
         }}
       />
 
       <div>
-        <p style={audioUploadLabel}>OPTIONAL VISUAL REFERENCE</p>
+        <p style={audioUploadLabel}>{ui.blueprints.optionalVisualReference}</p>
 
         <p
           style={{
@@ -3205,9 +3263,9 @@ style={{
           margin: "0 auto 12px",
           borderRadius: "16px",
           background: visualReferenceDragging
-            ? "linear-gradient(180deg, rgba(168,85,247,0.38), rgba(168,85,247,0.18))"
-            : "linear-gradient(180deg, rgba(168,85,247,0.22), rgba(168,85,247,0.08))",
-          border: "1px solid rgba(168,85,247,0.32)",
+            ? "linear-gradient(180deg, rgba(216,181,106,0.18), rgba(255,255,255,0.055))"
+            : "linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.035))",
+          border: "1px solid rgba(216,181,106,0.18)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -3217,7 +3275,7 @@ style={{
             : "scale(1) translateY(0px)",
           animation: visualReferenceDragging ? "iconPulse 0.9s infinite" : "none",
           boxShadow: visualReferenceDragging
-            ? "0 0 30px rgba(168,85,247,0.28)"
+            ? "0 0 30px rgba(216,181,106,0.18)"
             : "none",
         }}
       >
@@ -3228,7 +3286,7 @@ style={{
             borderRadius: "6px",
             border: "2px solid rgba(255,255,255,0.9)",
             position: "relative",
-            boxShadow: "0 0 18px rgba(168,85,247,0.35)",
+            boxShadow: "0 0 18px rgba(216,181,106,0.18)",
           }}
         >
           <div
@@ -3245,7 +3303,7 @@ style={{
         </div>
       </div>
 
-      <p style={audioUploadLabel}>OPTIONAL VISUAL REFERENCE</p>
+      <p style={audioUploadLabel}>{ui.blueprints.optionalVisualReference}</p>
 
       <p
         style={{
@@ -3255,7 +3313,7 @@ style={{
           marginBottom: "18px",
         }}
       >
-        Upload a portrait, product or mood image to guide identity, styling and cinematic direction.
+        {ui.blueprints.visualReferenceHelp}
       </p>
     </>
   )}
@@ -3281,7 +3339,7 @@ style={{
         padding: "14px",
         borderRadius: "16px",
         background: "rgba(255,255,255,0.045)",
-        border: "1px solid rgba(168,85,247,0.22)",
+        border: "1px solid rgba(216,181,106,0.14)",
         textAlign: "left",
       }}
     >
@@ -3321,11 +3379,11 @@ style={{
               borderRadius: "999px",
               border:
                 visualReferenceType === referenceOption.id
-                  ? "1px solid rgba(168,85,247,0.72)"
+                  ? "1px solid rgba(216,181,106,0.42)"
                   : "1px solid rgba(255,255,255,0.14)",
               background:
                 visualReferenceType === referenceOption.id
-                  ? "linear-gradient(180deg, rgba(168,85,247,0.30), rgba(76,29,149,0.30))"
+                  ? "linear-gradient(180deg, rgba(216,181,106,0.12), rgba(255,255,255,0.055))"
                   : "rgba(255,255,255,0.055)",
               color: "#f5f3ff",
               fontSize: "12px",
@@ -3387,10 +3445,10 @@ style={{
           style={{
             padding: "8px 12px",
             borderRadius: "999px",
-            border: "1px solid rgba(168,85,247,0.36)",
+            border: "1px solid rgba(216,181,106,0.22)",
             background:
-              "linear-gradient(180deg, rgba(168,85,247,0.18), rgba(76,29,149,0.24))",
-            color: "#f5f3ff",
+              "linear-gradient(180deg, rgba(216,181,106,0.12), rgba(255,255,255,0.045))",
+            color: "#F6F3EB",
             fontSize: "12px",
             fontWeight: "850",
             cursor: "pointer",
@@ -3414,7 +3472,7 @@ style={{
             cursor: "pointer",
           }}
         >
-          Remove image
+          {ui.blueprints.removeImage}
         </button>
       </div>
     </div>
@@ -3440,16 +3498,16 @@ style={{
     padding: "14px 16px",
     borderRadius: "18px",
     background: "rgba(255,255,255,0.035)",
-    border: "1px solid rgba(168,85,247,0.16)",
+    border: "1px solid rgba(246,243,235,0.08)",
     color: "rgba(255,255,255,0.66)",
     fontSize: "13px",
     lineHeight: "1.65",
   }}
 >
   <strong style={{ color: "#f5f3ff" }}>
-    Use both together:
+    {ui.blueprints.useBothTogether}:
   </strong>{" "}
-  Upload audio to guide mood, rhythm and pacing. Upload a visual reference to guide identity, product detail or atmosphere. FrameLab combines both references inside the cinematic blueprint and copy-ready AI video prompts.
+  {ui.blueprints.useBothTogetherText}
 </div>
 
   {moodSuggestions.length > 0 && (
@@ -3461,11 +3519,11 @@ style={{
 style={moodSuggestionChip}
 onMouseEnter={(e) => {
   e.currentTarget.style.transform = "translateY(-2px)";
-  e.currentTarget.style.boxShadow = "0 0 28px rgba(168,85,247,0.22)";
+  e.currentTarget.style.boxShadow = "0 12px 28px rgba(0,0,0,0.26)";
 }}
 onMouseLeave={(e) => {
   e.currentTarget.style.transform = "translateY(0)";
-  e.currentTarget.style.boxShadow = "0 0 18px rgba(168,85,247,0.08)";
+  e.currentTarget.style.boxShadow = "0 8px 18px rgba(0,0,0,0.16)";
 }}
           onClick={() => {
             let recommendedMode = "Neo Tokyo";
@@ -3537,23 +3595,23 @@ Include:
     marginBottom: "10px",
   }}
 >
-Describe your cinematic vision
+{ui.blueprints.visionTitle}
 </div>
 
 <div
   style={{
-    color: "#94a3b8",
+    color: "rgba(246,243,235,0.68)",
     fontSize: "14px",
     lineHeight: "1.7",
     marginBottom: "18px",
   }}
 >
-Describe a world, story, character, product or atmosphere. FrameLab will transform it into a director-grade cinematic blueprint with shots, visual systems, pacing, voiceover and production direction.
+{ui.blueprints.visionHelp}
 </div>
 
 <textarea
   className="cinematicTextarea"
-  placeholder="A luxury fashion campaign in Neo Tokyo during neon rain. Slow cinematic camera movement, reflective streets, emotional narration, premium visual atmosphere..."
+  placeholder={ui.blueprints.visionPlaceholder}
   value={prompt}
   onChange={(e) => {
     setPrompt(e.target.value);
@@ -3594,8 +3652,8 @@ style={{
 
   background:
     selectedMode === mode.name
-      ? `linear-gradient(135deg, ${mode.accent}55 0%, ${mode.accent}22 100%)`
-      : "rgba(124,58,237,0.12)",
+      ? "linear-gradient(180deg, rgba(20,21,23,0.92), rgba(10,11,13,0.96))"
+      : "rgba(255,255,255,0.045)",
 
   transform:
     selectedMode === mode.name
@@ -3604,12 +3662,12 @@ style={{
 
   boxShadow:
     selectedMode === mode.name
-      ? `0 0 0 1px ${mode.accent}, 0 0 26px ${mode.accent}45`
+      ? "0 0 0 1px rgba(216,181,106,0.24), 0 10px 24px rgba(0,0,0,0.24)"
       : "0 0 0px transparent",
 
   outline:
     selectedMode === mode.name
-      ? `1px solid ${mode.accent}`
+      ? "1px solid rgba(216,181,106,0.24)"
       : "1px solid transparent",
 
   outlineOffset: "-1px",
@@ -3620,7 +3678,7 @@ onMouseEnter={(e) => {
   if (selectedMode !== mode.name) {
     e.currentTarget.style.transform = "translateY(-2px)";
     e.currentTarget.style.boxShadow =
-      "0 0 18px rgba(168,85,247,0.12)";
+      "0 10px 24px rgba(0,0,0,0.24)";
   }
 }}
 onMouseLeave={(e) => {
@@ -3680,8 +3738,8 @@ onMouseLeave={(e) => {
         fontSize: "9px",
         letterSpacing: "1.5px",
         textTransform: "uppercase",
-        color: "#f5d0fe",
-        opacity: 0.75,
+        color: "#E7CC91",
+        opacity: 0.82,
       }}
     >
       PRO
@@ -3710,20 +3768,20 @@ onMouseEnter={(e) => {
     e.currentTarget.style.transform =
       "translateY(-2px) scale(1.01)";
     e.currentTarget.style.boxShadow =
-      "0 22px 86px rgba(168,85,247,0.56), 0 0 130px rgba(168,85,247,0.24)";
+      "0 22px 86px rgba(216,181,106,0.34), 0 0 110px rgba(216,181,106,0.16)";
   }
 }}
 onMouseLeave={(e) => {
   e.currentTarget.style.transform =
     generating ? "scale(0.98)" : "scale(1)";
   e.currentTarget.style.boxShadow =
-    "0 18px 60px rgba(168,85,247,0.34)";
+    "0 18px 60px rgba(216,181,106,0.24)";
 }}
   >
 {generating
-  ? "Generating Cinematic Blueprint..."
+  ? ui.blueprints.generating
   : generated
-  ? "Regenerate Blueprint"
+  ? ui.blueprints.regenerate
   : "Generate Cinematic Blueprint"}
       </button>
 
@@ -3739,21 +3797,21 @@ style={{
 onMouseEnter={(e) => {
   if (!saved && !generating) {
     e.currentTarget.style.transform = "translateY(-2px) scale(1.01)";
-    e.currentTarget.style.boxShadow = "0 0 32px rgba(168,85,247,0.22)";
-    e.currentTarget.style.borderColor = "rgba(168,85,247,0.45)";
+    e.currentTarget.style.boxShadow = "0 0 32px rgba(216,181,106,0.14)";
+    e.currentTarget.style.borderColor = "rgba(216,181,106,0.28)";
   }
 }}
 onMouseLeave={(e) => {
   e.currentTarget.style.transform = "scale(1)";
   e.currentTarget.style.boxShadow = "none";
-  e.currentTarget.style.borderColor = "rgba(168,85,247,0.22)";
+  e.currentTarget.style.borderColor = "rgba(216,181,106,0.16)";
 }}
 >
 {saving
-  ? "Saving Blueprint..."
+  ? ui.blueprints.saving
   : saved
-  ? "Blueprint Saved ✓"
-  : "Save Blueprint"}
+  ? ui.blueprints.saved
+  : ui.blueprints.save}
       </button>
 </div>
 </div>
@@ -3780,9 +3838,9 @@ onMouseLeave={(e) => {
       borderRadius: "28px",
       animation: "fadeUp 0.45s ease-out",
       background:
-        "linear-gradient(135deg, rgba(15,23,42,0.96), rgba(88,28,135,0.28))",
-      border: "1px solid rgba(168,85,247,0.25)",
-      boxShadow: "0 0 60px rgba(168,85,247,0.14)",
+        "linear-gradient(135deg, rgba(20,21,23,0.97), rgba(10,11,13,0.98))",
+      border: "1px solid rgba(216,181,106,0.16)",
+      boxShadow: "0 24px 70px rgba(0,0,0,0.28)",
     }}
   >
 
@@ -3790,7 +3848,7 @@ onMouseLeave={(e) => {
   Cinematic Blueprint Ready
 </h2>
 
-<p style={{ color: "#cbd5e1", lineHeight: 1.7, marginBottom: "22px" }}>
+<p style={{ color: "rgba(246,243,235,0.72)", lineHeight: 1.7, marginBottom: "22px" }}>
   Your concept has been transformed into a director-grade cinematic blueprint using{" "}
   <strong>{selectedMode}</strong> visual language.
 </p>
@@ -3801,15 +3859,15 @@ onMouseLeave={(e) => {
     padding: "24px",
     borderRadius: "24px",
     background:
-      "linear-gradient(180deg, rgba(168,85,247,0.13), rgba(15,23,42,0.72))",
-    border: "1px solid rgba(196,181,253,0.24)",
-    boxShadow: "0 20px 70px rgba(124,58,237,0.16)",
+      "linear-gradient(180deg, rgba(255,255,255,0.055), rgba(18,18,16,0.82))",
+    border: "1px solid rgba(216,181,106,0.18)",
+    boxShadow: "0 20px 70px rgba(0,0,0,0.24)",
   }}
 >
   <div
     style={{
       fontSize: "11px",
-      color: "#c4b5fd",
+      color: "#E7CC91",
       letterSpacing: "2.4px",
       fontWeight: "900",
       textTransform: "uppercase",
@@ -3869,8 +3927,8 @@ onMouseLeave={(e) => {
       },
       {
         step: "04",
-        title: "Copy what you need",
-        text: "Use the copy buttons beside Hook, Narration, Caption, Blueprint or individual shots.",
+        title: ui.blueprints.copyWhatNeed,
+        text: ui.blueprints.copyWhatNeedText,
       },
       {
         step: "05",
@@ -3884,12 +3942,12 @@ onMouseLeave={(e) => {
           padding: "16px",
           borderRadius: "18px",
           background: "rgba(255,255,255,0.045)",
-          border: "1px solid rgba(168,85,247,0.16)",
+          border: "1px solid rgba(246,243,235,0.08)",
         }}
       >
         <div
           style={{
-            color: "#c084fc",
+            color: "#E7CC91",
             fontSize: "11px",
             fontWeight: "900",
             letterSpacing: "2px",
@@ -3929,8 +3987,8 @@ onMouseLeave={(e) => {
         marginBottom: "24px",
         padding: "22px",
         borderRadius: "24px",
-        background: "rgba(2,6,23,0.72)",
-        border: "1px solid rgba(196,181,253,0.22)",
+        background: "rgba(10,11,13,0.94)",
+        border: "1px solid rgba(216,181,106,0.16)",
         boxShadow: "0 24px 70px rgba(0,0,0,0.32)",
       }}
     >
@@ -3948,7 +4006,7 @@ onMouseLeave={(e) => {
           <div
             style={{
               fontSize: "11px",
-              color: "#c4b5fd",
+              color: "#E7CC91",
               letterSpacing: "2.4px",
               fontWeight: "900",
               textTransform: "uppercase",
@@ -3993,17 +4051,17 @@ onMouseLeave={(e) => {
               try {
                 await navigator.clipboard.writeText(expandedPrompt);
                 setCopied(true);
-                setCopyLabel("Copied ✓");
+                setCopyLabel(ui.blueprints.copied);
 
                 setTimeout(() => {
                   setCopied(false);
-                  setCopyLabel("Copy Blueprint");
+                  setCopyLabel(ui.blueprints.copyBlueprint);
                 }, 1400);
               } catch (error) {
-                setCopyLabel("Copy failed");
+                setCopyLabel(ui.blueprints.copyFailed);
 
                 setTimeout(() => {
-                  setCopyLabel("Copy Blueprint");
+                  setCopyLabel(ui.blueprints.copyBlueprint);
                 }, 1400);
               }
             }}
@@ -4050,10 +4108,10 @@ onMouseLeave={(e) => {
         padding: "28px",
         borderRadius: "28px",
         background:
-          "linear-gradient(180deg, rgba(18,18,32,0.92), rgba(8,8,16,0.98))",
-        border: "1px solid rgba(196,181,253,0.18)",
+          "linear-gradient(180deg, rgba(20,21,23,0.94), rgba(10,11,13,0.98))",
+        border: "1px solid rgba(216,181,106,0.16)",
         boxShadow:
-          "0 24px 80px rgba(0,0,0,0.38), 0 0 60px rgba(124,58,237,0.14)",
+          "0 24px 80px rgba(0,0,0,0.38), 0 0 46px rgba(216,181,106,0.08)",
       }}
     >
       <div
@@ -4069,7 +4127,7 @@ onMouseLeave={(e) => {
         <div
           style={{
             fontSize: "11px",
-            color: "#c4b5fd",
+            color: "#E7CC91",
             letterSpacing: "2.4px",
             fontWeight: "900",
             textTransform: "uppercase",
@@ -4088,7 +4146,7 @@ onMouseLeave={(e) => {
           className="premiumCopyAction"
           style={assetCopyLabel === "director" ? premiumCopyButtonCopied : premiumCopyButton}
         >
-          {assetCopyLabel === "director" ? "Copied ✓" : "Copy Direction"}
+          {assetCopyLabel === "director" ? ui.blueprints.copied : ui.blueprints.copyDirection}
         </button>
       </div>
 
@@ -4107,7 +4165,7 @@ onMouseLeave={(e) => {
 
       <div
         style={{
-          color: "#d8ccff",
+          color: "rgba(255,255,255,0.88)",
           fontSize: "16px",
           lineHeight: "1.9",
           whiteSpace: "pre-wrap",
@@ -4122,28 +4180,28 @@ onMouseLeave={(e) => {
       {
         key: "hook",
         label: "HOOK",
-        copyLabel: "Copy Hook",
+        copyLabel: ui.blueprints.copyHook,
         value: productionAssets.hook,
         wide: true,
       },
       {
         key: "voiceover",
-        label: "NARRATION SCRIPT",
-        copyLabel: "Copy Narration",
+        label: ui.blueprints.narrationScript,
+        copyLabel: ui.blueprints.copyNarration,
         value: productionAssets.voiceover,
         wide: true,
       },
       {
         key: "music",
-        label: "MUSIC",
-        copyLabel: "Copy Music",
+        label: ui.blueprints.music,
+        copyLabel: ui.blueprints.copyMusic,
         value: productionAssets.music,
         wide: true,
       },
       {
         key: "caption",
-        label: "CAPTION",
-        copyLabel: "Copy Caption",
+        label: ui.blueprints.caption,
+        copyLabel: ui.blueprints.copyCaption,
         value: productionAssets.caption,
         wide: true,
       },
@@ -4155,7 +4213,7 @@ onMouseLeave={(e) => {
           padding: "16px",
           borderRadius: "16px",
           background: "rgba(255,255,255,0.03)",
-          border: "1px solid rgba(168,85,247,0.14)",
+          border: "1px solid rgba(246,243,235,0.08)",
         }}
       >
         <div
@@ -4171,7 +4229,7 @@ onMouseLeave={(e) => {
           <div
             style={{
               fontSize: "11px",
-              color: "#c4b5fd",
+              color: "#E7CC91",
               letterSpacing: "1.5px",
               fontWeight: "800",
             }}
@@ -4189,7 +4247,7 @@ onMouseLeave={(e) => {
             className="premiumCopyAction"
             style={assetCopyLabel === item.key ? premiumCopyButtonCopied : premiumCopyButton}
           >
-            {assetCopyLabel === item.key ? "Copied ✓" : item.copyLabel}
+            {assetCopyLabel === item.key ? ui.blueprints.copied : item.copyLabel}
           </button>
         </div>
 
@@ -4206,12 +4264,42 @@ onMouseLeave={(e) => {
     ))}
   </div>
 )}
+
+<div
+  aria-hidden="true"
+  style={{
+    position: "relative",
+    height: "220px",
+    marginBottom: "24px",
+    overflow: "hidden",
+    borderRadius: "24px",
+    backgroundImage:
+      "url('/framelab-premium-blueprints-assets/03_FrameLab_Blueprints_VisualCard_Fresnel_Spotlight.png')",
+    backgroundSize: "cover",
+    backgroundPosition: "center right",
+    backgroundRepeat: "no-repeat",
+    border: "1px solid rgba(216,181,106,0.16)",
+    boxShadow:
+      "0 18px 54px rgba(0,0,0,0.26), 0 0 34px rgba(216,181,106,0.05)",
+  }}
+>
+  <div
+    style={{
+      position: "absolute",
+      inset: 0,
+      pointerEvents: "none",
+      background:
+        "linear-gradient(90deg, rgba(10,11,13,0.62) 0%, rgba(10,11,13,0.30) 42%, rgba(10,11,13,0.14) 72%, rgba(10,11,13,0.10) 100%)",
+    }}
+  />
+</div>
+
 <div
   style={{
     padding: "18px",
     borderRadius: "20px",
-    background: "rgba(2,6,23,0.55)",
-    border: "1px solid rgba(148,163,184,0.16)",
+    background: "rgba(10,11,13,0.82)",
+    border: "1px solid rgba(216,181,106,0.14)",
   }}
 >
   <div
@@ -4223,7 +4311,7 @@ onMouseLeave={(e) => {
       marginBottom: "12px",
     }}
   >
-    <p style={{ color: "#94a3b8", fontSize: "13px", margin: 0 }}>
+    <p style={{ color: "rgba(231,204,145,0.82)", fontSize: "13px", margin: 0 }}>
       SHOT OVERVIEW
     </p>
   </div>
@@ -4244,21 +4332,21 @@ onMouseLeave={(e) => {
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = "translateY(-5px)";
             e.currentTarget.style.boxShadow =
-              "0 18px 60px rgba(168,85,247,0.22)";
-            e.currentTarget.style.border = "1px solid rgba(168,85,247,0.45)";
+              "0 18px 60px rgba(0,0,0,0.30)";
+            e.currentTarget.style.border = "1px solid rgba(216,181,106,0.26)";
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = "translateY(0)";
             e.currentTarget.style.boxShadow =
-              "0 0 30px rgba(168,85,247,0.08)";
+              "0 16px 34px rgba(0,0,0,0.26)";
             e.currentTarget.style.border =
               selectedShot === index
-                ? "1px solid rgba(168,85,247,0.75)"
-                : "1px solid rgba(168,85,247,0.12)";
+                ? "1px solid rgba(216,181,106,0.48)"
+                : "1px solid rgba(216,181,106,0.10)";
           }}
           style={{
             transition: "all 0.3s ease",
-            boxShadow: "0 0 30px rgba(168,85,247,0.08)",
+            boxShadow: "0 16px 34px rgba(0,0,0,0.26)",
             cursor: "pointer",
             padding: "20px",
             borderRadius: "20px",
@@ -4267,12 +4355,12 @@ onMouseLeave={(e) => {
             flexDirection: "column",
             background:
               selectedShot === index
-                ? "linear-gradient(180deg, rgba(168,85,247,0.16), rgba(255,255,255,0.04))"
-                : "rgba(255,255,255,0.03)",
+                ? "linear-gradient(180deg, rgba(216,181,106,0.08), rgba(255,255,255,0.04))"
+                : "rgba(255,255,255,0.045)",
             border:
               selectedShot === index
-                ? "1px solid rgba(168,85,247,0.75)"
-                : "1px solid rgba(168,85,247,0.12)",
+                ? "1px solid rgba(216,181,106,0.48)"
+                : "1px solid rgba(216,181,106,0.10)",
           }}
         >
           <div
@@ -4290,7 +4378,7 @@ onMouseLeave={(e) => {
 
             <div
               style={{
-                color: "rgba(196,181,253,0.82)",
+                color: "rgba(231,204,145,0.82)",
                 fontSize: "10px",
                 fontWeight: "800",
                 letterSpacing: "1.4px",
@@ -4315,7 +4403,7 @@ onMouseLeave={(e) => {
 
           <div
             style={{
-              color: "rgba(255,255,255,0.58)",
+              color: "rgba(246,243,235,0.68)",
               fontSize: "12px",
               fontWeight: "700",
               marginBottom: "14px",
@@ -4326,7 +4414,7 @@ onMouseLeave={(e) => {
 
           <div
             style={{
-              color: "rgba(255,255,255,0.76)",
+              color: "rgba(246,243,235,0.72)",
               fontSize: "13px",
               lineHeight: "1.65",
               marginBottom: "16px",
@@ -4364,8 +4452,8 @@ onMouseLeave={(e) => {
             style={{
               marginTop: "18px",
               paddingTop: "14px",
-              borderTop: "1px solid rgba(168,85,247,0.14)",
-              color: "#c4b5fd",
+              borderTop: "1px solid rgba(246,243,235,0.08)",
+              color: "#E7CC91",
               fontSize: "12px",
               fontWeight: "800",
               letterSpacing: "1px",
@@ -4384,9 +4472,9 @@ onMouseLeave={(e) => {
       marginTop: "24px",
       padding: "22px",
       borderRadius: "22px",
-      background: "rgba(15,23,42,0.72)",
-      border: "1px solid rgba(168,85,247,0.28)",
-      boxShadow: "0 0 50px rgba(168,85,247,0.12)",
+      background: "rgba(18,18,16,0.82)",
+      border: "1px solid rgba(216,181,106,0.16)",
+      boxShadow: "0 18px 50px rgba(0,0,0,0.24)",
     }}
   >
     <div
@@ -4407,19 +4495,19 @@ onMouseLeave={(e) => {
           const textToCopy = generatedShots[selectedShot]?.directorNotes;
 
           if (!textToCopy) {
-            alert("No director notes found.");
+            alert(ui.blueprints.noDirectorNotes);
             return;
           }
 
           await navigator.clipboard.writeText(textToCopy);
-          setShotCopyLabel("Copied ✓");
+          setShotCopyLabel(ui.blueprints.copied);
 
           setTimeout(() => {
             setShotCopyLabel("Copy Director Notes");
           }, 1200);
         }}
         className="premiumCopyAction"
-        style={shotCopyLabel === "Copied ✓" ? premiumCopyButtonCopied : premiumCopyButton}
+        style={shotCopyLabel === ui.blueprints.copied ? premiumCopyButtonCopied : premiumCopyButton}
       >
         {shotCopyLabel}
       </button>
@@ -4438,7 +4526,7 @@ onMouseLeave={(e) => {
           padding: "20px",
           borderRadius: "20px",
           background: "rgba(255,255,255,0.025)",
-          border: "1px solid rgba(168,85,247,0.14)",
+          border: "1px solid rgba(246,243,235,0.08)",
         }}
       >
         <div style={shotLabel}>
@@ -4459,7 +4547,7 @@ onMouseLeave={(e) => {
 
         <div
           style={{
-            color: "rgba(255,255,255,0.58)",
+            color: "rgba(246,243,235,0.68)",
             fontSize: "13px",
             fontWeight: "700",
             marginBottom: "18px",
@@ -4470,7 +4558,7 @@ onMouseLeave={(e) => {
 
         <div
           style={{
-            color: "rgba(255,255,255,0.82)",
+            color: "rgba(246,243,235,0.72)",
             fontSize: "15px",
             lineHeight: "1.8",
             fontWeight: "500",
@@ -4507,7 +4595,7 @@ onMouseLeave={(e) => {
 
         <div
           style={{
-            color: "rgba(255,255,255,0.82)",
+            color: "rgba(246,243,235,0.72)",
             fontSize: "14px",
             lineHeight: "1.8",
             whiteSpace: "pre-wrap",
@@ -4521,8 +4609,9 @@ onMouseLeave={(e) => {
         style={{
           padding: "20px",
           borderRadius: "20px",
-          background: "rgba(2,6,23,0.48)",
-          border: "1px solid rgba(168,85,247,0.16)",
+          background: "rgba(24,22,17,0.82)",
+          border: "1px solid rgba(216,181,106,0.18)",
+          boxShadow: "0 18px 50px rgba(216,181,106,0.07)",
         }}
       >
         <div
@@ -4543,19 +4632,19 @@ onMouseLeave={(e) => {
               const textToCopy = generatedShots[selectedShot]?.shotPrompt;
 
               if (!textToCopy) {
-                alert("No AI video prompt found.");
+                alert(ui.blueprints.noVideoPrompt);
                 return;
               }
 
               await navigator.clipboard.writeText(textToCopy);
-              setShotPromptCopyLabel("Copied ✓");
+              setShotPromptCopyLabel(ui.blueprints.copied);
 
               setTimeout(() => {
                 setShotPromptCopyLabel("Copy AI Video Prompt");
               }, 1200);
             }}
             className="premiumCopyAction"
-            style={shotPromptCopyLabel === "Copied ✓" ? premiumCopyButtonCopied : premiumCopyButton}
+            style={shotPromptCopyLabel === ui.blueprints.copied ? premiumCopyButtonCopied : premiumCopyButton}
           >
             {shotPromptCopyLabel}
           </button>
@@ -4563,7 +4652,7 @@ onMouseLeave={(e) => {
 
         <div
           style={{
-            color: "#cbd5e1",
+            color: "rgba(246,243,235,0.72)",
             fontSize: "14px",
             lineHeight: "1.8",
             whiteSpace: "pre-wrap",
@@ -4579,6 +4668,7 @@ onMouseLeave={(e) => {
 </div>
   </div>
 )}
+</div>
 </div>
   </Layout>
 );

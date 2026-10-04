@@ -242,8 +242,8 @@ const globalCss = `
   .premium-action-button:hover {
     transform: translateY(-3px) scale(1.015);
     box-shadow:
-      0 0 44px rgba(192,132,252,0.46),
-      0 18px 70px rgba(168,85,247,0.36) !important;
+      0 0 40px rgba(216,181,106,0.26),
+      0 18px 70px rgba(216,181,106,0.20) !important;
     filter: brightness(1.08);
   }
 
@@ -258,8 +258,8 @@ const globalCss = `
   .premium-export-button:hover {
     transform: translateY(-3px) scale(1.018);
     box-shadow:
-      0 0 58px rgba(216,180,254,0.62),
-      0 14px 42px rgba(216,180,254,0.38) !important;
+      0 0 42px rgba(216,181,106,0.24),
+      0 14px 42px rgba(0,0,0,0.32) !important;
     filter: brightness(1.06);
   }
 
@@ -340,11 +340,13 @@ const inputStyle = {
   width: "100%",
   padding: "15px 16px",
   borderRadius: "16px",
-  border: "1px solid rgba(255,255,255,0.12)",
-  background: "rgba(255,255,255,0.06)",
+  border: "1px solid rgba(216,181,106,0.16)",
+  background: "rgba(13,13,18,0.72)",
   color: "white",
   outline: "none",
   fontSize: "14px",
+  boxShadow:
+    "inset 0 1px 0 rgba(255,255,255,0.035), 0 8px 24px rgba(0,0,0,0.10)",
 };
 
 const selectStyle = {
@@ -356,8 +358,8 @@ const copyButton = {
   padding: "12px 18px",
   borderRadius: "999px",
   border: "none",
-  background: "linear-gradient(90deg, #7c3aed, #c084fc)",
-  color: "white",
+  background: "linear-gradient(90deg, #B88A3B, #E7CC91)",
+  color: "#17130C",
   cursor: "pointer",
   fontWeight: "800",
   fontSize: "13px",
@@ -417,8 +419,8 @@ async function copyToClipboard(text) {
   }
 }
 
-function OutputCard({ title, text }) {
-  const [copyLabel, setCopyLabel] = useState("Copy");
+function OutputCard({ title, text, t = (value) => value }) {
+  const [copyLabel, setCopyLabel] = useState(t("Copy"));
   const [isHovered, setIsHovered] = useState(false);
 
   if (!text) return null;
@@ -429,11 +431,11 @@ function OutputCard({ title, text }) {
     const copied = await copyToClipboard(text);
 
     if (copied) {
-      setCopyLabel("Copied");
-      setTimeout(() => setCopyLabel("Copy"), 1200);
+      setCopyLabel(t("Copied"));
+      setTimeout(() => setCopyLabel(t("Copy")), 1200);
     } else {
-      setCopyLabel("Failed");
-      setTimeout(() => setCopyLabel("Copy"), 1200);
+      setCopyLabel(t("Failed"));
+      setTimeout(() => setCopyLabel(t("Copy")), 1200);
     }
   }
 
@@ -448,10 +450,10 @@ function OutputCard({ title, text }) {
         background:
           "linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025))",
         border: isHovered
-          ? "1px solid rgba(192,132,252,0.32)"
+          ? "1px solid rgba(216,181,106,0.18)"
           : "1px solid rgba(255,255,255,0.08)",
         boxShadow: isHovered
-          ? "0 24px 80px rgba(168,85,247,0.18)"
+          ? "0 24px 80px rgba(0,0,0,0.32)"
           : "0 18px 60px rgba(0,0,0,0.22)",
         transform: isHovered ? "translateY(-3px)" : "translateY(0)",
         transition: "all 0.22s ease",
@@ -488,13 +490,13 @@ function OutputCard({ title, text }) {
             padding: "9px 14px",
             fontSize: "12px",
             background:
-              copyLabel === "Copied"
+              copyLabel === t("Copied")
                 ? "linear-gradient(90deg, #22c55e, #86efac)"
                 : "rgba(255,255,255,0.08)",
-            color: copyLabel === "Copied" ? "#07130b" : "white",
+            color: copyLabel === t("Copied") ? "#07130b" : "white",
             border: "1px solid rgba(255,255,255,0.12)",
             boxShadow:
-              copyLabel === "Copied"
+              copyLabel === t("Copied")
                 ? "0 0 24px rgba(34,197,94,0.28)"
                 : "none",
           }}
@@ -526,14 +528,14 @@ function ResultSectionHeader({ eyebrow, title, description }) {
         padding: "22px 24px",
         borderRadius: "24px",
         background:
-          "linear-gradient(135deg, rgba(124,58,237,0.18), rgba(255,255,255,0.035))",
-        border: "1px solid rgba(185,133,255,0.16)",
+          "linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.028))",
+        border: "1px solid rgba(216,181,106,0.14)",
         boxShadow: "0 18px 60px rgba(0,0,0,0.22)",
       }}
     >
       <div
         style={{
-          color: "#c084fc",
+          color: "#E7CC91",
           fontSize: "11px",
           fontWeight: "900",
           letterSpacing: "0.16em",
@@ -604,7 +606,7 @@ function ProgressMetric({ label, value }) {
           style={{
             width: `${width}%`,
             height: "100%",
-            background: "linear-gradient(90deg, #b985ff, #d8b4fe)",
+            background: "linear-gradient(90deg, #B88A3B 0%, #D8B56A 50%, #E7CC91 100%)",
           }}
         />
       </div>
@@ -716,7 +718,7 @@ SNOWFLAKE SIGNATURE:
 ${identity.snowflakeSignature || ""}`;
 }
 
-export default function Home() {
+export default function Home({ language, ui, t = (value) => value }) {
   const { isSignedIn, user } = useUser();
 
   const [artist, setArtist] = useState("Aurora Wolves");
@@ -735,6 +737,7 @@ export default function Home() {
   const [userPlan, setUserPlan] = useState("free");
   const [remainingCredits, setRemainingCredits] = useState(2);
   const [mounted, setMounted] = useState(false);
+  const generationRequestIdRef = useRef(null);
 
   const [result, setResult] = useState(null);
   const [thumbnailLoading, setThumbnailLoading] = useState(false);
@@ -742,10 +745,10 @@ export default function Home() {
   const [history, setHistory] = useState([]);
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportCopyLabel, setExportCopyLabel] = useState(
-    "Copy Full Creative Package"
+    ui.generate.copyFullPackage
   );
   const [promptCopyLabel, setPromptCopyLabel] = useState(
-    "Copy AI Video Prompt Only"
+    ui.generate.copyVideoPrompt
   ); 
 
   const resultRef = useRef(null);
@@ -787,43 +790,48 @@ export default function Home() {
     purposeSignal: String(reelPurpose || "").toLowerCase(),
   };
 
+  const briefingCopy = (englishValue, germanValue) =>
+    language === "Deutsch" ? germanValue : englishValue;
+
   const identityEngineIntelligence = (() => {
     const { artist, track, genreSignal, moodSignal, purposeSignal } = creativeContext;
 
     if (!artist || !track) {
-      return "Waiting for artist identity.";
+      return briefingCopy("Waiting for artist identity.", "Identitätsprofil ausstehend.");
     }
 
     const identityPressure =
       genreSignal.includes("techno")
-        ? "a precise, high-control electronic identity"
+        ? briefingCopy("a precise, high-control electronic identity", "eine präzise, stark kontrollierte elektronische Identität")
         : genreSignal.includes("house")
-        ? "a warm but curated club-facing identity"
+        ? briefingCopy("a warm but curated club-facing identity", "eine warme, aber kuratierte cluborientierte Identität")
         : genreSignal.includes("ambient") || genreSignal.includes("downtempo")
-        ? "an atmospheric identity built through restraint and space"
-        : "a distinctive release identity shaped by the selected sound";
+        ? briefingCopy("an atmospheric identity built through restraint and space", "eine atmosphärische Identität, die durch Zurückhaltung und Raum entsteht")
+        : briefingCopy("a distinctive release identity shaped by the selected sound", "eine eigenständige Release-Identität, geprägt vom gewählten Sound");
 
     const emotionalPosition =
       moodSignal.includes("nocturnal")
-        ? "The artist should feel intimate, late-night and close to the listener."
+        ? briefingCopy("The artist should feel intimate, late-night and close to the listener.", "Der Artist sollte intim, nächtlich und nah am Publikum wirken.")
         : moodSignal.includes("hypnotic")
-        ? "The artist should feel magnetic, repetitive and difficult to look away from."
+        ? briefingCopy("The artist should feel magnetic, repetitive and difficult to look away from.", "Der Artist sollte magnetisch, repetitiv und visuell fesselnd wirken.")
         : moodSignal.includes("tense")
-        ? "The artist should feel controlled, unresolved and visually disciplined."
+        ? briefingCopy("The artist should feel controlled, unresolved and visually disciplined.", "Der Artist sollte kontrolliert, spannungsvoll und visuell diszipliniert wirken.")
         : moodSignal.includes("euphoric")
-        ? "The artist should feel expansive, luminous and release-driven."
-        : "The artist identity should follow the emotional pressure of the track.";
+        ? briefingCopy("The artist should feel expansive, luminous and release-driven.", "Der Artist sollte weit, leuchtend und auf den Release ausgerichtet wirken.")
+        : briefingCopy("The artist identity should follow the emotional pressure of the track.", "Die Artist-Identität sollte der emotionalen Spannung des Tracks folgen.");
 
     const releasePosition =
       purposeSignal.includes("identity")
-        ? "Prioritize recognition over plot."
+        ? briefingCopy("Prioritize recognition over plot.", "Priorisiere Wiedererkennbarkeit vor Handlung.")
         : purposeSignal.includes("launch") || purposeSignal.includes("teaser")
-        ? "Prioritize immediate memory and anticipation."
+        ? briefingCopy("Prioritize immediate memory and anticipation.", "Priorisiere unmittelbare Wiedererkennbarkeit und Erwartung.")
         : purposeSignal.includes("canvas")
-        ? "Prioritize loopable visual identity."
-        : "Prioritize a clear creative signature for the release.";
+        ? briefingCopy("Prioritize loopable visual identity.", "Priorisiere eine visuelle Identität, die als Loop funktioniert.")
+        : briefingCopy("Prioritize a clear creative signature for the release.", "Priorisiere eine klare kreative Handschrift für den Release.");
 
-    return `Creative Assessment: ${artist} — ${track} should present ${identityPressure}. ${emotionalPosition} ${releasePosition}`;
+    return language === "Deutsch"
+      ? `Kreative Einschätzung: ${artist} — ${track} sollte ${identityPressure} vermitteln. ${emotionalPosition} ${releasePosition}`
+      : `Creative Assessment: ${artist} — ${track} should present ${identityPressure}. ${emotionalPosition} ${releasePosition}`;
   })();
 
   const sonicPressureIntelligence = (() => {
@@ -832,236 +840,260 @@ export default function Home() {
     const moodSignal = String(mood || "").toLowerCase();
 
     if (!genre || !bpm || !mood) {
-      return "Waiting for sonic profile.";
+      return briefingCopy("Waiting for sonic profile.", "Klangprofil ausstehend.");
     }
 
     const tempoDirection =
       bpmNumber >= 130
-        ? "high-pressure kinetic pacing"
+        ? briefingCopy("high-pressure kinetic pacing", "ein druckvolles, kinetisches Tempo")
         : bpmNumber >= 118
-        ? "controlled forward momentum"
-        : "slow-burn emotional movement";
+        ? briefingCopy("controlled forward momentum", "kontrollierten Vorwärtsdrang")
+        : briefingCopy("slow-burn emotional movement", "langsam aufgebaute emotionale Bewegung");
 
     const genreDirection =
       genreSignal.includes("minimal")
-        ? "minimal repetition, negative space and restrained structural tension"
+        ? briefingCopy("minimal repetition, negative space and restrained structural tension", "minimale Wiederholung, Negativraum und zurückhaltende strukturelle Spannung")
         : genreSignal.includes("progressive")
-        ? "gradual escalation, layered movement and long-form release pressure"
+        ? briefingCopy("gradual escalation, layered movement and long-form release pressure", "graduelle Steigerung, geschichtete Bewegung und langfristig aufgebauten Release-Druck")
         : genreSignal.includes("techno")
-        ? "industrial drive, physical pulse and machine-like persistence"
+        ? briefingCopy("industrial drive, physical pulse and machine-like persistence", "industriellen Drive, physischen Puls und maschinelle Beharrlichkeit")
         : genreSignal.includes("house")
-        ? "club warmth, groove continuity and body-led motion"
+        ? briefingCopy("club warmth, groove continuity and body-led motion", "Club-Wärme, Groove-Kontinuität und körpergeführte Bewegung")
         : genreSignal.includes("ambient") || genreSignal.includes("downtempo")
-        ? "atmospheric drift, suspended rhythm and emotional spaciousness"
-        : "genre-led rhythm behavior and musical pressure";
+        ? briefingCopy("atmospheric drift, suspended rhythm and emotional spaciousness", "atmosphärisches Driften, schwebenden Rhythmus und emotionale Weite")
+        : briefingCopy("genre-led rhythm behavior and musical pressure", "genregeprägtes Rhythmusverhalten und musikalischen Druck");
 
     const moodDirection =
       moodSignal.includes("tense")
-        ? "anticipation should stay unresolved instead of exploding too early"
+        ? briefingCopy("anticipation should stay unresolved instead of exploding too early", "die Erwartung sollte offenbleiben, statt sich zu früh zu entladen")
         : moodSignal.includes("nocturnal")
-        ? "night pressure should feel intimate, controlled and close to the skin"
+        ? briefingCopy("night pressure should feel intimate, controlled and close to the skin", "die nächtliche Spannung sollte intim, kontrolliert und unmittelbar wirken")
         : moodSignal.includes("euphoric")
-        ? "release moments should feel earned, luminous and expansive"
+        ? briefingCopy("release moments should feel earned, luminous and expansive", "Release-Momente sollten verdient, leuchtend und weit wirken")
         : moodSignal.includes("melancholic")
-        ? "movement should carry emotional weight rather than pure energy"
+        ? briefingCopy("movement should carry emotional weight rather than pure energy", "Bewegung sollte emotionales Gewicht statt bloßer Energie tragen")
         : moodSignal.includes("romantic")
-        ? "distance, restraint and longing should shape the rhythm"
+        ? briefingCopy("distance, restraint and longing should shape the rhythm", "Distanz, Zurückhaltung und Sehnsucht sollten den Rhythmus prägen")
         : moodSignal.includes("hypnotic")
-        ? "repetition should become the main visual engine"
-        : "the emotional tone should control how the rhythm is perceived";
+        ? briefingCopy("repetition should become the main visual engine", "Wiederholung sollte zum zentralen visuellen Motor werden")
+        : briefingCopy("the emotional tone should control how the rhythm is perceived", "der emotionale Ton sollte bestimmen, wie der Rhythmus wahrgenommen wird");
 
-    return `Creative Assessment: ${genre} at ${bpm} BPM suggests ${tempoDirection}. Use ${genreDirection}; ${moodDirection}.`;
+    return language === "Deutsch"
+      ? `Kreative Einschätzung: ${genre} bei ${bpm} BPM deutet auf ${tempoDirection} hin. Nutze ${genreDirection}; ${moodDirection}.`
+      : `Creative Assessment: ${genre} at ${bpm} BPM suggests ${tempoDirection}. Use ${genreDirection}; ${moodDirection}.`;
   })();
 
   const materialLanguageIntelligence = (() => {
     const { styleSignal, genreSignal, moodSignal, bpmNumber } = creativeContext;
 
     if (!style) {
-      return "Waiting for material language.";
+      return briefingCopy("Waiting for material language.", "Visuelle Sprache ausstehend.");
     }
 
     const sonicBehavior =
       bpmNumber >= 130
-        ? "fast rhythmic pressure"
+        ? briefingCopy("fast rhythmic pressure", "schnellen rhythmischen Druck")
         : bpmNumber >= 118
-        ? "controlled forward motion"
-        : "slow atmospheric movement";
+        ? briefingCopy("controlled forward motion", "kontrollierte Vorwärtsbewegung")
+        : briefingCopy("slow atmospheric movement", "langsame atmosphärische Bewegung");
 
     const emotionalBehavior =
       moodSignal.includes("tense")
-        ? "unresolved tension"
+        ? briefingCopy("unresolved tension", "ungelöste Spannung")
         : moodSignal.includes("hypnotic")
-        ? "repetition and trance-like continuity"
+        ? briefingCopy("repetition and trance-like continuity", "Wiederholung und tranceartige Kontinuität")
         : moodSignal.includes("nocturnal")
-        ? "intimate night pressure"
+        ? briefingCopy("intimate night pressure", "intime nächtliche Spannung")
         : moodSignal.includes("melancholic")
-        ? "emotional residue"
-        : "the selected emotional tone";
+        ? briefingCopy("emotional residue", "emotionale Nachwirkung")
+        : briefingCopy("the selected emotional tone", "den gewählten emotionalen Ton");
 
     const genreBehavior =
       genreSignal.includes("techno")
-        ? "machine persistence"
+        ? briefingCopy("machine persistence", "maschinelle Beharrlichkeit")
         : genreSignal.includes("house")
-        ? "groove continuity"
+        ? briefingCopy("groove continuity", "Groove-Kontinuität")
         : genreSignal.includes("ambient") || genreSignal.includes("downtempo")
-        ? "spacious drift"
-        : "the track rhythm";
+        ? briefingCopy("spacious drift", "räumliches Driften")
+        : briefingCopy("the track rhythm", "den Rhythmus des Tracks");
 
     if (styleSignal.includes("vhs") || styleSignal.includes("analog") || styleSignal.includes("dusty")) {
-      return `Creative Assessment: Imperfection should respond to ${genreBehavior}. Grain, bleed and optical decay must carry ${emotionalBehavior}, not sit on top as a filter.`;
+      return language === "Deutsch"
+      ? `Kreative Einschätzung: Imperfektion sollte auf ${genreBehavior} reagieren. Körnung, Bleeding und optischer Zerfall müssen ${emotionalBehavior} tragen, statt nur als Filter darüberzuliegen.`
+      : `Creative Assessment: Imperfection should respond to ${genreBehavior}. Grain, bleed and optical decay must carry ${emotionalBehavior}, not sit on top as a filter.`;
     }
 
     if (styleSignal.includes("chrome") || styleSignal.includes("reflection") || styleSignal.includes("glass")) {
-      return `Creative Assessment: Reflective surfaces should translate ${sonicBehavior} into light behavior. Highlights and mirrors must reveal rhythm, pressure and ${emotionalBehavior}.`;
+      return language === "Deutsch"
+      ? `Kreative Einschätzung: Reflektierende Oberflächen sollten ${sonicBehavior} in Lichtverhalten übersetzen. Highlights und Spiegel müssen Rhythmus, Druck und ${emotionalBehavior} sichtbar machen.`
+      : `Creative Assessment: Reflective surfaces should translate ${sonicBehavior} into light behavior. Highlights and mirrors must reveal rhythm, pressure and ${emotionalBehavior}.`;
     }
 
     if (styleSignal.includes("editorial") || styleSignal.includes("fashion")) {
-      return `Creative Assessment: Editorial light should turn ${genreBehavior} into decisive visual gestures. Contrast, pose and reveal must feel shaped by ${emotionalBehavior}.`;
+      return language === "Deutsch"
+      ? `Kreative Einschätzung: Editorial-Licht sollte ${genreBehavior} in klare visuelle Gesten übersetzen. Kontrast, Pose und Reveal müssen von ${emotionalBehavior} geprägt wirken.`
+      : `Creative Assessment: Editorial light should turn ${genreBehavior} into decisive visual gestures. Contrast, pose and reveal must feel shaped by ${emotionalBehavior}.`;
     }
 
     if (styleSignal.includes("velvet") || styleSignal.includes("dark")) {
-      return `Creative Assessment: Darkness should absorb ${sonicBehavior}. Texture, shadow and negative space must hold ${emotionalBehavior} instead of becoming empty atmosphere.`;
+      return language === "Deutsch"
+      ? `Kreative Einschätzung: Dunkelheit sollte ${sonicBehavior} aufnehmen. Textur, Schatten und Negativraum müssen ${emotionalBehavior} tragen, statt zu leerer Atmosphäre zu werden.`
+      : `Creative Assessment: Darkness should absorb ${sonicBehavior}. Texture, shadow and negative space must hold ${emotionalBehavior} instead of becoming empty atmosphere.`;
     }
 
-    return `Creative Assessment: The visual style should convert ${genreBehavior}, ${sonicBehavior} and ${emotionalBehavior} into material behavior across the reel.`;
+    return language === "Deutsch"
+    ? `Kreative Einschätzung: Der visuelle Stil sollte ${genreBehavior}, ${sonicBehavior} und ${emotionalBehavior} über das gesamte Reel in Materialverhalten übersetzen.`
+    : `Creative Assessment: The visual style should convert ${genreBehavior}, ${sonicBehavior} and ${emotionalBehavior} into material behavior across the reel.`;
   })();
 
   const directorGrammarIntelligence = (() => {
     const { directorSignal, styleSignal, genreSignal, moodSignal, bpmNumber } = creativeContext;
 
     if (!directorMode) {
-      return "Waiting for director grammar.";
+      return briefingCopy("Waiting for director grammar.", "Regielogik ausstehend.");
     }
 
     const cameraEnergy =
       bpmNumber >= 130
-        ? "pressure-driven movement"
+        ? briefingCopy("pressure-driven movement", "druckgetriebene Bewegung")
         : bpmNumber >= 118
-        ? "controlled camera momentum"
-        : "patient observational movement";
+        ? briefingCopy("controlled camera momentum", "kontrollierten Kamerafluss")
+        : briefingCopy("patient observational movement", "ruhige beobachtende Bewegung");
 
     const materialInfluence =
       styleSignal.includes("chrome") || styleSignal.includes("reflection")
-        ? "reflections should guide framing and reveal timing"
+        ? briefingCopy("reflections should guide framing and reveal timing", "Reflexionen sollten Framing und Reveal-Timing führen")
         : styleSignal.includes("vhs") || styleSignal.includes("analog")
-        ? "camera grammar should allow imperfection, drift and optical memory"
+        ? briefingCopy("camera grammar should allow imperfection, drift and optical memory", "die Kamerasprache sollte Imperfektion, Drift und optische Erinnerung zulassen")
         : styleSignal.includes("velvet") || styleSignal.includes("dark")
-        ? "framing should protect darkness, negative space and restraint"
-        : "visual material should determine how the camera discovers the subject";
+        ? briefingCopy("framing should protect darkness, negative space and restraint", "das Framing sollte Dunkelheit, Negativraum und Zurückhaltung bewahren")
+        : briefingCopy("visual material should determine how the camera discovers the subject", "das visuelle Material sollte bestimmen, wie die Kamera das Motiv entdeckt");
 
     const sonicInfluence =
       genreSignal.includes("techno")
-        ? "movement should feel mechanical and disciplined"
+        ? briefingCopy("movement should feel mechanical and disciplined", "Bewegung sollte mechanisch und diszipliniert wirken")
         : genreSignal.includes("house")
-        ? "movement should preserve groove and body rhythm"
-        : "movement should follow the track's internal pressure";
+        ? briefingCopy("movement should preserve groove and body rhythm", "Bewegung sollte Groove und Körperrhythmus bewahren")
+        : briefingCopy("movement should follow the track\'s internal pressure", "Bewegung sollte der inneren Spannung des Tracks folgen");
 
     if (directorSignal.includes("neo noir") || directorSignal.includes("sci-fi") || directorSignal.includes("sci fi")) {
-      return `Creative Assessment: ${directorMode} should make ${cameraEnergy} feel intentional, not random. ${materialInfluence}; ${sonicInfluence}.`;
+      return language === "Deutsch"
+      ? `Kreative Einschätzung: ${directorMode} sollte ${cameraEnergy} bewusst statt zufällig wirken lassen. ${materialInfluence}; ${sonicInfluence}.`
+      : `Creative Assessment: ${directorMode} should make ${cameraEnergy} feel intentional, not random. ${materialInfluence}; ${sonicInfluence}.`;
     }
 
     if (directorSignal.includes("analog") || directorSignal.includes("memory")) {
-      return `Creative Assessment: ${directorMode} should treat the camera like a memory device. ${materialInfluence}; pacing must respect ${moodSignal || "the emotional tone"}.`;
+      return language === "Deutsch"
+      ? `Kreative Einschätzung: ${directorMode} sollte die Kamera wie ein Erinnerungsmedium behandeln. ${materialInfluence}; das Timing muss ${moodSignal || "den emotionalen Ton"} respektieren.`
+      : `Creative Assessment: ${directorMode} should treat the camera like a memory device. ${materialInfluence}; pacing must respect ${moodSignal || "the emotional tone"}.`;
     }
 
     if (directorSignal.includes("spatial") || directorSignal.includes("architecture")) {
-      return `Creative Assessment: ${directorMode} should prioritize room logic over close-up spectacle. Camera movement must reveal how sound, material and space affect each other.`;
+      return language === "Deutsch"
+      ? `Kreative Einschätzung: ${directorMode} sollte Raumlogik vor Nahaufnahme-Spektakel priorisieren. Kamerabewegung muss sichtbar machen, wie Klang, Material und Raum einander beeinflussen.`
+      : `Creative Assessment: ${directorMode} should prioritize room logic over close-up spectacle. Camera movement must reveal how sound, material and space affect each other.`;
     }
 
-    return `Creative Assessment: ${directorMode} should translate the sonic and material decisions into camera behavior, framing discipline and reveal timing.`;
+    return language === "Deutsch"
+    ? `Kreative Einschätzung: ${directorMode} sollte die klanglichen und materiellen Entscheidungen in Kameraverhalten, präzises Framing und Reveal-Timing übersetzen.`
+    : `Creative Assessment: ${directorMode} should translate the sonic and material decisions into camera behavior, framing discipline and reveal timing.`;
   })();
 
   const worldLogicIntelligence = (() => {
     const { dnaSignal, eraSignal, styleSignal, directorSignal, genreSignal, moodSignal } = creativeContext;
 
     if (!styleDNA || !era) {
-      return "Waiting for world logic.";
+      return briefingCopy("Waiting for world logic.", "Bildwelt ausstehend.");
     }
 
     const eraBehavior =
       eraSignal.includes("ancient")
-        ? "time should feel mythic, ritualized and older than technology"
+        ? briefingCopy("time should feel mythic, ritualized and older than technology", "Zeit sollte mythisch, ritualisiert und älter als Technologie wirken")
         : eraSignal.includes("future") || eraSignal.includes("2090")
-        ? "time should feel engineered, speculative and physically transformed"
+        ? briefingCopy("time should feel engineered, speculative and physically transformed", "Zeit sollte konstruiert, spekulativ und physisch transformiert wirken")
         : eraSignal.includes("chrome") || eraSignal.includes("millennium")
-        ? "time should feel polished, synthetic and culturally over-designed"
+        ? briefingCopy("time should feel polished, synthetic and culturally over-designed", "Zeit sollte poliert, synthetisch und kulturell überinszeniert wirken")
         : eraSignal.includes("vhs") || eraSignal.includes("analog")
-        ? "time should feel degraded, remembered and imperfect"
-        : "the selected era should define the world's visual laws";
+        ? briefingCopy("time should feel degraded, remembered and imperfect", "Zeit sollte degradiert, erinnert und unvollkommen wirken")
+        : briefingCopy("the selected era should define the world\'s visual laws", "die gewählte Ära sollte die visuellen Gesetze der Welt definieren");
 
     const dnaBehavior =
       dnaSignal.includes("noir")
-        ? "the world should hide information through shadow, reflection and partial visibility"
+        ? briefingCopy("the world should hide information through shadow, reflection and partial visibility", "die Welt sollte Informationen durch Schatten, Reflexion und partielle Sichtbarkeit verbergen")
         : dnaSignal.includes("dream")
-        ? "the world should follow emotional logic instead of realism"
+        ? briefingCopy("the world should follow emotional logic instead of realism", "die Welt sollte einer emotionalen Logik statt dem Realismus folgen")
         : dnaSignal.includes("luxury")
-        ? "the world should communicate status through restraint, material control and silence"
+        ? briefingCopy("the world should communicate status through restraint, material control and silence", "die Welt sollte Status durch Zurückhaltung, Materialkontrolle und Stille vermitteln")
         : dnaSignal.includes("tokyo") || dnaSignal.includes("chrome")
-        ? "the world should feel dense, reflective and technologically saturated"
-        : "the cinematic DNA should control atmosphere, architecture and behavior";
+        ? briefingCopy("the world should feel dense, reflective and technologically saturated", "die Welt sollte dicht, reflektierend und technologisch gesättigt wirken")
+        : briefingCopy("the cinematic DNA should control atmosphere, architecture and behavior", "die Cinematic DNA sollte Atmosphäre, Architektur und Verhalten steuern");
 
     const materialBehavior =
       styleSignal.includes("chrome") || styleSignal.includes("reflection")
-        ? "surfaces must behave like active storytelling devices"
+        ? briefingCopy("surfaces must behave like active storytelling devices", "Oberflächen müssen als aktive Mittel des Storytellings funktionieren")
         : styleSignal.includes("vhs") || styleSignal.includes("analog")
-        ? "imperfection must become part of the world physics"
+        ? briefingCopy("imperfection must become part of the world physics", "Imperfektion muss Teil der Physik dieser Welt werden")
         : styleSignal.includes("dark") || styleSignal.includes("velvet")
-        ? "darkness must define what the viewer is allowed to understand"
-        : "materials must reinforce the world's internal rules";
+        ? briefingCopy("darkness must define what the viewer is allowed to understand", "Dunkelheit muss bestimmen, was das Publikum verstehen darf")
+        : briefingCopy("materials must reinforce the world\'s internal rules", "Materialien müssen die inneren Regeln der Welt verstärken");
 
     const directorBehavior =
       directorSignal.includes("minimal") || directorSignal.includes("monumental")
-        ? "camera logic should make the world feel larger than the subject"
+        ? briefingCopy("camera logic should make the world feel larger than the subject", "die Kameralogik sollte die Welt größer als das Motiv wirken lassen")
         : directorSignal.includes("noir") || directorSignal.includes("sci")
-        ? "camera logic should reveal the world through controlled fragments"
-        : "camera logic should expose how the world behaves under pressure";
+        ? briefingCopy("camera logic should reveal the world through controlled fragments", "die Kameralogik sollte die Welt durch kontrollierte Fragmente enthüllen")
+        : briefingCopy("camera logic should expose how the world behaves under pressure", "die Kameralogik sollte zeigen, wie sich die Welt unter Druck verhält");
 
-    return `Creative Assessment: ${styleDNA} in ${era} should create a world where ${eraBehavior}. ${dnaBehavior}; ${materialBehavior}; ${directorBehavior}.`;
+    return language === "Deutsch"
+    ? `Kreative Einschätzung: ${styleDNA} in ${era} sollte eine Welt schaffen, in der ${eraBehavior}. ${dnaBehavior}; ${materialBehavior}; ${directorBehavior}.`
+    : `Creative Assessment: ${styleDNA} in ${era} should create a world where ${eraBehavior}. ${dnaBehavior}; ${materialBehavior}; ${directorBehavior}.`;
   })();
 
   const releaseObjectiveIntelligence = (() => {
     const { purposeSignal, genreSignal, moodSignal, directorSignal } = creativeContext;
 
     if (!reelPurpose) {
-      return "Waiting for release objective.";
+      return briefingCopy("Waiting for release objective.", "Release-Ziel ausstehend.");
     }
 
     const purposeBehavior =
       purposeSignal.includes("identity")
-        ? "the reel should make the artist recognizable before it explains anything"
+        ? briefingCopy("the reel should make the artist recognizable before it explains anything", "das Reel sollte den Artist wiedererkennbar machen, bevor es etwas erklärt")
         : purposeSignal.includes("teaser") || purposeSignal.includes("launch")
-        ? "the reel should create anticipation without resolving the full idea"
+        ? briefingCopy("the reel should create anticipation without resolving the full idea", "das Reel sollte Erwartung erzeugen, ohne die gesamte Idee aufzulösen")
         : purposeSignal.includes("canvas")
-        ? "the reel should become a hypnotic loop that strengthens track memory"
+        ? briefingCopy("the reel should become a hypnotic loop that strengthens track memory", "das Reel sollte zu einem hypnotischen Loop werden, der die Wiedererkennbarkeit des Tracks stärkt")
         : purposeSignal.includes("festival")
-        ? "the reel should communicate scale, impact and instant visual readability"
+        ? briefingCopy("the reel should communicate scale, impact and instant visual readability", "das Reel sollte Größe, Wirkung und unmittelbare visuelle Lesbarkeit vermitteln")
         : purposeSignal.includes("editorial") || purposeSignal.includes("campaign")
-        ? "the reel should feel campaign-ready, intentional and visually ownable"
+        ? briefingCopy("the reel should feel campaign-ready, intentional and visually ownable", "das Reel sollte kampagnenreif, bewusst gestaltet und visuell eigenständig wirken")
         : purposeSignal.includes("video")
-        ? "the reel should seed a larger music-video world without revealing everything"
-        : "the reel should serve the selected release goal with a clear creative function";
+        ? briefingCopy("the reel should seed a larger music-video world without revealing everything", "das Reel sollte eine größere Musikvideo-Welt anlegen, ohne alles vorwegzunehmen")
+        : briefingCopy("the reel should serve the selected release goal with a clear creative function", "das Reel sollte dem gewählten Release-Ziel mit einer klaren kreativen Funktion dienen");
 
     const emotionalStrategy =
       moodSignal.includes("hypnotic")
-        ? "Repetition should become the retention mechanism."
+        ? briefingCopy("Repetition should become the retention mechanism.", "Wiederholung sollte zum Mechanismus für Wiedererkennung werden.")
         : moodSignal.includes("tense")
-        ? "Unresolved pressure should hold attention."
+        ? briefingCopy("Unresolved pressure should hold attention.", "Ungelöste Spannung sollte die Aufmerksamkeit halten.")
         : moodSignal.includes("nocturnal")
-        ? "Intimacy and atmosphere should create recognition."
+        ? briefingCopy("Intimacy and atmosphere should create recognition.", "Intimität und Atmosphäre sollten Wiedererkennbarkeit schaffen.")
         : moodSignal.includes("euphoric")
-        ? "Release and lift should create shareability."
-        : "The emotional tone should define what the viewer remembers.";
+        ? briefingCopy("Release and lift should create shareability.", "Auflösung und Auftrieb sollten Teilbarkeit fördern.")
+        : briefingCopy("The emotional tone should define what the viewer remembers.", "Der emotionale Ton sollte bestimmen, was dem Publikum in Erinnerung bleibt.");
 
     const formatStrategy =
       genreSignal.includes("techno")
-        ? "Keep the visual system disciplined and physical."
+        ? briefingCopy("Keep the visual system disciplined and physical.", "Halte das visuelle System diszipliniert und physisch.")
         : genreSignal.includes("house")
-        ? "Keep the visual system warm, rhythmic and body-led."
+        ? briefingCopy("Keep the visual system warm, rhythmic and body-led.", "Halte das visuelle System warm, rhythmisch und körpergeführt.")
         : directorSignal.includes("minimal")
-        ? "Keep the concept precise, iconic and stripped of excess."
-        : "Keep the final creative signal easy to understand within seconds.";
+        ? briefingCopy("Keep the concept precise, iconic and stripped of excess.", "Halte das Konzept präzise, ikonisch und frei von Überfluss.")
+        : briefingCopy("Keep the final creative signal easy to understand within seconds.", "Halte das finale kreative Signal innerhalb weniger Sekunden verständlich.");
 
-    return `Creative Assessment: For ${reelPurpose}, ${purposeBehavior}. ${emotionalStrategy} ${formatStrategy}`;
+    return language === "Deutsch"
+    ? `Kreative Einschätzung: Für ${reelPurpose} gilt: ${purposeBehavior}. ${emotionalStrategy} ${formatStrategy}`
+    : `Creative Assessment: For ${reelPurpose}, ${purposeBehavior}. ${emotionalStrategy} ${formatStrategy}`;
   })();
 
   const selectedDirector =
@@ -1404,26 +1436,31 @@ export default function Home() {
   }, []);
 
   function getButtonText() {
-    if (!mounted) return "Loading...";
-    if (loading) return "Generating...";
+    if (!mounted) return ui.common.loading;
+    if (loading) return ui.common.generating;
 
-    if (!isSignedIn) return "Create free account to continue";
+    if (!isSignedIn) return ui.generate.createAccount;
 
-    if (userPlan === "pro") return "Generate Reel · Pro Unlimited";
-    if (userPlan === "standard") return "Generate Reel · Standard";
+    if (userPlan === "pro") return ui.generate.generatePro;
+    if (userPlan === "standard") return ui.generate.generateStandard;
 
     if (userPlan === "free") {
-      if (remainingCredits === null) return "Loading...";
-      if (remainingCredits > 0) return `Generate Reel (${remainingCredits} left)`;
-      return "Upgrade for CHF 19.90/month";
+      if (remainingCredits === null) return ui.common.loading;
+      if (remainingCredits > 0) {
+        return ui.generate.generateCredits.replace(
+          "{count}",
+          String(remainingCredits)
+        );
+      }
+      return ui.generate.upgradeMonthly;
     }
 
-    return "Generate Reel";
+    return ui.generate.generateReel;
   }
 
   async function handleUpgrade() {
     if (userPlan === "pro") {
-      alert("You already have Pro Unlimited.");
+      alert(ui.common.alreadyPro);
       return;
     }
 
@@ -1443,7 +1480,30 @@ export default function Home() {
       }
     } catch (error) {
       console.error(error);
-      alert("Checkout failed.");
+      alert(ui.common.checkoutFailed);
+    }
+  }
+
+  async function handleManageSubscription() {
+    try {
+      const response = await fetch("/api/create-portal-session", {
+        method: "POST",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.url) {
+        throw new Error(
+          data.error || "Failed to open subscription management"
+        );
+      }
+
+      window.location.href = data.url;
+    } catch (error) {
+      console.error("Manage subscription error:", error);
+      alert(
+        error.message || "Failed to open subscription management"
+      );
     }
   }
 
@@ -1462,7 +1522,7 @@ export default function Home() {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.message || data.error || "Thumbnail generation failed");
+        alert(data.message || data.error || ui.generate.thumbnailFailed);
         return;
       }
 
@@ -1471,7 +1531,7 @@ export default function Home() {
       }
     } catch (error) {
       console.error(error);
-      alert("Thumbnail generation failed.");
+      alert(ui.generate.thumbnailFailed);
     } finally {
       setThumbnailLoading(false);
     }
@@ -1490,6 +1550,18 @@ export default function Home() {
       return;
     }
 
+    let generationRequestId = null;
+
+    if (userPlan === "free") {
+      if (!generationRequestIdRef.current) {
+        generationRequestIdRef.current =
+          globalThis.crypto.randomUUID();
+      }
+
+      generationRequestId =
+        generationRequestIdRef.current;
+    }
+
     setLoading(true);
     setResult(null);
     setThumbnailImage(null);
@@ -1505,6 +1577,7 @@ export default function Home() {
         body: JSON.stringify({
           artistName: artist,
           trackName: track,
+          language,
           bpm,
           genre,
           mood,
@@ -1514,6 +1587,7 @@ export default function Home() {
           era,
           reelPurpose,
           userReelVision,
+          generationRequestId,
         }),
             });
 
@@ -1535,6 +1609,57 @@ export default function Home() {
         } catch (error) {
           responseParseError = error;
         }
+      }
+
+      if (
+        response.status === 403 &&
+        data?.code === "FREE_CREDITS_EXHAUSTED"
+      ) {
+        generationRequestIdRef.current = null;
+        window.location.href =
+          "/pricing?reason=credits-used";
+        return;
+      }
+
+      if (
+        !response.ok &&
+        data?.code === "premium_preservation_not_passed"
+      ) {
+        const isEvaluationFailure =
+          data?.evaluationStatus === "evaluation_failure";
+
+        const preservationStatus =
+          typeof data?.preservationStatus === "string"
+            ? data.preservationStatus.trim()
+            : "";
+
+        const hasObservedRegularNonPass =
+          !isEvaluationFailure &&
+          preservationStatus.length > 0 &&
+          preservationStatus !== "pass" &&
+          preservationStatus !== "uncertain";
+
+        const preservationMessage = isEvaluationFailure
+          ? "FrameLab couldn't safely verify this result, so it wasn't returned. You can choose whether to generate again."
+          : hasObservedRegularNonPass
+          ? "This result didn't receive a preservation pass, so FrameLab didn't return it. You can choose whether to generate again."
+          : "Generation couldn't be completed, and FrameLab didn't return this result. You can choose whether to generate again.";
+
+        console.error("Generate preservation check blocked output:", {
+          status: response.status,
+          code: data?.code || null,
+          evaluationStatus:
+            data?.evaluationStatus || null,
+          preservationStatus:
+            data?.preservationStatus || null,
+          uncertainFields:
+            data?.uncertainFields || [],
+          errorCode:
+            data?.errorCode || null,
+        });
+
+        alert(preservationMessage);
+        return;
       }
 
       if (!response.ok) {
@@ -1661,10 +1786,37 @@ Stage 3: ${data.narrativeArc.stage3 || ""}`
       };
 
       setResult(newResult);
+      generationRequestIdRef.current = null;
 
       if (userPlan === "free") {
-        await fetch("/api/use-credit", { method: "POST" });
-        setRemainingCredits((prev) => Math.max((prev || 0) - 1, 0));
+        try {
+          const creditsRes = await fetch(
+            `/api/credits?ts=${Date.now()}`,
+            {
+              cache: "no-store",
+              headers: {
+                "Cache-Control": "no-cache",
+              },
+            }
+          );
+
+          const creditsData =
+            await creditsRes.json();
+
+          if (
+            creditsRes.ok &&
+            typeof creditsData.remaining === "number"
+          ) {
+            setRemainingCredits(
+              creditsData.remaining
+            );
+          }
+        } catch (creditRefreshError) {
+          console.error(
+            "Credit refresh failed:",
+            creditRefreshError
+          );
+        }
       }
 
       if (isSignedIn && user?.id) {
@@ -1726,7 +1878,7 @@ Stage 3: ${data.narrativeArc.stage3 || ""}`
       }, 100);
     } catch (error) {
       console.error(error);
-      alert(error.message || "Generation failed");
+      alert(error.message || ui.generate.generationFailed);
     } finally {
       setLoading(false);
     }
@@ -1863,10 +2015,10 @@ GENERATED BY FRAMELAB
     padding: "36px",
     borderRadius: "32px",
     background:
-      "linear-gradient(180deg, rgba(18,18,28,0.96) 0%, rgba(10,10,18,0.98) 100%)",
+      "linear-gradient(180deg, rgba(18,18,16,0.96) 0%, rgba(10,11,13,0.98) 100%)",
     border: "1px solid rgba(255,255,255,0.08)",
     boxShadow:
-      "0 30px 120px rgba(0,0,0,0.55), 0 0 80px rgba(168,85,247,0.18)",
+      "0 30px 120px rgba(0,0,0,0.55), 0 0 70px rgba(216,181,106,0.08)",
   };
 
   return (
@@ -1875,13 +2027,49 @@ GENERATED BY FRAMELAB
         display: "flex",
         minHeight: "100vh",
         width: "100%",
-        background:
-          "radial-gradient(circle at top left, rgba(124,58,237,0.22), transparent 34%), radial-gradient(circle at top right, rgba(192,132,252,0.14), transparent 30%), #050508",
+        background: "#090A0C",
         position: "relative",
         overflow: "hidden",
+        isolation: "isolate",
       }}
     >
       <style jsx global>{globalCss}</style>
+
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          zIndex: 0,
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "100%",
+            backgroundImage: 'url("/framelab-premium-generate-assets/09_framelab_generate_Hero.png")',
+            backgroundSize: "cover",
+            backgroundPosition: "center top",
+            backgroundRepeat: "no-repeat",
+            opacity: 0.9,
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(90deg, rgba(5,5,6,0.96) 0%, rgba(5,5,6,0.78) 36%, rgba(5,5,6,0.30) 68%, rgba(5,5,6,0.10) 100%), linear-gradient(180deg, rgba(5,5,6,0.06) 35%, rgba(5,5,6,0.92) 100%)",
+          }}
+        />
+
+
+      </div>
 
       <main
         className="generate-content"
@@ -1890,99 +2078,83 @@ GENERATED BY FRAMELAB
           width: "100%",
           maxWidth: "100%",
           overflowX: "hidden",
+          background: "transparent",
+          position: "relative",
+          zIndex: 1,
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            top: "30px",
-            right: "30px",
-            zIndex: 999,
-          }}
-        >
-          <SignedOut>
-            <button
-              onClick={() => (window.location.href = "/sign-in")}
-              style={{
-                padding: "10px 18px",
-                borderRadius: "12px",
-                border: "none",
-                background: "#9b85ff",
-                color: "white",
-                fontWeight: "bold",
-                cursor: "pointer",
-              }}
-            >
-              Login
-            </button>
-          </SignedOut>
-
-          <SignedIn>
-            <UserButton afterSignOutUrl="/" />
-          </SignedIn>
-        </div>
-
         <section
           style={{
             width: "100%",
-            maxWidth: "1180px",
-            margin: "0 auto",
-            paddingTop: "34px",
+            paddingTop: "32px",
             paddingBottom: "80px",
+            position: "relative",
           }}
         >
-          <p
+          <div
             style={{
-              color: "#b985ff",
-              fontSize: "12px",
-              fontWeight: "800",
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-              textAlign: "center",
-              marginBottom: "18px",
+              width: "100%",
+              padding: "0 72px",
+              boxSizing: "border-box",
             }}
           >
-            CINEMATIC AI REEL GENERATOR
-          </p>
+            <p
+              style={{
+                color: "#D8B56A",
+                fontSize: "13px",
+                fontWeight: "800",
+                letterSpacing: "0.28em",
+                textTransform: "uppercase",
+                textAlign: "left",
+                marginBottom: "22px",
+              }}
+            >
+              CINEMATIC AI REEL GENERATOR
+            </p>
 
-          <h1
-            className="generate-title"
-            style={{
-              color: "white",
-              fontSize: "clamp(44px, 8vw, 88px)",
-              lineHeight: "0.95",
-              textAlign: "center",
-              margin: "0 auto 22px",
-              maxWidth: "1040px",
-              fontWeight: "950",
-              letterSpacing: "-0.06em",
-            }}
-          >
-            Create viral cinematic reels for your music.
-          </h1>
+            <h1
+              className="generate-title"
+              style={{
+                color: "#F6F3EB",
+                fontSize: "72px",
+                lineHeight: "0.95",
+                textAlign: "left",
+                margin: "0",
+                maxWidth: "720px",
+                fontWeight: "900",
+                letterSpacing: "-0.05em",
+                textShadow: "0 8px 36px rgba(0,0,0,0.58)",
+              }}
+            >
+              {ui.generate.headline}
+            </h1>
 
-          <p
-            style={{
-              color: "#a1a1aa",
-              fontSize: "16px",
-              textAlign: "center",
-              maxWidth: "760px",
-              margin: "0 auto",
-              lineHeight: "1.8",
-            }}
-          >
-            Build premium reel concepts, cinematic AI video prompts, visual
-            direction systems and export-ready creative packages.
-          </p>
+            <p
+              style={{
+                color: "#a1a1aa",
+                fontSize: "19px",
+                textAlign: "left",
+                maxWidth: "650px",
+                margin: "24px 0 0",
+                lineHeight: "1.6",
+              }}
+            >
+              Build premium reel concepts, cinematic AI video prompts, visual
+              direction systems and export-ready creative packages.
+            </p>
+          </div>
 
           <div
             style={{
-              marginTop: "52px",
+              width: "calc(100% - 72px)",
+              maxWidth: "1180px",
+              margin: "52px 0 0 72px",
+              boxSizing: "border-box",
               padding: "28px",
               borderRadius: "32px",
               background:
-                "linear-gradient(180deg, rgba(18,18,28,0.88), rgba(9,9,16,0.96))",
-              border: "1px solid rgba(255,255,255,0.08)",
+                "linear-gradient(180deg, rgba(22,23,25,0.94), rgba(10,11,13,0.98))",
+              border: "1px solid rgba(216,181,106,0.18)",
               boxShadow:
                 "0 30px 110px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.04)",
             }}
@@ -1998,178 +2170,250 @@ GENERATED BY FRAMELAB
               <div
                 style={{
                   gridColumn: "1 / -1",
-                  padding: "26px",
-                  borderRadius: "28px",
+                  padding: "34px",
+                  borderRadius: "22px",
                   background:
-                    "linear-gradient(135deg, rgba(124,58,237,0.18), rgba(255,255,255,0.045))",
-                  border: "1px solid rgba(196,181,253,0.18)",
-                  boxShadow: "0 22px 70px rgba(0,0,0,0.24)",
+                    "linear-gradient(180deg, rgba(10,11,13,0.98), rgba(6,7,9,0.99))",
+                  border: "1px solid rgba(216,181,106,0.18)",
+                  boxShadow:
+                    "0 32px 90px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.035)",
                 }}
               >
                 <div
                   style={{
-                    color: "#c4b5fd",
-                    fontSize: "11px",
+                    color: "#E7CC91",
+                    fontSize: "10px",
                     fontWeight: "900",
-                    letterSpacing: "0.16em",
+                    letterSpacing: "0.2em",
                     textTransform: "uppercase",
-                    marginBottom: "12px",
+                    marginBottom: "15px",
                   }}
                 >
-                  Creative Briefing System
+                  {ui.generate.briefEyebrow}
                 </div>
 
                 <h3
                   style={{
                     margin: 0,
                     color: "white",
-                    fontSize: "26px",
-                    lineHeight: "1.15",
+                    fontSize: "32px",
+                    lineHeight: "1.08",
                     letterSpacing: "-0.04em",
-                    fontWeight: "950",
-                    maxWidth: "820px",
+                    fontWeight: "900",
+                    maxWidth: "700px",
                   }}
                 >
-                  Build a cinematic creative brief before FrameLab generates the reel.
+                  {ui.generate.briefHeadline}
                 </h3>
 
                 <p
                   style={{
-                    marginTop: "12px",
-                    marginBottom: "20px",
+                    marginTop: "14px",
+                    marginBottom: "30px",
                     color: "rgba(255,255,255,0.72)",
                     fontSize: "15px",
-                    lineHeight: "1.75",
-                    maxWidth: "900px",
+                    lineHeight: "1.65",
+                    maxWidth: "760px",
                   }}
                 >
-                  FrameLab turns your artist, track, genre, mood and visual direction into a ready-to-use creative system for short-form video, social rollout and AI video generation.
+                  {ui.generate.briefSupporting}
                 </p>
 
                 <div
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-                      alignItems: "start",
-                    gap: "12px",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(max(180px, calc((100% - 24px) / 3)), 1fr))",
+                      alignItems: "stretch",
+                    gap: "18px",
                   }}
                 >
                   {[
                     {
-                      title: "Identity Engine",
-                      signal: "Artist + Track",
-                      status: artist && track ? "Identity Locked" : "Waiting",
+                      id: "identity",
+                      image: "/framelab-premium-generate-assets/01_Identity_Profile.png",
+                      title: ui.generate.briefIdentityTitle,
+                      signal: ui.generate.briefIdentitySignal,
+                      status: artist && track ? ui.generate.briefIdentityReady : ui.generate.briefWaiting,
                     },
                     {
-                      title: "Sonic Pressure",
-                      signal: "Genre + BPM + Mood",
-                      status: genre && bpm && mood ? "Sonic Profile Built" : "Waiting",
+                      id: "sonic",
+                      image: "/framelab-premium-generate-assets/03_Sonic_Profile.png",
+                      title: ui.generate.briefSonicTitle,
+                      signal: ui.generate.briefSonicSignal,
+                      status: genre && bpm && mood ? ui.generate.briefSonicReady : ui.generate.briefWaiting,
                     },
                     {
-                      title: "Material Language",
-                      signal: "Visual Style",
-                      status: style ? "Material Language Defined" : "Waiting",
+                      id: "material",
+                      image: "/framelab-premium-generate-assets/02_Visual_Language.png",
+                      title: ui.generate.briefMaterialTitle,
+                      signal: ui.generate.briefMaterialSignal,
+                      status: style ? ui.generate.briefMaterialReady : ui.generate.briefWaiting,
                     },
                     {
-                      title: "Director Grammar",
-                      signal: "Director Mode",
-                      status: directorMode ? "Director Vision Active" : "Waiting",
+                      id: "director",
+                      image: "/framelab-premium-generate-assets/04_Director_Logic.png",
+                      title: ui.generate.briefDirectorTitle,
+                      signal: ui.generate.briefDirectorSignal,
+                      status: directorMode ? ui.generate.briefDirectorReady : ui.generate.briefWaiting,
                     },
                     {
-                      title: "World Logic",
-                      signal: "Cinematic DNA + Era",
-                      status: styleDNA && era ? "World Synced" : "Waiting",
+                      id: "world",
+                      image: "/framelab-premium-generate-assets/05_Visual_World.png",
+                      title: ui.generate.briefWorldTitle,
+                      signal: ui.generate.briefWorldSignal,
+                      status: styleDNA && era ? ui.generate.briefWorldReady : ui.generate.briefWaiting,
                     },
                     {
-                      title: "Release Objective",
-                      signal: "Reel Purpose",
-                      status: reelPurpose ? "Release Strategy Ready" : "Waiting",
+                      id: "release",
+                      image: "/framelab-premium-generate-assets/06_Release_Objective.png",
+                      title: ui.generate.briefReleaseTitle,
+                      signal: ui.generate.briefReleaseSignal,
+                      status: reelPurpose ? ui.generate.briefReleaseReady : ui.generate.briefWaiting,
                     },
                   ].map((item) => {
-                    const isPrimaryBriefingEngine =
-                      item.title === "Identity Engine" || item.title === "World Logic";
+                    const isPrimary =
+                      item.id === "identity" || item.id === "director";
 
                     return (
                       <div
                         key={item.title}
                         style={{
-                          padding: isPrimaryBriefingEngine ? "22px 22px" : (item.title === "World Logic" ? "16px 16px" : "15px 15px"),
+                          padding: "0 20px 21px",
                           borderRadius: "16px",
-                          background: isPrimaryBriefingEngine
-                            ? "linear-gradient(135deg, rgba(168,85,247,0.24), rgba(255,255,255,0.07))"
-                            : "linear-gradient(135deg, rgba(168,85,247,0.14), rgba(255,255,255,0.045))",
-                          border: isPrimaryBriefingEngine
-                            ? "1px solid rgba(216,180,254,0.28)"
-                            : "1px solid rgba(196,181,253,0.13)",
-                          boxShadow: isPrimaryBriefingEngine
-                            ? item.title === "Identity Engine" ? "0 24px 72px rgba(88,28,135,0.30)" : "0 18px 55px rgba(88,28,135,0.22)"
-                            : "none",
+                          background:
+                            "linear-gradient(180deg, rgba(24,25,27,0.96), rgba(16,17,19,0.98))",
+                          border: "1px solid rgba(216,181,106,0.12)",
+                          boxShadow:
+                            "0 18px 48px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.035)",
+                          position: "relative",
+                          overflow: "hidden",
+                          display: "block",
                         }}
                       >
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px",
-                          marginBottom: "8px",
-                        }}
-                      >
-                        <span
+                        <div
+                          aria-hidden="true"
                           style={{
-                            width: "7px",
-                            height: "7px",
-                            borderRadius: "999px",
-                            background: "#a78bfa",
-                            boxShadow: "0 0 14px rgba(167,139,250,0.85)",
-                            flexShrink: 0,
-                          }}
-                        />
-                        <span
-                          style={{
-                            color: "#c4b5fd",
-                            fontSize: "9px",
-                            fontWeight: "950",
-                            letterSpacing: "0.14em",
-                            textTransform: "uppercase",
+                            position: "relative",
+                            height: "148px",
+                            margin: "0 -20px 18px",
+                            overflow: "hidden",
+                            background: "#111214",
                           }}
                         >
-                          {item.status || "Online"}
-                        </span>
-                      </div>
+                          <img
+                            src={item.image}
+                            alt=""
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              display: "block",
+                              objectFit: "cover",
+                              objectPosition: "center",
+                              transform: "scale(1.025)",
+                              opacity: 0.82,
+                            }}
+                          />
 
-                      <div
-                        style={{
-                          color: "#f5f3ff",
-                          fontSize: "13px",
-                          fontWeight: "950",
-                          marginBottom: "6px",
-                        }}
-                      >
-                        {item.title}
-                      </div>
+                          <div
+                            style={{
+                              position: "absolute",
+                              inset: 0,
+                              background:
+                                "linear-gradient(180deg, rgba(8,9,11,0.04) 0%, rgba(8,9,11,0.18) 48%, rgba(16,17,19,0.96) 100%)",
+                            }}
+                          />
 
-                      <div
-                        style={{
-                          color: "rgba(255,255,255,0.62)",
-                          fontSize: "12px",
-                          lineHeight: "1.45",
-                          fontWeight: "700",
-                        }}
-                      >
-                        {item.signal}
-                      </div>
+                          <div
+                            style={{
+                              position: "absolute",
+                              inset: 0,
+                              background:
+                                "linear-gradient(110deg, rgba(216,181,106,0.10), transparent 38%, rgba(0,0,0,0.12) 78%)",
+                              mixBlendMode: "screen",
+                              opacity: 0.42,
+                            }}
+                          />
+                        </div>
 
-                      {item.title === "Identity Engine" && (
                         <div
                           style={{
-                            marginTop: "10px",
-                            padding: "10px",
-                            borderRadius: "12px",
+                            minWidth: 0,
+                            flex: isPrimary ? "1.12 1 150px" : undefined,
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                              marginBottom: "12px",
+                            }}
+                          >
+                            <span
+                              style={{
+                                width: "7px",
+                                height: "7px",
+                                borderRadius: "999px",
+                                background: "#D8B56A",
+                                boxShadow: "0 0 14px rgba(216,181,106,0.55)",
+                                flexShrink: 0,
+                              }}
+                            />
+                            <span
+                              style={{
+                                color: "#E7CC91",
+                                fontSize: "9px",
+                                fontWeight: "950",
+                                letterSpacing: "0.14em",
+                                textTransform: "uppercase",
+                              }}
+                            >
+                              {item.status || "Online"}
+                            </span>
+                          </div>
+
+                          <div
+                            style={{
+                              color: "#f5f3ff",
+                              fontSize: "15px",
+                              fontWeight: "900",
+                              marginBottom: "8px",
+                              letterSpacing: "-0.015em",
+                            }}
+                          >
+                            {item.title}
+                          </div>
+
+                          <div
+                            style={{
+                              color: "rgba(255,255,255,0.62)",
+                              fontSize: "12px",
+                              lineHeight: "1.6",
+                              fontWeight: "600",
+                            }}
+                          >
+                            {item.signal}
+                          </div>
+                        </div>
+
+                        <div
+                          style={{
+                            minWidth: 0,
+                            flex: isPrimary ? "0.88 1 150px" : undefined,
+                          }}
+                        >
+
+                          {item.id === "identity" && (
+                        <div
+                          style={{
+                            marginTop: "14px",
+                            padding: "11px 12px 11px 14px",
+                            borderRadius: "6px",
                             background: "rgba(0,0,0,0.18)",
-                            border: "1px solid rgba(255,255,255,0.07)",
+                            borderLeft: "2px solid rgba(216,181,106,0.28)",
                             color: "rgba(255,255,255,0.76)",
                             fontSize: "10px",
-                            lineHeight: "1.45",
+                            lineHeight: "1.55",
                             fontWeight: "650",
                             minHeight: "auto",
                           }}
@@ -2178,17 +2422,17 @@ GENERATED BY FRAMELAB
                         </div>
                       )}
 
-                      {item.title === "Material Language" && (
+                          {item.id === "material" && (
                         <div
                           style={{
-                            marginTop: "10px",
-                            padding: "10px",
-                            borderRadius: "12px",
+                            marginTop: "14px",
+                            padding: "11px 12px 11px 14px",
+                            borderRadius: "6px",
                             background: "rgba(0,0,0,0.18)",
-                            border: "1px solid rgba(255,255,255,0.07)",
+                            borderLeft: "2px solid rgba(216,181,106,0.28)",
                             color: "rgba(255,255,255,0.76)",
                             fontSize: "10px",
-                            lineHeight: "1.45",
+                            lineHeight: "1.55",
                             fontWeight: "650",
                             minHeight: "auto",
                           }}
@@ -2197,17 +2441,17 @@ GENERATED BY FRAMELAB
                         </div>
                       )}
 
-                      {item.title === "Sonic Pressure" && (
+                          {item.id === "sonic" && (
                         <div
                           style={{
-                            marginTop: "10px",
-                            padding: "10px",
-                            borderRadius: "12px",
+                            marginTop: "14px",
+                            padding: "11px 12px 11px 14px",
+                            borderRadius: "6px",
                             background: "rgba(0,0,0,0.18)",
-                            border: "1px solid rgba(255,255,255,0.07)",
+                            borderLeft: "2px solid rgba(216,181,106,0.28)",
                             color: "rgba(255,255,255,0.76)",
                             fontSize: "10px",
-                            lineHeight: "1.45",
+                            lineHeight: "1.55",
                             fontWeight: "650",
                             minHeight: "auto",
                           }}
@@ -2216,17 +2460,17 @@ GENERATED BY FRAMELAB
                         </div>
                       )}
 
-                      {item.title === "Director Grammar" && (
+                          {item.id === "director" && (
                         <div
                           style={{
-                            marginTop: "10px",
-                            padding: "10px",
-                            borderRadius: "12px",
+                            marginTop: "14px",
+                            padding: "11px 12px 11px 14px",
+                            borderRadius: "6px",
                             background: "rgba(0,0,0,0.18)",
-                            border: "1px solid rgba(255,255,255,0.07)",
+                            borderLeft: "2px solid rgba(216,181,106,0.28)",
                             color: "rgba(255,255,255,0.76)",
                             fontSize: "10px",
-                            lineHeight: "1.45",
+                            lineHeight: "1.55",
                             fontWeight: "650",
                             minHeight: "auto",
                           }}
@@ -2235,17 +2479,17 @@ GENERATED BY FRAMELAB
                         </div>
                       )}
 
-                      {item.title === "Release Objective" && (
+                          {item.id === "release" && (
                         <div
                           style={{
-                            marginTop: "10px",
-                            padding: "10px",
-                            borderRadius: "12px",
+                            marginTop: "14px",
+                            padding: "11px 12px 11px 14px",
+                            borderRadius: "6px",
                             background: "rgba(0,0,0,0.18)",
-                            border: "1px solid rgba(255,255,255,0.07)",
+                            borderLeft: "2px solid rgba(216,181,106,0.28)",
                             color: "rgba(255,255,255,0.76)",
                             fontSize: "10px",
-                            lineHeight: "1.45",
+                            lineHeight: "1.55",
                             fontWeight: "650",
                             minHeight: "auto",
                           }}
@@ -2254,32 +2498,44 @@ GENERATED BY FRAMELAB
                         </div>
                       )}
 
-                      {item.title === "World Logic" && (
+                          {item.id === "world" && (
                         <div
                           style={{
-                            marginTop: "10px",
-                            padding: "10px",
-                            borderRadius: "12px",
+                            marginTop: "14px",
+                            padding: "11px 12px 11px 14px",
+                            borderRadius: "6px",
                             background: "rgba(0,0,0,0.18)",
-                            border: "1px solid rgba(255,255,255,0.07)",
+                            borderLeft: "2px solid rgba(216,181,106,0.28)",
                             color: "rgba(255,255,255,0.76)",
                             fontSize: "10px",
-                            lineHeight: "1.45",
+                            lineHeight: "1.55",
                             fontWeight: "650",
                             minHeight: "auto",
                           }}
                         >
                           {worldLogicIntelligence}
                         </div>
-                      )}
+                          )}
+                        </div>
                       </div>
                     );
                   })}
                 </div>
               </div>
 
+              <div
+                aria-hidden="true"
+                style={{
+                  gridColumn: "1 / -1",
+                  height: "1px",
+                  margin: "10px 0 8px",
+                  background:
+                    "linear-gradient(90deg, transparent, rgba(216,181,106,0.20) 18%, rgba(216,181,106,0.20) 82%, transparent)",
+                }}
+              />
+
               <div>
-                <FieldLabel>Artist Name</FieldLabel>
+                <FieldLabel>{ui.generate.artistName}</FieldLabel>
                 <input
                   value={artist}
                   onChange={(e) => setArtist(e.target.value)}
@@ -2289,7 +2545,7 @@ GENERATED BY FRAMELAB
               </div>
 
               <div>
-                <FieldLabel>Track Name</FieldLabel>
+                <FieldLabel>{ui.generate.trackName}</FieldLabel>
                 <input
                   value={track}
                   onChange={(e) => setTrack(e.target.value)}
@@ -2298,8 +2554,14 @@ GENERATED BY FRAMELAB
                 />
               </div>
 
-              <div>
-                <FieldLabel>Genre</FieldLabel>
+              <div
+                style={{
+                  paddingTop: "18px",
+                  marginTop: "6px",
+                  borderTop: "1px solid rgba(216,181,106,0.10)",
+                }}
+              >
+                <FieldLabel>{ui.generate.genre}</FieldLabel>
                 <select
                   value={genre}
                   onChange={(e) => setGenre(e.target.value)}
@@ -2311,8 +2573,14 @@ GENERATED BY FRAMELAB
                 </select>
               </div>
 
-              <div>
-                <FieldLabel>BPM</FieldLabel>
+              <div
+                style={{
+                  paddingTop: "18px",
+                  marginTop: "6px",
+                  borderTop: "1px solid rgba(216,181,106,0.10)",
+                }}
+              >
+                <FieldLabel>{ui.generate.bpm}</FieldLabel>
                 <input
                   value={bpm}
                   onChange={(e) => setBpm(e.target.value)}
@@ -2322,7 +2590,7 @@ GENERATED BY FRAMELAB
               </div>
 
                 <div>
-                  <FieldLabel>Mood</FieldLabel>
+                  <FieldLabel>{ui.generate.mood}</FieldLabel>
                   <select
                     value={mood}
                     onChange={(e) => setMood(e.target.value)}
@@ -2334,7 +2602,7 @@ GENERATED BY FRAMELAB
                   </select>
                 </div>
                 <div>
-                  <FieldLabel>Visual Style</FieldLabel>
+                  <FieldLabel>{ui.generate.visualStyle}</FieldLabel>
                   <select
                     value={style}
                     onChange={(e) => setStyle(e.target.value)}
@@ -2345,8 +2613,14 @@ GENERATED BY FRAMELAB
                     ))}
                   </select>
                 </div>
-              <div>
-                <FieldLabel>Director Mode</FieldLabel>
+              <div
+                style={{
+                  paddingTop: "18px",
+                  marginTop: "6px",
+                  borderTop: "1px solid rgba(216,181,106,0.10)",
+                }}
+              >
+                <FieldLabel>{ui.generate.directorMode}</FieldLabel>
                 <select
                   value={directorMode}
                   onChange={(e) => setDirectorMode(e.target.value)}
@@ -2360,8 +2634,14 @@ GENERATED BY FRAMELAB
                 </select>
               </div>
 
-              <div>
-                <FieldLabel>Cinematic DNA</FieldLabel>
+              <div
+                style={{
+                  paddingTop: "18px",
+                  marginTop: "6px",
+                  borderTop: "1px solid rgba(216,181,106,0.10)",
+                }}
+              >
+                <FieldLabel>{ui.generate.cinematicDNA}</FieldLabel>
                 <select
                   value={styleDNA}
                   onChange={(e) => setStyleDNA(e.target.value)}
@@ -2373,8 +2653,14 @@ GENERATED BY FRAMELAB
                 </select>
               </div>
 
-              <div>
-                <FieldLabel>Era</FieldLabel>
+              <div
+                style={{
+                  paddingTop: "18px",
+                  marginTop: "6px",
+                  borderTop: "1px solid rgba(216,181,106,0.10)",
+                }}
+              >
+                <FieldLabel>{ui.generate.era}</FieldLabel>
                 <select
                   value={era}
                   onChange={(e) => setEra(e.target.value)}
@@ -2386,8 +2672,14 @@ GENERATED BY FRAMELAB
                 </select>
               </div>
 
-              <div>
-                <FieldLabel>Reel Purpose</FieldLabel>
+              <div
+                style={{
+                  paddingTop: "18px",
+                  marginTop: "6px",
+                  borderTop: "1px solid rgba(216,181,106,0.10)",
+                }}
+              >
+                <FieldLabel>{ui.generate.reelPurpose}</FieldLabel>
                 <select
                   value={reelPurpose}
                   onChange={(e) => setReelPurpose(e.target.value)}
@@ -2400,7 +2692,7 @@ GENERATED BY FRAMELAB
               </div>
 
               <div>
-                <FieldLabel>Your Reel Vision (Optional)</FieldLabel>
+                <FieldLabel>{ui.generate.reelVisionOptional}</FieldLabel>
                 <textarea
                   value={userReelVision}
                   onChange={(e) => setUserReelVision(e.target.value)}
@@ -2422,12 +2714,12 @@ GENERATED BY FRAMELAB
                   padding: "24px",
                   borderRadius: "26px",
                   background:
-                    "radial-gradient(circle at top left, rgba(185,133,255,0.14), rgba(255,255,255,0.035) 62%)",
-                  border: "1px solid rgba(185,133,255,0.16)",
+                    "radial-gradient(circle at top left, rgba(216,181,106,0.10), rgba(255,255,255,0.035) 62%)",
+                  border: "1px solid rgba(216,181,106,0.14)",
                   boxShadow: "0 18px 60px rgba(0,0,0,0.22)",
                 }}
               >
-                <FieldLabel>Selected Director Intelligence</FieldLabel>
+                <FieldLabel>{ui.generate.selectedDirectorIntelligence}</FieldLabel>
 
                 <div
                   className="creative-grid director-intelligence-grid"
@@ -2436,6 +2728,7 @@ GENERATED BY FRAMELAB
                     gridTemplateColumns: "0.85fr 1.05fr 1.1fr",
                     gap: "18px",
                     alignItems: "stretch",
+                    marginTop: "12px",
                   }}
                 >
                   <div>
@@ -2454,11 +2747,14 @@ GENERATED BY FRAMELAB
                           borderRadius: "18px",
                           display: "grid",
                           placeItems: "center",
-                          background: selectedDirector?.accent || "#7c3aed",
+                          background:
+                            selectedDirector?.accent ||
+                            "linear-gradient(180deg, rgba(20,21,23,0.92), rgba(10,11,13,0.96))",
                           color: "white",
                           fontWeight: "900",
                           fontSize: "18px",
-                          boxShadow: "0 0 34px rgba(168,85,247,0.28)",
+                          boxShadow:
+                            "0 0 0 1px rgba(216,181,106,0.24), 0 12px 32px rgba(0,0,0,0.28)",
                         }}
                       >
                         {selectedDirector?.avatar || "◆"}
@@ -2483,7 +2779,7 @@ GENERATED BY FRAMELAB
                             marginTop: "3px",
                           }}
                         >
-                          {selectedDirector?.category || "Director Mode"}
+                          {selectedDirector?.category || ui.generate.directorMode}
                           </div>
                         </div>
                       </div>
@@ -2511,7 +2807,7 @@ GENERATED BY FRAMELAB
                     >
                       <div
                         style={{
-                          color: "#c084fc",
+                          color: "#E7CC91",
                           fontSize: "10px",
                           fontWeight: "900",
                           letterSpacing: "0.14em",
@@ -2537,9 +2833,9 @@ GENERATED BY FRAMELAB
                               style={{
                                 padding: "7px 10px",
                                 borderRadius: "999px",
-                                background: "rgba(185,133,255,0.1)",
-                                border: "1px solid rgba(185,133,255,0.16)",
-                                color: "#d8b4fe",
+                                background: "rgba(216,181,106,0.10)",
+                                border: "1px solid rgba(216,181,106,0.14)",
+                                color: "#E7CC91",
                                 fontSize: "11px",
                                 fontWeight: "800",
                               }}
@@ -2561,7 +2857,7 @@ GENERATED BY FRAMELAB
                     >
                       <div
                         style={{
-                          color: "#c084fc",
+                          color: "#E7CC91",
                           fontSize: "10px",
                           fontWeight: "900",
                           letterSpacing: "0.14em",
@@ -2594,8 +2890,8 @@ GENERATED BY FRAMELAB
                   padding: "22px",
                   borderRadius: "24px",
                   background:
-                    "radial-gradient(circle at top left, rgba(185,133,255,0.16), rgba(255,255,255,0.025) 65%)",
-                  border: "1px solid rgba(185,133,255,0.14)",
+                    "radial-gradient(circle at top left, rgba(216,181,106,0.10), rgba(255,255,255,0.025) 65%)",
+                  border: "1px solid rgba(216,181,106,0.14)",
                 }}
               >
                 <div
@@ -2609,7 +2905,7 @@ GENERATED BY FRAMELAB
                   <div>
                     <div
                       style={{
-                        color: "#c084fc",
+                        color: "#E7CC91",
                         fontSize: "11px",
                         fontWeight: "900",
                         letterSpacing: "0.14em",
@@ -2637,7 +2933,7 @@ GENERATED BY FRAMELAB
                       <div style={{ marginTop: "16px" }}>
                         <div
                           style={{
-                            color: "#c084fc",
+                            color: "#E7CC91",
                             fontSize: "11px",
                             fontWeight: "900",
                             letterSpacing: "0.14em",
@@ -2679,7 +2975,7 @@ GENERATED BY FRAMELAB
                   <div>
                     <div
                       style={{
-                        color: "#c084fc",
+                        color: "#E7CC91",
                         fontSize: "11px",
                         fontWeight: "900",
                         letterSpacing: "0.14em",
@@ -2730,7 +3026,7 @@ GENERATED BY FRAMELAB
                       >
                         <div
                           style={{
-                            color: "#c084fc",
+                            color: "#E7CC91",
                             fontSize: "11px",
                             fontWeight: "900",
                             letterSpacing: "0.14em",
@@ -2773,15 +3069,15 @@ GENERATED BY FRAMELAB
                 background:
                   loading || !mounted
                     ? "rgba(255,255,255,0.12)"
-                    : "linear-gradient(90deg, #7c3aed, #c084fc)",
-                color: "white",
+                    : "linear-gradient(90deg, #B88A3B, #E7CC91)",
+                color: loading || !mounted ? "white" : "#17130C",
                 fontWeight: "950",
                 fontSize: "16px",
                 cursor: loading || !mounted ? "not-allowed" : "pointer",
                 boxShadow:
                   loading || !mounted
                     ? "none"
-                    : "0 18px 60px rgba(168,85,247,0.34)",
+                    : "0 18px 60px rgba(216,181,106,0.30)",
               }}
             >
               {getButtonText()}
@@ -2792,11 +3088,11 @@ GENERATED BY FRAMELAB
                 style={{
                   marginTop: "12px",
                   textAlign: "center",
-                  color: "#bda7ff",
+                  color: "rgba(255,255,255,0.88)",
                   fontSize: "13px",
                 }}
               >
-                Free credits left: {remainingCredits} / 2
+                {ui.generate.freeCreditsLeft}: {remainingCredits} / 2
               </p>
             )}
 
@@ -2807,32 +3103,36 @@ GENERATED BY FRAMELAB
                   style={{
                     border: "none",
                     background: "transparent",
-                    color: "#c4b5fd",
+                    color: "#E7CC91",
                     textDecoration: "underline",
                     cursor: "pointer",
                     fontSize: "13px",
                     fontWeight: "700",
                   }}
                 >
-                  Upgrade to Pro Unlimited
+                  {ui.generate.upgradePro}
                 </button>
               </div>
             )}
 
             {userPlan === "pro" && (
               <div style={{ textAlign: "center", marginTop: "14px" }}>
-                <a
-                  href="https://billing.stripe.com/p/login/dRmfZg7onfTccD9xjgjC00"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  type="button"
+                  onClick={handleManageSubscription}
                   style={{
-                    color: "#bda7ff",
+                    border: "none",
+                    padding: 0,
+                    background: "transparent",
+                    color: "#E7CC91",
                     textDecoration: "underline",
+                    cursor: "pointer",
+                    font: "inherit",
                     fontSize: "14px",
                   }}
                 >
-                  Manage Subscription
-                </a>
+                  {ui.common.manageSubscription}
+                </button>
               </div>
             )}
           </div>
@@ -2859,10 +3159,10 @@ GENERATED BY FRAMELAB
                   borderRadius: "32px",
                   padding: "42px 32px",
                   background:
-                    "linear-gradient(180deg, rgba(18,18,28,0.96) 0%, rgba(10,10,18,0.98) 100%)",
+                    "linear-gradient(180deg, rgba(18,18,16,0.96) 0%, rgba(10,11,13,0.98) 100%)",
                   border: "1px solid rgba(255,255,255,0.08)",
                   boxShadow:
-                    "0 30px 120px rgba(0,0,0,0.55), 0 0 80px rgba(168,85,247,0.22)",
+                    "0 30px 120px rgba(0,0,0,0.55), 0 0 70px rgba(216,181,106,0.10)",
                   textAlign: "center",
                 }}
               >
@@ -2873,7 +3173,7 @@ GENERATED BY FRAMELAB
                     margin: "0 auto 24px",
                     borderRadius: "999px",
                     border: "3px solid rgba(255,255,255,0.08)",
-                    borderTop: "3px solid #c084fc",
+                    borderTop: "3px solid #D8B56A",
                     animation: "spin 1s linear infinite",
                   }}
                 />
@@ -2914,7 +3214,7 @@ GENERATED BY FRAMELAB
                     borderRadius: "28px",
                     marginBottom: "30px",
                     objectFit: "cover",
-                    boxShadow: "0 0 40px rgba(124,58,237,0.35)",
+                    boxShadow: "0 0 36px rgba(216,181,106,0.14)",
                   }}
                 />
               )}
@@ -2950,24 +3250,22 @@ GENERATED BY FRAMELAB
                   padding: "32px",
                   borderRadius: "28px",
                   background:
-                    "radial-gradient(circle at top, rgba(124,58,237,0.28), rgba(10,10,20,0.94) 70%)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  boxShadow: "0 20px 70px rgba(124,58,237,0.22)",
+                    "radial-gradient(circle at top, rgba(216,181,106,0.07), rgba(10,11,13,0.96) 70%)",
+                  border: "1px solid rgba(255,255,255,0.10)",
+                  boxShadow: "0 20px 70px rgba(0,0,0,0.28)",
                   textAlign: "center",
                 }}
               >
                 <div
                   style={{
-                    color: "#c084fc",
+                    color: "#E7CC91",
                     fontSize: "12px",
                     fontWeight: "800",
                     letterSpacing: "0.14em",
                     textTransform: "uppercase",
                     marginBottom: "10px",
                   }}
-                >
-                  Export Package
-                </div>
+                >{ui.generate.exportPackage}</div>
 
                 <p
                   style={{
@@ -2975,9 +3273,7 @@ GENERATED BY FRAMELAB
                     fontSize: "14px",
                     marginBottom: "22px",
                   }}
-                >
-                  Copy or export your complete FrameLab reel package.
-                </p>
+                >{ui.generate.exportDescription}</p>
 
                 <button
                   className="premium-export-button"
@@ -2987,54 +3283,54 @@ GENERATED BY FRAMELAB
                     maxWidth: "420px",
                     height: "46px",
                     background:
-                      "linear-gradient(180deg, #ffffff 0%, #d8b4fe 100%)",
-                    color: "#111827",
+                      "linear-gradient(90deg, #B88A3B 0%, #D8B56A 50%, #E7CC91 100%)",
+                    color: "#17130C",
                     boxShadow:
-                      "0 0 30px rgba(216,180,254,0.35), 0 10px 35px rgba(216,180,254,0.35)",
+                      "0 0 30px rgba(216,181,106,0.24), 0 10px 35px rgba(0,0,0,0.35)",
                   }}
                   onClick={() => setShowExportModal(true)}
                 >
-                  Export Center
+                  {ui.generate.exportCenter}
                 </button>
               </div>
 
               <ResultSectionHeader
-                eyebrow="Concept Foundation"
-                title="Creative Core"
-                description="The central idea, cinematic identity and director logic behind this reel."
+                eyebrow={ui.generate.conceptFoundation}
+                title={ui.generate.creativeCore}
+                description={ui.generate.creativeCoreDescription}
               />
 
-              <OutputCard title="Reel Concept" text={result.concept} />
+              <OutputCard t={t} title={ui.generate.reelConcept} text={result.concept} />
 
-              <OutputCard
-                title="Cinematic Identity"
+              <OutputCard t={t}
+                title={ui.generate.cinematicIdentity}
                 text={buildCinematicIdentityText(result.cinematicIdentity)}
               />
 
               {result.formatIntent && (
-                <OutputCard
-                  title="Format Intent"
+                <OutputCard t={t}
+                  title={ui.generate.formatIntent}
                   text={`FORMAT: ${result.formatIntent.format || ""}
 PURPOSE: ${result.formatIntent.purpose || ""}
 COMPOSITION PRIORITY: ${result.formatIntent.compositionPriority || ""}`}
                 />
               )}
 
-              <OutputCard
-                title="Director's Notes"
+              <OutputCard t={t}
+                title={ui.generate.directorsNotes}
                 text={result.directorSummary}
               />
 
-              <OutputCard title="Narrative Arc" text={result.narrativeArc} />
+              <OutputCard t={t} title={ui.generate.narrativeArc} text={result.narrativeArc} />
 
               <ResultSectionHeader
-                eyebrow="Production Blueprint"
-                title="AI Video Direction"
-                description="The cinematic sequence and production-ready visual prompt for generation."
+                eyebrow={ui.generate.productionBlueprint}
+                title={ui.generate.aiVideoDirection}
+                description={ui.generate.aiVideoDescription}
               />
 
-              <OutputCard
-                title="Cinematic Sequence"
+              <OutputCard t={t}
+                title={ui.generate.cinematicSequence}
                 text={result.prompt}
               />
 
@@ -3050,11 +3346,34 @@ COMPOSITION PRIORITY: ${result.formatIntent.compositionPriority || ""}`}
                 result.hashtags,
               ].some((value) => String(value || "").trim()) && (
                 <>
-                  <ResultSectionHeader
-                    eyebrow="Social Delivery"
-                    title="Platform Package"
-                    description="Captions, hooks and hashtags prepared for short-form release."
-                  />
+                  <div
+                    style={{
+                      position: "relative",
+                      marginTop: "38px",
+                      paddingTop: "28px",
+                      background:
+                        "linear-gradient(180deg, rgba(216,181,106,0.045) 0%, rgba(216,181,106,0.012) 42%, rgba(216,181,106,0) 100%)",
+                    }}
+                  >
+                    <div
+                      aria-hidden="true"
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "1px",
+                        background:
+                          "linear-gradient(90deg, rgba(216,181,106,0) 0%, rgba(216,181,106,0.58) 18%, rgba(216,181,106,0.22) 72%, rgba(216,181,106,0) 100%)",
+                        boxShadow: "0 0 24px rgba(216,181,106,0.14)",
+                      }}
+                    />
+                    <ResultSectionHeader
+                      eyebrow={ui.generate.socialDelivery}
+                      title={ui.generate.platformPackage}
+                      description={ui.generate.platformDescription}
+                    />
+                  </div>
 
                   {[
                     result.caption,
@@ -3062,7 +3381,7 @@ COMPOSITION PRIORITY: ${result.formatIntent.compositionPriority || ""}`}
                     result.tiktokCaption,
                     result.shortsCaption,
                   ].some((value) => String(value || "").trim()) && (
-                    <OutputCard
+                    <OutputCard t={t}
                       title="Platform Captions"
                       text={`MAIN CAPTION:
 ${result.caption}
@@ -3084,8 +3403,8 @@ ${result.shortsCaption}`}
                     result.emotionalHook,
                     result.viralHook,
                   ].some((value) => String(value || "").trim()) && (
-                    <OutputCard
-                      title="Hook Variants"
+                    <OutputCard t={t}
+                      title={ui.generate.hookVariants}
                       text={`PRIMARY HOOK:
 ${result.hook}
 
@@ -3100,7 +3419,7 @@ ${result.viralHook}`}
                     />
                   )}
 
-                  <OutputCard title="Hashtags" text={result.hashtags} />
+                  <OutputCard t={t} title={ui.generate.hashtags} text={result.hashtags} />
                 </>
               )}
                             
@@ -3122,9 +3441,9 @@ ${result.viralHook}`}
                   : String(value || "").trim()
               ) && (
                 <ResultSectionHeader
-                  eyebrow="Performance Intelligence"
-                  title="Concept Strength Analysis"
-                  description="A quality check of viral potential, creative logic, audience fit and content performance."
+                  eyebrow={ui.generate.performanceIntelligence}
+                  title={ui.generate.conceptStrengthAnalysis}
+                  description={ui.generate.qualityDescription}
                 />
               )}
               
@@ -3134,16 +3453,13 @@ ${result.viralHook}`}
                     marginTop: "22px",
                     padding: "24px",
                     borderRadius: "24px",
-                    background:
-                      "linear-gradient(135deg, rgba(185,133,255,0.18), rgba(255,255,255,0.035))",
-                    border: "1px solid rgba(185,133,255,0.24)",
-                    boxShadow:
-                      "0 18px 70px rgba(124,58,237,0.18), inset 0 1px 0 rgba(255,255,255,0.06)",
+                    background: "rgba(255,255,255,0.03)",
+                    border: "1px solid rgba(255,255,255,0.08)",
                   }}
                 >
                   <div
                     style={{
-                      color: "#c084fc",
+                      color: "#E7CC91",
                       fontSize: "11px",
                       fontWeight: "900",
                       letterSpacing: "0.16em",
@@ -3151,7 +3467,7 @@ ${result.viralHook}`}
                       marginBottom: "8px",
                     }}
                   >
-                    Viral Score
+                    {ui.generate.viralScore}
                   </div>
 
                   <h3
@@ -3191,8 +3507,8 @@ ${result.viralHook}`}
                         height: "100%",
                         borderRadius: "999px",
                         background:
-                          "linear-gradient(90deg, #7c3aed, #c084fc, #f0abfc)",
-                        boxShadow: "0 0 22px rgba(192,132,252,0.36)",
+                          "linear-gradient(90deg, #B88A3B, #D8B56A, #E7CC91)",
+                        boxShadow: "0 0 22px rgba(216,181,106,0.20)",
                       }}
                     />
                   </div>
@@ -3205,14 +3521,13 @@ ${result.viralHook}`}
                     marginTop: "20px",
                     padding: "24px",
                     borderRadius: "24px",
-                    background:
-                      "linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.025))",
+                    background: "rgba(255,255,255,0.03)",
                     border: "1px solid rgba(255,255,255,0.08)",
                   }}
                 >
                   <div
                     style={{
-                      color: "#c084fc",
+                      color: "#E7CC91",
                       fontSize: "11px",
                       fontWeight: "900",
                       letterSpacing: "0.16em",
@@ -3374,7 +3689,7 @@ ${result.viralHook}`}
                       >
                         <div
                           style={{
-                            color: "#9f7aea",
+                            color: "#D8B56A",
                             fontSize: "11px",
                             letterSpacing: "1px",
                             fontWeight: 800,
@@ -3392,53 +3707,59 @@ ${result.viralHook}`}
                 </div>
               )}
               
-              <div
-                style={{
-                  display:
-                    String(result.thumbnailPrompt || "").trim() || thumbnailImage
-                      ? "block"
-                      : "none",
-                  marginTop: "20px",
-                  padding: "22px",
-                  borderRadius: "22px",
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                }}
-              >
-                <h3
-                  style={{
-                    color: "white",
-                    marginBottom: "14px",
-                    fontSize: "20px",
-                  }}
-                >
-                  Thumbnail Concept
-                </h3>
-
+              {(String(result.thumbnailPrompt || "").trim() || thumbnailImage) && (
                 <div
                   style={{
-                    color: "#cfcfe7",
-                    lineHeight: "1.8",
-                    whiteSpace: "pre-wrap",
+                    marginTop: "52px",
+                    paddingTop: "30px",
+                    background:
+                      "linear-gradient(180deg, rgba(255,255,255,0.018) 0%, rgba(255,255,255,0.006) 42%, rgba(255,255,255,0) 100%)",
                   }}
                 >
-                  {result.thumbnailPrompt}
-                </div>
-
-                {thumbnailImage && (
-                  <img
-                    src={thumbnailImage}
-                    alt="Generated thumbnail"
+                  <div
                     style={{
-                      width: "100%",
-                      borderRadius: "20px",
-                      marginTop: "18px",
-                      border: "1px solid rgba(255,255,255,0.08)",
+                      padding: "20px",
+                      borderRadius: "22px",
+                      background: "rgba(255,255,255,0.02)",
+                      border: "1px solid rgba(255,255,255,0.06)",
                     }}
-                  />
-                )}
+                  >
+                    <h3
+                      style={{
+                        color: "white",
+                        marginBottom: "14px",
+                        fontSize: "20px",
+                      }}
+                    >
+                      {ui.generate.thumbnailConcept}
+                    </h3>
 
-              </div>
+                    <div
+                      style={{
+                        color: "#cfcfe7",
+                        lineHeight: "1.8",
+                        whiteSpace: "pre-wrap",
+                      }}
+                    >
+                      {result.thumbnailPrompt}
+                    </div>
+
+                    {thumbnailImage && (
+                      <img
+                        src={thumbnailImage}
+                        alt="Generated thumbnail"
+                        style={{
+                          width: "100%",
+                          borderRadius: "20px",
+                          marginTop: "18px",
+                          border: "1px solid rgba(255,255,255,0.08)",
+                        }}
+                      />
+                    )}
+
+                  </div>
+                </div>
+              )}
             </div>
           )}
           
@@ -3451,7 +3772,7 @@ ${result.viralHook}`}
                   letterSpacing: "-0.03em",
                 }}
               >
-                Reel History
+                {ui.generate.reelHistory}
               </h2>
 
               <div className="history-grid">
@@ -3483,8 +3804,8 @@ ${result.viralHook}`}
                     }}
                     style={{
                       background:
-                        "linear-gradient(180deg, rgba(14,10,24,0.96) 0%, rgba(8,8,18,0.98) 100%)",
-                      border: "1px solid rgba(180,140,255,0.12)",
+                        "linear-gradient(180deg, rgba(20,21,23,0.96) 0%, rgba(10,11,13,0.98) 100%)",
+                      border: "1px solid rgba(216,181,106,0.14)",
                       borderRadius: "28px",
                       padding: "24px",
                       marginBottom: "24px",
@@ -3493,10 +3814,10 @@ ${result.viralHook}`}
                       position: "relative",
                       overflow: "hidden",
                       boxShadow:
-                        "0 30px 90px rgba(0,0,0,0.45), 0 0 80px rgba(120,70,255,0.08), inset 0 1px 0 rgba(255,255,255,0.04)",
+                        "0 30px 90px rgba(0,0,0,0.45), 0 0 80px rgba(216,181,106,0.08), inset 0 1px 0 rgba(255,255,255,0.04)",
                     }}
                   >
-                    <p style={{ color: "#b985ff", fontWeight: "bold" }}>
+                    <p style={{ color: "#E7CC91", fontWeight: "bold" }}>
                       {item.artist} — {item.track}
                     </p>
 
@@ -3506,14 +3827,14 @@ ${result.viralHook}`}
 
                     <p
                       style={{
-                        color: "#b985ff",
+                        color: "#D8B56A",
                         marginTop: "8px",
                         fontSize: "12px",
                         fontWeight: "600",
                       }}
                     >
-                      {item.directorMode || "Director Mode"} ·{" "}
-                      {item.styleDNA || "Cinematic DNA"} · {item.era || "Era"}
+                      {item.directorMode || ui.generate.directorMode} ·{" "}
+                      {item.styleDNA || ui.generate.cinematicDNA} · {item.era || ui.generate.era}
                     </p>
 
                     <p
@@ -3541,13 +3862,13 @@ ${result.viralHook}`}
                         style={{
                           padding: "6px 10px",
                           borderRadius: "999px",
-                          background: "rgba(185,133,255,0.12)",
-                          color: "#b985ff",
+                          background: "rgba(216,181,106,0.12)",
+                          color: "#E7CC91",
                           fontSize: "11px",
                           fontWeight: "700",
                         }}
                       >
-                        Viral: {item.result?.viralScore || "--"}
+                        {ui.generate.viralLabel} {item.result?.viralScore || "--"}
                       </span>
 
                       <span
@@ -3560,7 +3881,7 @@ ${result.viralHook}`}
                           fontWeight: "700",
                         }}
                       >
-                        {item.result?.bestPlatform || "Platform N/A"}
+                        {item.result?.bestPlatform || ui.generate.platformNA}
                       </span>
 
                       <span
@@ -3573,7 +3894,7 @@ ${result.viralHook}`}
                           fontWeight: "700",
                         }}
                       >
-                        {item.result?.contentType || "Content Type N/A"}
+                        {item.result?.contentType || ui.generate.contentTypeNA}
                       </span>
                     </div>
 
@@ -3610,7 +3931,7 @@ ${result.viralHook}`}
                           fontSize: "12px",
                         }}
                       >
-                        Delete
+                        {ui.common.delete}
                       </button>
 
                       <span style={{ marginLeft: "10px" }}>{item.date}</span>
@@ -3642,10 +3963,10 @@ ${result.viralHook}`}
                 width: "420px",
                 maxWidth: "100%",
                 background:
-                  "linear-gradient(180deg, rgba(17,24,39,0.98), rgba(8,8,18,0.98))",
+                  "linear-gradient(180deg, rgba(20,21,23,0.98), rgba(9,10,12,0.98))",
                 borderRadius: "24px",
                 padding: "24px",
-                border: "1px solid rgba(168,85,247,0.25)",
+                border: "1px solid rgba(216,181,106,0.18)",
                 position: "relative",
                 boxShadow: "0 30px 120px rgba(0,0,0,0.55)",
               }}
@@ -3669,9 +3990,7 @@ ${result.viralHook}`}
                 ×
               </button>
 
-              <h2 style={{ color: "white", marginBottom: "10px" }}>
-                Export Package
-              </h2>
+              <h2 style={{ color: "white", marginBottom: "10px" }}>{ui.generate.exportPackage}</h2>
 
               <p
                 style={{
@@ -3680,10 +3999,7 @@ ${result.viralHook}`}
                   fontSize: "14px",
                   marginBottom: "20px",
                 }}
-              >
-                Copy the complete FrameLab reel package for production,
-                briefing or client handoff.
-              </p>
+              >{ui.generate.exportModalDescription}</p>
 
                 <button
                   style={{
@@ -3691,26 +4007,26 @@ ${result.viralHook}`}
                     width: "100%",
                     marginBottom: "12px",
                     background:
-                      exportCopyLabel === "Copied"
+                      exportCopyLabel === t("Copied")
                         ? "linear-gradient(90deg, #22c55e, #86efac)"
                         : copyButton.background,
-                    color: exportCopyLabel === "Copied" ? "#07130b" : "white",
+                    color: exportCopyLabel === t("Copied") ? "#07130b" : "white",
                   }}
                   onClick={async () => {
                     const copied = await copyToClipboard(buildExportText());
 
                     if (copied) {
-                      setExportCopyLabel("Copied");
+                      setExportCopyLabel(t("Copied"));
                       setTimeout(
                         () =>
-                          setExportCopyLabel("Copy Full Creative Package"),
+                          setExportCopyLabel(ui.generate.copyFullPackage),
                         1400
                       );
                     } else {
-                      setExportCopyLabel("Copy Failed");
+                      setExportCopyLabel(t("Copy Failed"));
                       setTimeout(
                         () =>
-                          setExportCopyLabel("Copy Full Creative Package"),
+                          setExportCopyLabel(ui.generate.copyFullPackage),
                         1400
                       );
                     }
@@ -3724,27 +4040,27 @@ ${result.viralHook}`}
                     ...copyButton,
                     width: "100%",
                     background:
-                      promptCopyLabel === "Copied"
+                      promptCopyLabel === t("Copied")
                         ? "linear-gradient(90deg, #22c55e, #86efac)"
                         : "rgba(255,255,255,0.08)",
-                    color: promptCopyLabel === "Copied" ? "#07130b" : "white",
+                    color: promptCopyLabel === t("Copied") ? "#07130b" : "white",
                     border: "1px solid rgba(255,255,255,0.12)",
                   }}
                   onClick={async () => {
                     const copied = await copyToClipboard(result?.prompt || "");
 
                     if (copied) {
-                      setPromptCopyLabel("Copied");
+                      setPromptCopyLabel(t("Copied"));
                       setTimeout(
                         () =>
-                          setPromptCopyLabel("Copy AI Video Prompt Only"),
+                          setPromptCopyLabel(ui.generate.copyVideoPrompt),
                         1400
                       );
                     } else {
-                      setPromptCopyLabel("Copy Failed");
+                      setPromptCopyLabel(t("Copy Failed"));
                       setTimeout(
                         () =>
-                          setPromptCopyLabel("Copy AI Video Prompt Only"),
+                          setPromptCopyLabel(ui.generate.copyVideoPrompt),
                         1400
                       );
                     }

@@ -1,6 +1,10 @@
 import OpenAI from "openai";
-import { getFreeUses, increaseFreeUses } from "../../lib/credits";
-import { isPro } from "../../lib/pro";
+import {
+  reserveFreeGenerate,
+  completeFreeGenerate,
+  failFreeGenerate,
+} from "../../lib/credits";
+import { getUserPlan } from "../../lib/pro";
 import { getAuth } from "@clerk/nextjs/server";
 import { directorModes } from "../../data/directorModes";
 
@@ -13,26 +17,107 @@ function escapeRegExp(string = "") {
 }
 
 export default async function handler(req, res) {
+  let freeGenerationContext = null;
+
   try {
+    const devMode =
+      process.env.FRAMELAB_DEV_MODE === "true";
+
+    const mockMode =
+      process.env.FRAMELAB_GENERATE_MOCK === "true";
+
     const { userId } = getAuth(req);
 
-    if (process.env.FRAMELAB_DEV_MODE === "true" ? false : !userId) {
+    if (!devMode && !userId) {
       return res.status(401).json({
         error: "Unauthorized",
       });
     }
 
-    const pro = await isPro(userId);
+    const plan = devMode
+      ? "pro"
+      : await getUserPlan(userId);
 
-    if (process.env.FRAMELAB_DEV_MODE === "true" ? false : !pro) {
+    const normalizedPlan =
+      String(plan || "free").toLowerCase();
+
+    const isProUser =
+      normalizedPlan.includes("pro");
+
+    const isFreeUser =
+      normalizedPlan === "free";
+
+    if (
+      !devMode &&
+      !isProUser &&
+      !isFreeUser
+    ) {
       return res.status(403).json({
         error: "Pro subscription required",
       });
     }
 
+    const generationRequestId =
+      typeof req.body?.generationRequestId === "string"
+        ? req.body.generationRequestId.trim()
+        : "";
+
+    if (isFreeUser && !mockMode) {
+      if (
+        !/^[A-Za-z0-9_-]{16,100}$/.test(
+          generationRequestId
+        )
+      ) {
+        return res.status(400).json({
+          error: "Invalid generation request id",
+          code: "INVALID_GENERATION_REQUEST_ID",
+        });
+      }
+
+      const reservation =
+        await reserveFreeGenerate(
+          userId,
+          generationRequestId
+        );
+
+      if (reservation.status === "COMPLETED") {
+        return res.status(200).json(
+          reservation.result
+        );
+      }
+
+      if (reservation.status === "IN_PROGRESS") {
+        return res.status(409).json({
+          error: "Generation already in progress",
+          code: "GENERATION_IN_PROGRESS",
+        });
+      }
+
+      if (reservation.status === "LIMIT") {
+        return res.status(403).json({
+          error: "Free credits exhausted",
+          code: "FREE_CREDITS_EXHAUSTED",
+        });
+      }
+
+      if (reservation.status !== "RESERVED") {
+        throw new Error(
+          `Unexpected credit reservation state: ${reservation.status}`
+        );
+      }
+
+      freeGenerationContext = {
+        userId,
+        generationRequestId,
+        reserved: true,
+        completed: false,
+      };
+    }
+
     const {
   artistName,
   trackName,
+  language = "English",
   bpm,
   genre,
   mood,
@@ -43,6 +128,19 @@ export default async function handler(req, res) {
   reelPurpose = "Artist Identity Reel",
   userReelVision = "",
 } = req.body;
+
+const allowedOutputLanguages = new Set([
+  "English",
+  "Deutsch",
+  "Español",
+  "Français",
+  "Italiano",
+  "Português",
+  "中文",
+]);
+
+const normalizedOutputLanguage =
+  allowedOutputLanguages.has(language) ? language : "English";
 
 const normalizedUserReelVision =
   typeof userReelVision === "string"
@@ -1244,6 +1342,13 @@ Use this structured Creative Decision Layer as the hierarchy for the output:
 ${creativeDecisionLayerText}
 
 Generate Reel is not a full production blueprint.
+
+OUTPUT LANGUAGE RULE:
+Write all user-facing generated Creative Package prose consistently in ${normalizedOutputLanguage}.
+Keep all JSON keys, schema structure and technical field names unchanged.
+Do not translate Artist Name, Track Name or other explicit proper names supplied by the user.
+Do not mix output languages except where an original proper name or unavoidable established term requires it.
+Output language changes wording only and must not alter concept selection, creative hierarchy or control semantics.
 
 Generate Reel must first interpret input hierarchy.
 
@@ -6546,7 +6651,948 @@ const buildSnowflakeSignature = (identity, concept) => {
       ],
     };
 
-    const selectedFamily = fallbackFamilies[moodFamily];
+    const localizedFallbackFamilies = {
+      Deutsch: {
+        warmHope: [
+          [
+            "Wärme legt sich über die Szene, während kleine Veränderungen zunehmend beruhigend wirken",
+            "Hoffnung wächst leise, während sich die zentrale Bewegung einer Verbindung öffnet",
+            "Eine sanfte Ruhe stellt sich ein, während die sichtbare Spannung langsam nachlässt",
+          ],
+          [
+            "Der umgebende Raum wirkt einladend, ohne seine gespannte Erwartung zu verlieren",
+            "Subtile Verschiebungen zwischen Motiv und Umgebung erzeugen ein zartes Gefühl von Möglichkeit",
+            "Distanz und Licht wirken zusammen und schaffen ein stilles Gefühl von Vertrauen",
+          ],
+          [
+            "Das Schlussbild hinterlässt Wärme, Ruhe und ein glaubwürdiges Gefühl von Hoffnung",
+            "Ein sanfter Nachklang bleibt bestehen und deutet an, dass sich der Moment weiter öffnen kann",
+            "Der Endzustand wirkt gefestigt und bleibt zugleich von zurückhaltender Möglichkeit belebt",
+          ],
+        ],
+        confidentArrival: [
+          [
+            "Die Präsenz gewinnt an Schärfe, während die zentrale Bewegung bewusst und sicher wirkt",
+            "Selbstvertrauen wächst, während das Motiv zunehmend Raum innerhalb der Szene einnimmt",
+            "Ein klares Gefühl des Ankommens entsteht, während Zögern in Kontrolle übergeht",
+          ],
+          [
+            "Der umgebende Raum wirkt von konzentrierter Erwartung aufgeladen",
+            "Jede sichtbare Verschiebung verstärkt das Gefühl von Zielstrebigkeit und Kontrolle",
+            "Das Gleichgewicht zwischen Bewegung und Stillstand erzeugt eine souveräne Erwartung",
+          ],
+          [
+            "Das Schlussbild hinterlässt einen klaren Eindruck von Bereitschaft und Vorwärtsdrang",
+            "Ein kontrollierter letzter Moment trägt das Versprechen entschlossenen Handelns",
+            "Das letzte Bild wirkt gesammelt, präsent und bereit für das, was folgt",
+          ],
+        ],
+        hypnoticMotion: [
+          [
+            "Der Rhythmus zieht den Körper nach innen, während die wiederholte Bewegung unausweichlich wirkt",
+            "Die Bewegung verdichtet sich zu einem Puls, der körperlich spürbar wird, bevor er bewusst erfasst wird",
+            "Ein tranceartiger Sog entsteht, während jede Verschiebung im umgebenden Raum nachhallt",
+          ],
+          [
+            "Die Szene scheint durch Zyklen von Druck, Entlastung und Wiederkehr zu atmen",
+            "Wiederholte Bewegung erzeugt das immersive Gefühl, innerhalb des Bildes zu treiben",
+            "Der wechselnde räumliche Rhythmus erzeugt ein körperliches Gefühl des Schwebens",
+          ],
+          [
+            "Das Schlussbild lässt einen langsamen Puls unterhalb des bewussten Denkens weiterwirken",
+            "Ein restlicher Rhythmus bleibt bestehen, als würde der Körper der Bewegung weiterhin folgen",
+            "Der Endzustand hält die Sinne in einer stillen, fortlaufenden Trance",
+          ],
+        ],
+        surrealStillness: [
+          [
+            "Die Stille wird fremdartig, während vertraute Beziehungen leise aus ihrer Ordnung geraten",
+            "Eine unheimliche Ruhe legt sich über die Szene, während gewöhnlicher Raum seine Gewissheit verliert",
+            "Das Ausbleiben von Bewegung erzeugt ein schwebendes Gefühl, das sich nur schwer einordnen lässt",
+          ],
+          [
+            "Der umgebende Raum wirkt schwerelos, fern und subtil unwirklich",
+            "Kleine visuelle Unterschiede erzeugen das Gefühl, in einem angehaltenen Traum zu stehen",
+            "Stille und Trennung verbinden sich zu einer Atmosphäre schwebender Unruhe",
+          ],
+          [
+            "Das Schlussbild hinterlässt eine Stille, die ungelöst und dennoch vollständig wirkt",
+            "Eine leise Fremdartigkeit bleibt zurück, nachdem die sichtbare Bewegung aufgehört hat",
+            "Der Endzustand verweilt wie ein Traum im Moment kurz vor dem Erwachen",
+          ],
+        ],
+        luxuryCalm: [
+          [
+            "Kontrolle legt sich über die Szene, während jede sichtbare Veränderung präzise und bewusst wirkt",
+            "Ruhiges Selbstvertrauen wächst durch zurückhaltende Bewegung und sorgfältig gehaltenen Raum",
+            "Eine verfeinerte Stille stellt sich ein, weil das Bild unnötige Dringlichkeit vermeidet",
+          ],
+          [
+            "Die umgebenden Details erzeugen ein gefasstes Gefühl von Komfort und Exklusivität",
+            "Abgemessene räumliche Verschiebungen erzeugen ein stilles Gefühl von Sicherheit und Leichtigkeit",
+            "Das Gleichgewicht aus Zurückhaltung und Detail schafft eine kultivierte Präsenz",
+          ],
+          [
+            "Das Schlussbild hinterlässt einen kontrollierten Eindruck von Ruhe, Qualität und Beständigkeit",
+            "Eine verfeinerte Nachwirkung bleibt bestehen, ohne Aufmerksamkeit zu erzwingen oder den Moment zu überhöhen",
+            "Der Endzustand wirkt mühelos, gefasst und auf stille Weise wertvoll",
+          ],
+        ],
+        euphoricRelease: [
+          [
+            "Energie öffnet sich nach außen, während die zentrale Bewegung ihre Begrenzung durchbricht",
+            "Erleichterung strömt durch die Szene, während aufgestauter Druck endlich nachgibt",
+            "Ein wachsendes Gefühl von Freiheit stellt sich ein, während sich das Bild ausdehnt",
+          ],
+          [
+            "Der umgebende Raum wirkt größer, schneller und von Möglichkeiten aufgeladen",
+            "Bewegung und Distanz verbinden sich zu einem körperlichen Gefühl von Befreiung",
+            "Jede sichtbare Verschiebung verstärkt den Schwung eines zunehmend befreienden Rhythmus",
+          ],
+          [
+            "Das Schlussbild hinterlässt einen weiten Schub von Freiheit und erneuerter Energie",
+            "Ein heller Nachhall bleibt bestehen und trägt das Gefühl über den letzten Moment hinaus",
+            "Der Endzustand wirkt offen, schwerelos und vollständig befreit",
+          ],
+        ],
+        darkTense: [
+          [
+            "Druck baut sich auf, während kleine Veränderungen zunehmend bedrohlich statt beruhigend wirken",
+            "Unbehagen verschärft sich, während die zentrale Beziehung immer weniger verlässlich erscheint",
+            "Eine zurückgehaltene Spannung entsteht, während sich der sichtbare Raum nach innen zu schließen beginnt",
+          ],
+          [
+            "Der umgebende Raum wirkt wachsam, verdichtet und zunehmend instabil",
+            "Die Distanz zwischen den Elementen erzeugt ein körperliches Gefühl von Isolation und Risiko",
+            "Jede visuelle Verschiebung erhöht das Gewicht der Situation, ohne echte Entlastung zu bieten",
+          ],
+          [
+            "Das Schlussbild hinterlässt Spannung, Unsicherheit und ein anhaltendes Gefühl von Gefahr",
+            "Eine kalte Nachwirkung bleibt bestehen und verweigert Trost oder emotionale Auflösung",
+            "Der Endzustand wirkt an der Oberfläche kontrolliert und darunter instabil",
+          ],
+        ],
+        reflective: [
+          [
+            "Erinnerung scheint sich um die Szene zu sammeln, während jede Veränderung leise persönlich wirkt",
+            "Eine nachdenkliche Traurigkeit wächst, während Distanz emotional an Bedeutung gewinnt",
+            "Die sichtbare Bewegung trägt das Gefühl von etwas, das bereits zu entgleiten beginnt",
+          ],
+          [
+            "Der umgebende Raum wirkt intim, fern und von Abwesenheit berührt",
+            "Subtile Veränderungen erzeugen einen leisen Schmerz, ohne den Moment dramatisch werden zu lassen",
+            "Das Gleichgewicht von Nähe und Trennung erzeugt ein zurückhaltendes Gefühl von Sehnsucht",
+          ],
+          [
+            "Das Schlussbild hinterlässt eine zarte Spur von Verlust und Erinnerung",
+            "Ein gedämpfter Nachklang bleibt zurück und trägt das Gewicht dessen, was nicht zurückkehren kann",
+            "Der Endzustand wirkt ruhig und bewahrt zugleich einen stillen emotionalen Schmerz",
+          ],
+        ],
+        measured: [
+          [
+            "Das Interesse wächst stetig, während die zentrale Veränderung zunehmend Gewicht erhält",
+            "Die Aufmerksamkeit verankert sich in der Szene, während sichtbare Beziehungen bedeutsamer werden",
+            "Durch zurückhaltende visuelle Veränderung entsteht ein kontrolliertes Gefühl von Beteiligung",
+          ],
+          [
+            "Der umgebende Raum erzeugt ein ausgewogenes Gefühl von Neugier und Erwartung",
+            "Subtile Verschiebungen zwischen den Elementen schaffen eine stille körperliche Wahrnehmung",
+            "Das Verhältnis von Bewegung und Stillstand erzeugt einen kontrollierten emotionalen Sog",
+          ],
+          [
+            "Das Schlussbild hinterlässt einen klaren, aber zurückhaltenden emotionalen Eindruck",
+            "Eine stille Nachwirkung bleibt bestehen, ohne eine einzige Interpretation zu erzwingen",
+            "Der Endzustand wirkt vollständig und lässt zugleich Raum für Reflexion",
+          ],
+        ],
+      },
+
+      Français: {
+        warmHope: [
+          [
+            "Une chaleur s'installe dans la scène tandis que les petits changements deviennent peu à peu rassurants",
+            "L'espoir grandit doucement à mesure que le mouvement central s'ouvre vers une forme de connexion",
+            "Un calme délicat s'installe tandis que la tension visible commence à s'adoucir",
+          ],
+          [
+            "L'espace environnant paraît accueillant sans perdre son sentiment d'attente",
+            "De subtils déplacements entre le sujet et son environnement créent une tendre impression de possibilité",
+            "La distance et la lumière agissent ensemble pour faire naître un discret sentiment de confiance",
+          ],
+          [
+            "L'image finale laisse une impression de chaleur, de calme et d'espoir crédible",
+            "Une douce rémanence demeure, suggérant que le moment peut encore s'ouvrir vers l'extérieur",
+            "L'état final paraît apaisé tout en restant animé d'une possibilité contenue",
+          ],
+        ],
+        confidentArrival: [
+          [
+            "La présence se précise tandis que le mouvement central devient volontaire et assuré",
+            "La confiance grandit à mesure que le sujet occupe davantage l'espace de la scène",
+            "Une nette sensation d'arrivée se forme lorsque l'hésitation cède la place à la maîtrise",
+          ],
+          [
+            "L'espace environnant semble chargé d'une attente concentrée",
+            "Chaque déplacement visible renforce un sentiment clair d'intention et de maîtrise",
+            "L'équilibre entre mouvement et immobilité crée une attente posée et assurée",
+          ],
+          [
+            "L'image finale laisse une impression ferme de préparation et d'élan vers l'avant",
+            "Un dernier temps maîtrisé porte la promesse d'une action décisive",
+            "Le dernier cadre paraît composé, présent et prêt pour ce qui va suivre",
+          ],
+        ],
+        hypnoticMotion: [
+          [
+            "Le rythme attire le corps vers l'intérieur tandis que le mouvement répété devient presque inévitable",
+            "Le mouvement se condense en une pulsation ressentie physiquement avant même d'être consciente",
+            "Une attraction proche de la transe se développe tandis que chaque déplacement résonne dans l'espace",
+          ],
+          [
+            "La scène semble respirer par cycles de pression, de relâchement et de retour",
+            "Le mouvement répété crée la sensation immersive de dériver à l'intérieur de l'image",
+            "Le rythme spatial changeant produit une sensation corporelle de suspension",
+          ],
+          [
+            "L'image finale laisse une pulsation lente persister sous la pensée consciente",
+            "Un rythme résiduel demeure, comme si le corps continuait à suivre le mouvement",
+            "L'état final maintient les sens dans une transe calme et continue",
+          ],
+        ],
+        surrealStillness: [
+          [
+            "L'immobilité devient étrange tandis que les relations familières semblent subtilement déplacées",
+            "Un calme inquiétant s'installe dans la scène tandis que l'espace ordinaire perd sa stabilité",
+            "L'absence de mouvement crée une sensation suspendue difficile à situer",
+          ],
+          [
+            "L'espace environnant paraît léger, distant et subtilement irréel",
+            "De petites différences visuelles donnent la sensation de se tenir dans un rêve mis en pause",
+            "Le silence et la séparation se combinent en une atmosphère d'inquiétude flottante",
+          ],
+          [
+            "L'image finale laisse une immobilité qui paraît irrésolue tout en restant complète",
+            "Une étrange discrétion demeure après l'arrêt de l'action visible",
+            "L'état final persiste comme un rêve retenu juste avant le réveil",
+          ],
+        ],
+        luxuryCalm: [
+          [
+            "La maîtrise s'installe dans la scène tandis que chaque changement visible paraît précis et intentionnel",
+            "Une confiance calme grandit grâce à des mouvements retenus et un espace soigneusement maîtrisé",
+            "Une immobilité raffinée s'impose tandis que l'image résiste à toute urgence superflue",
+          ],
+          [
+            "Les détails environnants créent une sensation composée de confort et d'exclusivité",
+            "Des déplacements spatiaux mesurés produisent un discret sentiment de confiance et d'aisance",
+            "L'équilibre entre retenue et détail crée une présence soignée et maîtrisée",
+          ],
+          [
+            "L'image finale laisse une impression contrôlée de calme, de qualité et de permanence",
+            "Une rémanence raffinée subsiste sans réclamer l'attention ni exagérer le moment",
+            "L'état final paraît naturel, composé et discrètement précieux",
+          ],
+        ],
+        euphoricRelease: [
+          [
+            "L'énergie s'ouvre vers l'extérieur lorsque le mouvement central se libère de sa retenue",
+            "Le soulagement traverse la scène tandis que la pression contenue finit par céder",
+            "Un sentiment croissant de liberté s'installe à mesure que l'image s'élargit",
+          ],
+          [
+            "L'espace environnant paraît plus vaste, plus rapide et chargé de possibilités",
+            "Le mouvement et la distance se combinent en une sensation physique de libération",
+            "Chaque déplacement visible ajoute de l'élan à un rythme de plus en plus libérateur",
+          ],
+          [
+            "L'image finale laisse un vaste élan de liberté et d'énergie renouvelée",
+            "Une vive résonance demeure et prolonge la sensation au-delà du dernier temps",
+            "L'état final paraît ouvert, aérien et pleinement libéré",
+          ],
+        ],
+        darkTense: [
+          [
+            "La pression monte tandis que de petits changements deviennent menaçants plutôt que rassurants",
+            "Le malaise s'intensifie à mesure que la relation centrale devient plus difficile à croire ou à suivre",
+            "Une tension contenue s'installe tandis que l'espace visible commence à se refermer",
+          ],
+          [
+            "L'espace environnant paraît vigilant, comprimé et de plus en plus instable",
+            "La distance entre les éléments crée une sensation physique d'isolement et de risque",
+            "Chaque déplacement visuel ajoute du poids sans offrir de véritable relâchement",
+          ],
+          [
+            "L'image finale laisse derrière elle tension, incertitude et sentiment persistant de danger",
+            "Une rémanence froide subsiste, refusant tout confort ou résolution émotionnelle",
+            "L'état final paraît maîtrisé en surface mais instable en profondeur",
+          ],
+        ],
+        reflective: [
+          [
+            "La mémoire semble se rassembler autour de la scène tandis que chaque changement devient intimement personnel",
+            "Une tristesse méditative grandit à mesure que la distance prend davantage de poids émotionnel",
+            "Le mouvement visible porte la sensation de quelque chose qui commence déjà à s'éloigner",
+          ],
+          [
+            "L'espace environnant paraît intime, distant et marqué par l'absence",
+            "De subtils changements créent une douleur discrète sans rendre le moment dramatique",
+            "L'équilibre entre proximité et séparation produit un sentiment contenu de désir et de manque",
+          ],
+          [
+            "L'image finale laisse une trace délicate de perte et de souvenir",
+            "Une rémanence assourdie demeure, portant le poids de ce qui ne peut revenir",
+            "L'état final paraît calme tout en conservant une douleur émotionnelle silencieuse",
+          ],
+        ],
+        measured: [
+          [
+            "L'intérêt grandit progressivement tandis que le changement central prend davantage de poids",
+            "L'attention se fixe dans la scène à mesure que les relations visibles deviennent plus significatives",
+            "Un sentiment mesuré d'implication naît de changements visuels retenus",
+          ],
+          [
+            "L'espace environnant crée un équilibre entre curiosité et attente",
+            "De subtils déplacements entre les éléments produisent une discrète conscience physique",
+            "La relation entre mouvement et immobilité crée une attraction émotionnelle maîtrisée",
+          ],
+          [
+            "L'image finale laisse une impression émotionnelle claire mais retenue",
+            "Une rémanence discrète demeure sans imposer une interprétation unique",
+            "L'état final paraît complet tout en conservant un espace pour la réflexion",
+          ],
+        ],
+      },
+
+      Italiano: {
+        warmHope: [
+          [
+            "Il calore si posa sulla scena mentre i piccoli cambiamenti iniziano a trasmettere rassicurazione",
+            "La speranza cresce con discrezione mentre il movimento centrale si apre verso una connessione",
+            "Una calma gentile prende forma mentre la tensione visibile comincia ad attenuarsi",
+          ],
+          [
+            "Lo spazio circostante appare accogliente senza perdere il proprio senso di attesa",
+            "Sottili cambiamenti tra soggetto e ambiente creano una delicata sensazione di possibilità",
+            "Distanza e luce agiscono insieme creando un quieto senso di fiducia",
+          ],
+          [
+            "L'immagine finale lascia calore, calma e una credibile sensazione di speranza",
+            "Rimane un morbido riverbero che suggerisce come il momento possa ancora aprirsi verso l'esterno",
+            "Lo stato finale appare stabile ma ancora animato da una possibilità trattenuta",
+          ],
+        ],
+        confidentArrival: [
+          [
+            "La presenza si definisce mentre il movimento centrale diventa intenzionale e sicuro",
+            "La fiducia cresce mentre il soggetto conquista più spazio all'interno della scena",
+            "Si forma un chiaro senso di arrivo mentre l'esitazione lascia spazio al controllo",
+          ],
+          [
+            "Lo spazio circostante appare carico di un'attesa focalizzata",
+            "Ogni cambiamento visibile rafforza un forte senso di intenzione e controllo",
+            "L'equilibrio tra movimento e immobilità crea un'aspettativa composta e sicura",
+          ],
+          [
+            "L'immagine finale lascia una netta impressione di prontezza e slancio in avanti",
+            "Un ultimo momento controllato porta con sé la promessa di un'azione decisa",
+            "L'ultimo fotogramma appare composto, presente e pronto per ciò che segue",
+          ],
+        ],
+        hypnoticMotion: [
+          [
+            "Il ritmo attira il corpo verso l'interno mentre il movimento ripetuto diventa quasi inevitabile",
+            "Il movimento si raccoglie in una pulsazione percepita fisicamente prima ancora di essere cosciente",
+            "Un richiamo simile alla trance cresce mentre ogni variazione risuona nello spazio circostante",
+          ],
+          [
+            "La scena sembra respirare attraverso cicli di pressione, rilascio e ritorno",
+            "Il movimento ripetuto crea la sensazione immersiva di fluttuare dentro l'immagine",
+            "Il ritmo spaziale mutevole produce una sensazione fisica di sospensione",
+          ],
+          [
+            "L'immagine finale lascia una lenta pulsazione al di sotto del pensiero cosciente",
+            "Rimane un ritmo residuo, come se il corpo continuasse ancora a seguire il movimento",
+            "Lo stato finale trattiene i sensi dentro una trance quieta e continua",
+          ],
+        ],
+        surrealStillness: [
+          [
+            "L'immobilità diventa insolita mentre relazioni familiari sembrano spostarsi silenziosamente",
+            "Una calma inquietante scende sulla scena mentre lo spazio ordinario perde certezza",
+            "L'assenza di movimento crea una sensazione sospesa difficile da collocare",
+          ],
+          [
+            "Lo spazio circostante appare senza peso, distante e sottilmente irreale",
+            "Piccole differenze visive danno la sensazione di trovarsi dentro un sogno messo in pausa",
+            "Silenzio e separazione si uniscono in un'atmosfera di inquietudine sospesa",
+          ],
+          [
+            "L'immagine finale lascia un'immobilità che appare irrisolta ma allo stesso tempo completa",
+            "Una quieta stranezza rimane dopo che l'azione visibile si è fermata",
+            "Lo stato finale persiste come un sogno trattenuto appena prima del risveglio",
+          ],
+        ],
+        luxuryCalm: [
+          [
+            "Il controllo si posa sulla scena mentre ogni cambiamento visibile appare preciso e intenzionale",
+            "Una fiducia calma cresce attraverso movimenti misurati e uno spazio attentamente mantenuto",
+            "Una quiete raffinata prende forma mentre l'immagine evita qualsiasi urgenza superflua",
+          ],
+          [
+            "I dettagli circostanti creano una composta sensazione di comfort ed esclusività",
+            "Spostamenti spaziali misurati producono un quieto senso di sicurezza e facilità",
+            "L'equilibrio tra misura e dettaglio crea una presenza elegante e controllata",
+          ],
+          [
+            "L'immagine finale lascia un'impressione controllata di calma, qualità e permanenza",
+            "Rimane un effetto raffinato senza richiedere attenzione né enfatizzare eccessivamente il momento",
+            "Lo stato finale appare naturale, composto e discretamente prezioso",
+          ],
+        ],
+        euphoricRelease: [
+          [
+            "L'energia si apre verso l'esterno mentre il movimento centrale si libera dai propri vincoli",
+            "Il sollievo attraversa la scena quando la pressione trattenuta finalmente cede",
+            "Un crescente senso di libertà prende forma mentre l'immagine si espande",
+          ],
+          [
+            "Lo spazio circostante appare più ampio, più rapido e carico di possibilità",
+            "Movimento e distanza si uniscono creando una sensazione fisica di liberazione",
+            "Ogni variazione visibile aggiunge slancio a un ritmo sempre più liberatorio",
+          ],
+          [
+            "L'immagine finale lascia un ampio impulso di libertà ed energia rinnovata",
+            "Rimane una luminosa eco che porta la sensazione oltre l'ultimo momento",
+            "Lo stato finale appare aperto, sospeso e completamente liberato",
+          ],
+        ],
+        darkTense: [
+          [
+            "La pressione cresce mentre piccoli cambiamenti iniziano a sembrare minacciosi invece che rassicuranti",
+            "Il disagio aumenta mentre la relazione centrale diventa sempre più difficile da considerare stabile",
+            "Una tensione trattenuta prende forma mentre lo spazio visibile comincia a chiudersi verso l'interno",
+          ],
+          [
+            "Lo spazio circostante appare vigile, compresso e sempre più instabile",
+            "La distanza tra gli elementi crea una sensazione fisica di isolamento e rischio",
+            "Ogni variazione visiva aggiunge peso senza offrire un vero sollievo",
+          ],
+          [
+            "L'immagine finale lascia tensione, incertezza e una persistente sensazione di pericolo",
+            "Rimane un effetto freddo che rifiuta conforto o risoluzione emotiva",
+            "Lo stato finale appare controllato in superficie ma instabile al di sotto",
+          ],
+        ],
+        reflective: [
+          [
+            "La memoria sembra raccogliersi attorno alla scena mentre ogni cambiamento diventa silenziosamente personale",
+            "Una tristezza riflessiva cresce mentre la distanza acquista maggiore peso emotivo",
+            "Il movimento visibile porta con sé la sensazione di qualcosa che sta già scivolando via",
+          ],
+          [
+            "Lo spazio circostante appare intimo, distante e segnato dall'assenza",
+            "Sottili cambiamenti creano un dolore quieto senza rendere il momento drammatico",
+            "L'equilibrio tra vicinanza e separazione produce un senso trattenuto di nostalgia",
+          ],
+          [
+            "L'immagine finale lascia una delicata traccia di perdita e memoria",
+            "Rimane un riverbero attenuato che porta il peso di ciò che non può tornare",
+            "Lo stato finale appare calmo pur conservando un quieto dolore emotivo",
+          ],
+        ],
+        measured: [
+          [
+            "L'interesse cresce gradualmente mentre il cambiamento centrale acquista maggiore peso",
+            "L'attenzione si posa sulla scena mentre le relazioni visibili diventano più significative",
+            "Un misurato senso di coinvolgimento nasce attraverso cambiamenti visivi contenuti",
+          ],
+          [
+            "Lo spazio circostante crea un equilibrio tra curiosità e attesa",
+            "Sottili variazioni tra gli elementi producono una quieta consapevolezza fisica",
+            "La relazione tra movimento e immobilità crea un richiamo emotivo controllato",
+          ],
+          [
+            "L'immagine finale lascia un'impressione emotiva chiara ma contenuta",
+            "Rimane un effetto discreto senza imporre una singola interpretazione",
+            "Lo stato finale appare completo pur lasciando spazio alla riflessione",
+          ],
+        ],
+      },
+
+      中文: {
+        warmHope: [
+          [
+            "细微变化逐渐带来安定感，温暖也随之在画面中沉淀下来",
+            "随着核心动作逐步走向连接，希望在不张扬的变化中缓慢生长",
+            "当可见的紧张开始软化，一种温和的平静逐渐占据画面",
+          ],
+          [
+            "周围空间显得亲近而开放，同时仍保留着适度的期待感",
+            "主体与环境之间的细微变化，让可能性以柔和而具体的方式浮现",
+            "距离与光线共同作用，让画面产生一种安静而可信的信任感",
+          ],
+          [
+            "结尾画面留下温暖、平静，以及真实可信的希望感",
+            "柔和的余韵仍然停留，暗示这一刻仍有继续向外展开的可能",
+            "最终状态已经稳定下来，却依然保留着克制而鲜活的可能性",
+          ],
+        ],
+        confidentArrival: [
+          [
+            "随着核心动作变得明确而笃定，主体的存在感也迅速清晰起来",
+            "主体在画面中占据更多空间时，自信随之逐步建立",
+            "犹豫让位于掌控之后，一种明确的抵达感开始形成",
+          ],
+          [
+            "周围空间被一种高度集中的期待感所充满",
+            "每一次可见变化都进一步强化目标感与掌控力",
+            "运动与静止之间的平衡，形成沉着而有把握的期待",
+          ],
+          [
+            "结尾画面留下清晰的准备感与向前推进的力量",
+            "一个受到控制的最终节拍，带出即将果断行动的意味",
+            "最后的画面稳定、在场，并对接下来发生的事保持准备状态",
+          ],
+        ],
+        hypnoticMotion: [
+          [
+            "重复运动逐渐变得难以摆脱，节奏也将身体感受不断向画面内部牵引",
+            "动作汇聚成一种脉冲，在被意识理解之前便先被身体感知",
+            "每一次位移都在周围空间中产生回响，逐渐形成近似催眠的吸引力",
+          ],
+          [
+            "画面仿佛通过压力、释放与回返的循环进行呼吸",
+            "重复运动让观者产生一种漂浮在影像内部的沉浸式感受",
+            "不断变化的空间节奏带来明确的身体悬浮感",
+          ],
+          [
+            "结尾画面留下缓慢的脉冲，并继续停留在意识之下",
+            "残余节奏持续存在，仿佛身体仍在跟随那段运动",
+            "最终状态让感官停留在一种安静而持续的催眠之中",
+          ],
+        ],
+        surrealStillness: [
+          [
+            "熟悉关系开始悄然错位，静止本身因此显得陌生",
+            "日常空间逐渐失去确定性，一种不安的平静随之笼罩画面",
+            "运动的缺席制造出一种悬而未决、难以准确定位的感受",
+          ],
+          [
+            "周围空间显得失重、遥远，并带有轻微的不真实感",
+            "细小的视觉差异让人产生站在一个被暂停的梦境中的感觉",
+            "沉默与分离共同形成一种漂浮而不稳定的氛围",
+          ],
+          [
+            "结尾画面留下既未完全解决、却又自成完整的静止感",
+            "可见动作停止之后，一种安静的陌生感仍然存在",
+            "最终状态像停在醒来之前的一场梦，迟迟没有散去",
+          ],
+        ],
+        luxuryCalm: [
+          [
+            "每一次可见变化都显得精准而有意图，画面因此逐渐建立起掌控感",
+            "克制的运动与被精心保持的空间，让平静的自信不断增强",
+            "画面拒绝不必要的急迫感，一种精致的静谧随之形成",
+          ],
+          [
+            "周围细节营造出有秩序的舒适感与专属感",
+            "经过控制的空间变化带来安静、自信而从容的感受",
+            "克制与细节之间的平衡，使画面形成精致而稳定的存在感",
+          ],
+          [
+            "结尾画面留下对平静、品质与持久性的明确印象",
+            "精致的余韵继续存在，却不争夺注意力，也不过度强调这一刻",
+            "最终状态显得毫不费力、沉着，并带有低调的价值感",
+          ],
+        ],
+        euphoricRelease: [
+          [
+            "核心动作突破限制后，能量开始明显向外展开",
+            "被压抑的压力终于释放，强烈的轻松感随之穿过整个画面",
+            "随着画面空间逐步扩张，一种不断增长的自由感开始形成",
+          ],
+          [
+            "周围空间显得更开阔、更快速，也更充满可能",
+            "运动与距离共同作用，形成一种直接的身体释放感",
+            "每一次可见变化都为节奏增加动能，使它越来越具有解放感",
+          ],
+          [
+            "结尾画面留下开阔的自由感与重新获得的能量",
+            "明亮的余震仍然持续，将这种感受带过最后一个节拍",
+            "最终状态显得开放、轻盈，并真正完成释放",
+          ],
+        ],
+        darkTense: [
+          [
+            "细小变化不再带来安定，反而逐渐显得具有威胁，压力因此不断累积",
+            "核心关系越来越难以信任，不安也随之加深",
+            "可见空间开始向内收缩，一种受到压制的紧张感逐步形成",
+          ],
+          [
+            "周围空间显得警觉、压缩，并越来越不稳定",
+            "元素之间的距离制造出明确的身体隔离感与风险感",
+            "每一次视觉变化都增加重量，却始终不给出真正的缓解",
+          ],
+          [
+            "结尾画面留下紧张、不确定，以及持续存在的危险感",
+            "冰冷的余韵没有消散，也拒绝给予安慰或情绪上的解决",
+            "最终状态表面受到控制，内部却依然明显不稳定",
+          ],
+        ],
+        reflective: [
+          [
+            "每一次变化都逐渐带上私人意味，记忆仿佛也开始在场景周围聚集",
+            "随着距离获得更强的情感意义，一种沉静的悲伤逐步加深",
+            "可见运动带着某种已经开始远去的感觉",
+          ],
+          [
+            "周围空间既亲密又遥远，并明显带着缺席留下的痕迹",
+            "细微变化制造出安静的痛感，却不让这一刻落入戏剧化",
+            "亲近与分离之间的平衡，形成一种克制而持续的思念",
+          ],
+          [
+            "结尾画面留下关于失去与记忆的柔和痕迹",
+            "低沉的余韵仍然存在，承载着那些无法回来的事物的重量",
+            "最终状态保持平静，同时保留着安静而真实的情绪疼痛",
+          ],
+        ],
+        measured: [
+          [
+            "随着核心变化逐渐获得更大分量，观者的关注也稳定增长",
+            "可见关系变得更有意义之后，注意力开始真正停留在场景之中",
+            "克制的视觉变化逐步形成一种有分寸的参与感",
+          ],
+          [
+            "周围空间在好奇与期待之间形成平衡",
+            "元素之间的细微变化带来安静而具体的身体感知",
+            "运动与静止之间的关系形成一种受到控制的情绪牵引",
+          ],
+          [
+            "结尾画面留下清晰但克制的情绪印象",
+            "安静的余韵仍然存在，却不强迫观者接受唯一解释",
+            "最终状态显得完整，同时继续为思考保留空间",
+          ],
+        ],
+      },
+          Español: {
+        warmHope: [
+          [
+            "La calidez se instala en la escena mientras pequeños cambios empiezan a resultar reconfortantes",
+            "La esperanza crece en silencio mientras el movimiento central se abre hacia la conexión",
+            "Una calma suave aparece mientras la tensión visible empieza a ceder",
+          ],
+          [
+            "El espacio alrededor se siente acogedor sin perder su sensación de expectativa",
+            "Cambios sutiles entre el sujeto y el entorno crean una delicada sensación de posibilidad",
+            "La distancia y la luz trabajan juntas para generar una tranquila sensación de confianza",
+          ],
+          [
+            "La imagen final deja calidez, calma y una sensación de esperanza creíble",
+            "Permanece un resplandor suave que sugiere que el momento todavía puede abrirse hacia fuera",
+            "El estado final se siente asentado, pero sigue vivo con una posibilidad contenida",
+          ],
+        ],
+        confidentArrival: [
+          [
+            "La presencia se intensifica mientras el movimiento central empieza a sentirse deliberado y seguro",
+            "La confianza crece a medida que el sujeto ocupa más espacio dentro de la escena",
+            "Surge una clara sensación de llegada cuando la vacilación da paso al control",
+          ],
+          [
+            "El espacio alrededor se carga de una expectativa enfocada",
+            "Cada cambio visible refuerza una fuerte sensación de propósito y dominio",
+            "El equilibrio entre movimiento y quietud crea una expectativa firme y controlada",
+          ],
+          [
+            "La imagen final deja una impresión clara de preparación e impulso hacia delante",
+            "Un último pulso controlado mantiene la promesa de una acción decisiva",
+            "El último plano se siente compuesto, presente y preparado para lo que viene",
+          ],
+        ],
+        hypnoticMotion: [
+          [
+            "El ritmo atrae al cuerpo hacia dentro mientras el movimiento repetido empieza a sentirse inevitable",
+            "El movimiento se concentra en un pulso que se siente físico antes de hacerse consciente",
+            "Surge una atracción de trance mientras cada cambio resuena en el espacio circundante",
+          ],
+          [
+            "La escena parece respirar a través de ciclos de presión, liberación y retorno",
+            "El movimiento repetido crea la sensación inmersiva de flotar dentro de la imagen",
+            "El ritmo espacial cambiante produce una sensación corporal de suspensión",
+          ],
+          [
+            "La imagen final deja un pulso lento que permanece por debajo del pensamiento consciente",
+            "Queda un ritmo residual, como si el cuerpo siguiera acompañando el movimiento",
+            "El estado final mantiene los sentidos dentro de un trance silencioso y continuo",
+          ],
+        ],
+        surrealStillness: [
+          [
+            "La quietud se vuelve extraña cuando relaciones familiares empiezan a sentirse sutilmente desplazadas",
+            "Una calma inquietante se instala en la escena mientras el espacio cotidiano pierde certeza",
+            "La ausencia de movimiento crea una sensación suspendida difícil de situar",
+          ],
+          [
+            "El espacio alrededor se siente ingrávido, distante y sutilmente irreal",
+            "Pequeñas diferencias visuales crean la sensación de estar dentro de un sueño detenido",
+            "El silencio y la separación se combinan en una atmósfera de inquietud flotante",
+          ],
+          [
+            "La imagen final deja una quietud que se siente irresuelta pero completa",
+            "Permanece una extrañeza silenciosa después de que la acción visible se detiene",
+            "El estado final persiste como un sueño sostenido justo antes de despertar",
+          ],
+        ],
+        luxuryCalm: [
+          [
+            "El control se instala en la escena mientras cada cambio visible se siente preciso e intencionado",
+            "Una confianza serena crece mediante movimientos contenidos y un espacio cuidadosamente sostenido",
+            "Una quietud refinada toma el control mientras la imagen evita toda urgencia innecesaria",
+          ],
+          [
+            "Los detalles del entorno crean una sensación compuesta de comodidad y exclusividad",
+            "Cambios espaciales medidos producen una tranquila sensación de confianza y facilidad",
+            "El equilibrio entre contención y detalle crea una presencia pulida",
+          ],
+          [
+            "La imagen final deja una impresión controlada de calma, calidad y permanencia",
+            "Permanece un efecto refinado sin exigir atención ni exagerar el momento",
+            "El estado final se siente natural, compuesto y discretamente valioso",
+          ],
+        ],
+        euphoricRelease: [
+          [
+            "La energía se abre hacia fuera cuando el movimiento central se libera de la contención",
+            "El alivio recorre la escena cuando la presión acumulada finalmente cede",
+            "Una sensación creciente de libertad aparece mientras la imagen se expande",
+          ],
+          [
+            "El espacio alrededor se siente más amplio, más rápido y cargado de posibilidades",
+            "El movimiento y la distancia se combinan en una sensación física de liberación",
+            "Cada cambio visible añade impulso a un ritmo cada vez más liberador",
+          ],
+          [
+            "La imagen final deja una oleada expansiva de libertad y energía renovada",
+            "Permanece una luminosa reverberación que lleva la sensación más allá del último pulso",
+            "El estado final se siente abierto, suspendido en el aire y plenamente liberado",
+          ],
+        ],
+        darkTense: [
+          [
+            "La presión aumenta cuando pequeños cambios empiezan a sentirse amenazantes en lugar de tranquilizadores",
+            "La inquietud se intensifica cuando la relación central resulta cada vez más difícil de confiar",
+            "Una tensión contenida se instala mientras el espacio visible empieza a cerrarse hacia dentro",
+          ],
+          [
+            "El espacio alrededor se siente vigilante, comprimido y cada vez más inestable",
+            "La distancia entre los elementos crea una sensación física de aislamiento y riesgo",
+            "Cada cambio visual añade peso sin ofrecer un alivio real",
+          ],
+          [
+            "La imagen final deja tensión, incertidumbre y una persistente sensación de peligro",
+            "Permanece un efecto frío que rechaza el consuelo o la resolución emocional",
+            "El estado final parece controlado en la superficie pero inestable por debajo",
+          ],
+        ],
+        reflective: [
+          [
+            "La memoria parece reunirse alrededor de la escena mientras cada cambio se siente íntimamente personal",
+            "Una tristeza reflexiva crece cuando la distancia adquiere mayor peso emocional",
+            "El movimiento visible transmite la sensación de algo que ya empieza a desaparecer",
+          ],
+          [
+            "El espacio alrededor se siente íntimo, distante y marcado por la ausencia",
+            "Cambios sutiles crean una punzada silenciosa sin volver dramático el momento",
+            "El equilibrio entre cercanía y separación produce una contenida sensación de añoranza",
+          ],
+          [
+            "La imagen final deja una huella delicada de pérdida y recuerdo",
+            "Permanece un resplandor apagado que conserva el peso de aquello que no puede volver",
+            "El estado final se siente sereno mientras mantiene una silenciosa herida emocional",
+          ],
+        ],
+        measured: [
+          [
+            "El interés crece de forma constante cuando el cambio central empieza a adquirir mayor peso",
+            "La atención se asienta en la escena cuando las relaciones visibles se vuelven más significativas",
+            "Una sensación medida de implicación surge a través de cambios visuales contenidos",
+          ],
+          [
+            "El espacio alrededor crea un equilibrio entre curiosidad y expectativa",
+            "Cambios sutiles entre los elementos producen una tranquila conciencia física",
+            "La relación entre movimiento y quietud crea una atracción emocional controlada",
+          ],
+          [
+            "La imagen final deja una impresión emocional clara pero contenida",
+            "Permanece un efecto silencioso sin imponer una única interpretación",
+            "El estado final se siente completo y al mismo tiempo deja espacio para la reflexión",
+          ],
+        ],
+      },
+      Português: {
+        warmHope: [
+          [
+            "O calor instala-se na cena enquanto pequenas mudanças começam a transmitir conforto",
+            "A esperança cresce discretamente enquanto o movimento central se abre à ligação",
+            "Uma calma suave toma forma enquanto a tensão visível começa a aliviar",
+          ],
+          [
+            "O espaço envolvente parece acolhedor sem perder a sensação de expectativa",
+            "Mudanças subtis entre o sujeito e o ambiente criam uma delicada sensação de possibilidade",
+            "A distância e a luz trabalham em conjunto para criar uma tranquila sensação de confiança",
+          ],
+          [
+            "A imagem final deixa calor, calma e uma sensação credível de esperança",
+            "Permanece um brilho suave que sugere que o momento ainda se pode abrir para fora",
+            "O estado final parece assente, mas continua vivo com uma possibilidade contida",
+          ],
+        ],
+        confidentArrival: [
+          [
+            "A presença torna-se mais nítida enquanto o movimento central começa a parecer deliberado e seguro",
+            "A confiança cresce à medida que o sujeito ocupa mais espaço dentro da cena",
+            "Forma-se uma clara sensação de chegada quando a hesitação dá lugar ao controlo",
+          ],
+          [
+            "O espaço envolvente ganha uma expectativa focada",
+            "Cada mudança visível reforça uma forte sensação de propósito e domínio",
+            "O equilíbrio entre movimento e quietude cria uma expectativa firme e composta",
+          ],
+          [
+            "A imagem final deixa uma impressão clara de prontidão e impulso para a frente",
+            "Um último pulso controlado mantém a promessa de uma ação decisiva",
+            "O último plano parece composto, presente e preparado para o que vem a seguir",
+          ],
+        ],
+        hypnoticMotion: [
+          [
+            "O ritmo puxa o corpo para dentro enquanto o movimento repetido começa a parecer inevitável",
+            "O movimento reúne-se num pulso que se sente fisicamente antes de se tornar consciente",
+            "Desenvolve-se uma atração de transe enquanto cada mudança ecoa pelo espaço envolvente",
+          ],
+          [
+            "A cena parece respirar através de ciclos de pressão, libertação e retorno",
+            "O movimento repetido cria uma sensação imersiva de flutuar dentro da imagem",
+            "O ritmo espacial em mudança produz uma sensação corporal de suspensão",
+          ],
+          [
+            "A imagem final deixa um pulso lento a permanecer abaixo do pensamento consciente",
+            "Fica um ritmo residual, como se o corpo ainda acompanhasse o movimento",
+            "O estado final mantém os sentidos dentro de um transe silencioso e contínuo",
+          ],
+        ],
+        surrealStillness: [
+          [
+            "A quietude torna-se estranha quando relações familiares começam a parecer subtilmente deslocadas",
+            "Uma calma inquietante instala-se na cena enquanto o espaço comum perde certeza",
+            "A ausência de movimento cria uma sensação suspensa difícil de localizar",
+          ],
+          [
+            "O espaço envolvente parece sem peso, distante e subtilmente irreal",
+            "Pequenas diferenças visuais criam a sensação de estar dentro de um sonho em pausa",
+            "O silêncio e a separação combinam-se numa atmosfera de inquietação flutuante",
+          ],
+          [
+            "A imagem final deixa uma quietude que parece irresolvida mas completa",
+            "Permanece uma estranheza silenciosa depois de a ação visível parar",
+            "O estado final permanece como um sonho suspenso imediatamente antes de acordar",
+          ],
+        ],
+        luxuryCalm: [
+          [
+            "O controlo instala-se na cena enquanto cada mudança visível parece precisa e intencional",
+            "Uma confiança serena cresce através de movimento contido e espaço cuidadosamente mantido",
+            "Uma quietude refinada toma conta da imagem enquanto esta evita urgência desnecessária",
+          ],
+          [
+            "Os detalhes envolventes criam uma sensação composta de conforto e exclusividade",
+            "Mudanças espaciais medidas produzem uma tranquila sensação de confiança e facilidade",
+            "O equilíbrio entre contenção e detalhe cria uma presença polida",
+          ],
+          [
+            "A imagem final deixa uma impressão controlada de calma, qualidade e permanência",
+            "Permanece um efeito refinado sem exigir atenção nem exagerar o momento",
+            "O estado final parece natural, composto e discretamente valioso",
+          ],
+        ],
+        euphoricRelease: [
+          [
+            "A energia abre-se para fora quando o movimento central se liberta da contenção",
+            "O alívio atravessa a cena quando a pressão acumulada finalmente cede",
+            "Uma sensação crescente de liberdade instala-se enquanto a imagem se expande",
+          ],
+          [
+            "O espaço envolvente parece maior, mais rápido e carregado de possibilidades",
+            "O movimento e a distância combinam-se numa sensação física de libertação",
+            "Cada mudança visível acrescenta impulso a um ritmo cada vez mais libertador",
+          ],
+          [
+            "A imagem final deixa uma vaga expansiva de liberdade e energia renovada",
+            "Permanece um eco luminoso que leva a sensação para além do último pulso",
+            "O estado final parece aberto, suspenso no ar e plenamente libertado",
+          ],
+        ],
+        darkTense: [
+          [
+            "A pressão acumula-se quando pequenas mudanças começam a parecer ameaçadoras em vez de reconfortantes",
+            "A inquietação intensifica-se quando a relação central se torna mais difícil de confiar",
+            "Uma tensão contida instala-se enquanto o espaço visível começa a fechar-se para dentro",
+          ],
+          [
+            "O espaço envolvente parece vigilante, comprimido e cada vez mais instável",
+            "A distância entre os elementos cria uma sensação física de isolamento e risco",
+            "Cada mudança visual acrescenta peso sem oferecer verdadeiro alívio",
+          ],
+          [
+            "A imagem final deixa tensão, incerteza e uma persistente sensação de perigo",
+            "Permanece um efeito frio que recusa conforto ou resolução emocional",
+            "O estado final parece controlado à superfície mas instável por baixo",
+          ],
+        ],
+        reflective: [
+          [
+            "A memória parece reunir-se em torno da cena enquanto cada mudança se torna discretamente pessoal",
+            "Uma tristeza reflexiva cresce à medida que a distância ganha maior peso emocional",
+            "O movimento visível transporta a sensação de algo que já começa a desaparecer",
+          ],
+          [
+            "O espaço envolvente parece íntimo, distante e marcado pela ausência",
+            "Mudanças subtis criam uma dor silenciosa sem tornar o momento dramático",
+            "O equilíbrio entre proximidade e separação produz uma contida sensação de saudade",
+          ],
+          [
+            "A imagem final deixa um traço delicado de perda e memória",
+            "Permanece um brilho suave e apagado, carregando o peso daquilo que não pode regressar",
+            "O estado final parece calmo enquanto preserva uma discreta dor emocional",
+          ],
+        ],
+        measured: [
+          [
+            "O interesse cresce de forma constante quando a mudança central começa a ganhar maior peso",
+            "A atenção fixa-se na cena quando as relações visíveis se tornam mais significativas",
+            "Uma sensação medida de envolvimento desenvolve-se através de mudanças visuais contidas",
+          ],
+          [
+            "O espaço envolvente cria um equilíbrio entre curiosidade e expectativa",
+            "Mudanças subtis entre os elementos produzem uma tranquila consciência física",
+            "A relação entre movimento e quietude cria uma atração emocional controlada",
+          ],
+          [
+            "A imagem final deixa uma impressão emocional clara mas contida",
+            "Permanece um efeito silencioso sem impor uma única interpretação",
+            "O estado final parece completo enquanto mantém espaço para reflexão",
+          ],
+        ],
+      },
+};
+
+    const languageFallbackFamilies =
+      normalizedOutputLanguage === "English"
+        ? fallbackFamilies
+        : localizedFallbackFamilies[normalizedOutputLanguage] || fallbackFamilies;
+
+    const selectedFamily = languageFallbackFamilies[moodFamily];
 
     return [
       selectedFamily[0][conceptIndex],
@@ -12098,14 +13144,55 @@ console.log(
   data.cinematicIdentity.creativeArchetype
 );
 
+if (freeGenerationContext?.reserved) {
+  const completion =
+    await completeFreeGenerate(
+      freeGenerationContext.userId,
+      freeGenerationContext.generationRequestId,
+      data
+    );
+
+  if (completion.status !== "COMPLETED") {
+    throw new Error(
+      `Credit completion failed: ${completion.status}`
+    );
+  }
+
+  freeGenerationContext.completed = true;
+}
+
 return res.status(200).json(data);
   } catch (error) {
+    if (
+      freeGenerationContext?.reserved &&
+      !freeGenerationContext.completed
+    ) {
+      try {
+        await failFreeGenerate(
+          freeGenerationContext.userId,
+          freeGenerationContext.generationRequestId
+        );
+      } catch (creditError) {
+        console.error(
+          "FrameLab credit rollback error:",
+          creditError
+        );
+      }
+    }
+
     console.error("FrameLab API Error:", error);
 
-    return res.status(500).json({
-      error: "AI generation failed",
-      details: error.message,
-    });
+    const creditStoreUnavailable =
+      error?.code === "CREDIT_STORE_UNAVAILABLE";
+
+    return res
+      .status(creditStoreUnavailable ? 503 : 500)
+      .json({
+        error: creditStoreUnavailable
+          ? "Credit service unavailable"
+          : "AI generation failed",
+        details: error.message,
+      });
   }
 }
 
