@@ -20,12 +20,26 @@ export default function ExportsPage({ ui, t }) {
         boxSizing: "border-box",
       }}
     >
-      <div style={{ maxWidth: "1080px" }}>
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .exports-content {
+            padding: 28px 22px 118px !important;
+          }
+
+          .exports-headline {
+            font-size: clamp(46px, 12vw, 58px) !important;
+            line-height: 1.02 !important;
+            max-width: 100% !important;
+            overflow-wrap: normal;
+          }
+        }
+      `}</style>
+      <div className="exports-content" style={{ maxWidth: "1080px" }}>
         <div
           style={{
             letterSpacing: "0.28em",
             textTransform: "uppercase",
-            color: "rgba(216,181,106,0.88)",
+            color: "rgba(var(--premivate-gold-rgb),0.88)",
             fontSize: "13px",
             fontWeight: 800,
             marginBottom: "28px",
@@ -33,6 +47,7 @@ export default function ExportsPage({ ui, t }) {
         >{ui.exports.title}</div>
 
         <h1
+          className="exports-headline"
           style={{
             fontSize: "72px",
             lineHeight: "0.95",
@@ -57,7 +72,8 @@ export default function ExportsPage({ ui, t }) {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+            gridTemplateColumns:
+              "repeat(auto-fit, minmax(min(360px, 100%), 1fr))",
             gap: "22px",
             marginBottom: "34px",
           }}
@@ -127,15 +143,15 @@ const cardStyle = {
 const primaryCardStyle = {
   background:
     "linear-gradient(145deg, rgba(46,38,23,0.90) 0%, rgba(22,20,16,0.92) 48%, rgba(11,12,13,0.94) 100%)",
-  border: "1px solid rgba(216,181,106,0.28)",
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.28)",
   boxShadow:
-    "0 28px 90px rgba(0,0,0,0.42), 0 12px 44px rgba(138,101,38,0.10), inset 0 1px 0 rgba(231,204,145,0.07)",
+    "0 28px 90px rgba(0,0,0,0.42), 0 12px 44px rgba(138,101,38,0.10), inset 0 1px 0 rgba(var(--premivate-gold-rgb),0.07)",
 };
 
 const secondaryCardStyle = {
-  border: "1px solid rgba(216,181,106,0.15)",
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.15)",
   boxShadow:
-    "0 24px 80px rgba(0,0,0,0.34), inset 0 1px 0 rgba(231,204,145,0.035)",
+    "0 24px 80px rgba(0,0,0,0.34), inset 0 1px 0 rgba(var(--premivate-gold-rgb),0.035)",
 };
 
 const statusCardStyle = {
@@ -174,13 +190,13 @@ const buttonStyle = {
   padding: "13px 18px",
   borderRadius: "12px",
   background:
-    "linear-gradient(135deg, rgba(184,138,59,0.98) 0%, rgba(231,204,145,0.98) 100%)",
+    "linear-gradient(135deg, rgba(var(--premivate-gold-rgb),0.98) 0%, rgba(var(--premivate-gold-rgb),0.98) 100%)",
   border: "1px solid rgba(246,225,174,0.22)",
   color: "#17130C",
   textDecoration: "none",
   fontWeight: 900,
   fontSize: "13px",
-  boxShadow: "0 16px 42px rgba(216,181,106,0.18)",
+  boxShadow: "0 16px 42px rgba(var(--premivate-gold-rgb),0.18)",
   transition:
     "transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease",
 };
@@ -189,14 +205,14 @@ const buttonHoverStyle = {
   transform: "translateY(-1px)",
   borderColor: "rgba(246,225,174,0.34)",
   boxShadow:
-    "0 18px 46px rgba(216,181,106,0.24), 0 0 0 1px rgba(246,225,174,0.05)",
+    "0 18px 46px rgba(var(--premivate-gold-rgb),0.24), 0 0 0 1px rgba(246,225,174,0.05)",
 };
 
 const buttonFocusStyle = {
   transform: "translateY(-1px)",
   borderColor: "rgba(246,225,174,0.46)",
   boxShadow:
-    "0 18px 46px rgba(216,181,106,0.22), 0 0 0 3px rgba(216,181,106,0.20)",
+    "0 18px 46px rgba(var(--premivate-gold-rgb),0.22), 0 0 0 3px rgba(var(--premivate-gold-rgb),0.20)",
 };
 
 const badgeRow = {
@@ -209,9 +225,9 @@ const badgeStyle = {
   display: "inline-flex",
   padding: "10px 14px",
   borderRadius: "999px",
-  background: "rgba(216,181,106,0.055)",
-  border: "1px solid rgba(216,181,106,0.18)",
-  color: "rgba(231,204,145,0.92)",
+  background: "rgba(var(--premivate-gold-rgb),0.055)",
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.18)",
+  color: "rgba(var(--premivate-gold-rgb),0.92)",
   fontSize: "13px",
   fontWeight: 800,
 };
@@ -220,5 +236,5 @@ const statusBadgeStyle = {
   ...badgeStyle,
   background: "rgba(246,243,235,0.035)",
   border: "1px solid rgba(246,243,235,0.08)",
-  color: "rgba(216,181,106,0.72)",
+  color: "rgba(var(--premivate-gold-rgb),0.72)",
 };

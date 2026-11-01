@@ -20,6 +20,10 @@ export default async function handler(req, res) {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
 
+      branding_settings: {
+        display_name: "PREMIVATE",
+      },
+
       payment_method_types: ["card"],
 
       metadata: {
@@ -37,9 +41,9 @@ export default async function handler(req, res) {
           price_data: {
             currency: "chf",
             product_data: {
-              name: "FrameLab Pro",
+              name: "Premivate Pro",
             },
-            unit_amount: 1900,
+            unit_amount: 2400,
             recurring: {
               interval: "month",
             },

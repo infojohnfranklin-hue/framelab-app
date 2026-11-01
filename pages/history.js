@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { useUser } from "@clerk/nextjs";
 import { supabase } from "../lib/supabaseClient";
@@ -11,6 +11,8 @@ export default function History({ ui, t }) {
   const [generations, setGenerations] = useState([]);
   const [hoveredId, setHoveredId] = useState(null);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const [showExportUnavailableDialog, setShowExportUnavailableDialog] = useState(false);
+  const exportUnavailableDialogRef = useRef(null);
 
   useEffect(() => {
     async function loadGenerations() {
@@ -33,6 +35,28 @@ setGenerations(data || []);
 
     loadGenerations();
   }, [user?.id]);
+
+  useEffect(() => {
+    if (!showExportUnavailableDialog) {
+      return;
+    }
+
+    const dialog = exportUnavailableDialogRef.current;
+
+    if (!dialog) {
+      return;
+    }
+
+    if (!dialog.open) {
+      dialog.showModal();
+    }
+
+    return () => {
+      if (dialog.open) {
+        dialog.close();
+      }
+    };
+  }, [showExportUnavailableDialog]);
 
   async function deleteGeneration(id) {
     if (!id) return;
@@ -93,7 +117,7 @@ setGenerations(data || []);
     }
 
     if (!item.video_url) {
-      alert(ui.history.noExportFile);
+      setShowExportUnavailableDialog(true);
       return;
     }
 
@@ -122,10 +146,45 @@ setGenerations(data || []);
   
   return (
     <Layout>
-      <main style={content}>
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .history-content {
+            padding: 28px 22px 118px !important;
+          }
+
+          .history-headline {
+            font-size: clamp(46px, 12vw, 58px) !important;
+            line-height: 1.02 !important;
+            max-width: 100% !important;
+            overflow-wrap: anywhere;
+          }
+
+          .history-grid {
+            grid-template-columns: minmax(0, 1fr) !important;
+          }
+
+          .history-card {
+            min-width: 0 !important;
+          }
+
+          .history-card-meta {
+            align-items: flex-start !important;
+            justify-content: flex-start !important;
+            flex-wrap: wrap;
+            gap: 8px;
+          }
+
+          .history-era {
+            max-width: 100%;
+            white-space: normal;
+            overflow-wrap: anywhere;
+          }
+        }
+      `}</style>
+      <main className="history-content" style={content}>
         <p style={eyebrow}>{ui.history.archiveEyebrow}</p>
 
-        <h1 style={headline}>{ui.history.memoryHeadline}</h1>
+        <h1 className="history-headline" style={headline}>{ui.history.memoryHeadline}</h1>
 
         <p style={subtitle}>
           {ui.history.memoryIntro}
@@ -155,12 +214,13 @@ setGenerations(data || []);
           </div>
         )}
 
-        <div style={grid}>
+        <div className="history-grid" style={grid}>
           {generations.map((item) => {
             const isHovered = hoveredId === item.id;
 
             return (
               <div
+                className="history-card"
                 key={item.id}
                 onClick={() => reopenGeneration(item)}
                 style={{
@@ -172,7 +232,7 @@ setGenerations(data || []);
                     ? "0 24px 70px rgba(0,0,0,0.34)"
                     : "0 18px 46px rgba(0,0,0,0.22)",
                   border: isHovered
-                    ? "1px solid rgba(216,181,106,0.18)"
+                    ? "1px solid rgba(var(--premivate-gold-rgb),0.18)"
                     : "1px solid rgba(255,255,255,0.08)",
                 }}
                 onMouseEnter={() => setHoveredId(item.id)}
@@ -180,6 +240,7 @@ setGenerations(data || []);
               >
 <div style={textArea}>
   <div
+    className="history-card-meta"
     style={{
       display: "flex",
       justifyContent: "space-between",
@@ -192,6 +253,7 @@ setGenerations(data || []);
     </p>
 
     <div
+      className="history-era"
       style={{
         fontSize: "10px",
         fontWeight: 700,
@@ -199,8 +261,8 @@ setGenerations(data || []);
         padding: "6px 10px",
         borderRadius: "999px",
         background: "rgba(255,255,255,0.055)",
-        border: "1px solid rgba(216,181,106,0.16)",
-        color: "#E7CC91",
+        border: "1px solid rgba(var(--premivate-gold-rgb),0.16)",
+        color: "var(--premivate-gold-muted)",
       }}
     >
 {item.era || ui.history.blueprintFallback}
@@ -214,7 +276,7 @@ setGenerations(data || []);
 <p
   style={{
     marginTop: "8px",
-    color: "#E7CC91",
+    color: "var(--premivate-gold-muted)",
     fontSize: "11px",
     fontWeight: "700",
     letterSpacing: "0.08em",
@@ -241,13 +303,16 @@ setGenerations(data || []);
     <div
       style={{
         ...video,
-        height: "420px",
-        padding: "22px",
-        borderRadius: "18px",
-        border: "1px solid rgba(246,243,235,0.08)",
+        width: "100%",
+        height: "360px",
+        boxSizing: "border-box",
+        padding: "24px",
+        borderRadius: "20px",
+        border: "1px solid rgba(var(--premivate-gold-rgb),0.18)",
         background:
-          "linear-gradient(135deg, rgba(20,21,23,0.96), rgba(10,11,13,0.98))",
-        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.035)",
+          "linear-gradient(145deg, rgba(20,19,17,0.98), rgba(9,10,12,0.99))",
+        boxShadow:
+          "inset 0 1px 0 rgba(255,255,255,0.035), 0 16px 36px rgba(0,0,0,0.16)",
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
@@ -257,7 +322,7 @@ setGenerations(data || []);
       <div>
         <div
           style={{
-            color: "#E7CC91",
+            color: "var(--premivate-gold-muted)",
             fontSize: "11px",
             fontWeight: "900",
             letterSpacing: "0.16em",
@@ -271,9 +336,9 @@ setGenerations(data || []);
         <pre
           style={{
             margin: 0,
-            color: "rgba(255,255,255,0.78)",
-            fontSize: "11px",
-            lineHeight: "1.65",
+            color: "rgba(255,255,255,0.86)",
+            fontSize: "12px",
+            lineHeight: "1.72",
             whiteSpace: "pre-wrap",
             fontFamily:
               "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
@@ -286,7 +351,7 @@ setGenerations(data || []);
       <div
         style={{
           marginTop: "16px",
-          color: "#a78bfa",
+          color: "rgba(var(--premivate-gold-rgb),0.82)",
           fontSize: "10px",
           fontWeight: "900",
           letterSpacing: "0.16em",
@@ -308,21 +373,22 @@ setGenerations(data || []);
     <div
       style={{
         ...video,
-        height: "420px",
+        width: "100%",
+        height: "112px",
+        boxSizing: "border-box",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         textAlign: "center",
-        color: "rgba(226,196,128,0.72)",
-        padding: "20px",
+        color: "rgba(226,196,128,0.48)",
+        padding: "18px",
         background:
-          "radial-gradient(circle at 50% 38%, rgba(216,181,106,0.10) 0%, rgba(216,181,106,0.025) 32%, transparent 58%), linear-gradient(145deg, rgba(20,19,17,0.99) 0%, rgba(10,11,13,0.99) 62%, rgba(7,8,10,1) 100%)",
-        border: "1px solid rgba(216,181,106,0.16)",
-        boxShadow:
-          "inset 0 0 0 1px rgba(246,243,235,0.025), inset 0 0 48px rgba(0,0,0,0.42)",
-        fontSize: "10px",
+          "linear-gradient(145deg, rgba(18,18,17,0.72), rgba(10,11,13,0.84))",
+        border: "1px solid rgba(var(--premivate-gold-rgb),0.10)",
+        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.02)",
+        fontSize: "9px",
         fontWeight: "800",
-        letterSpacing: "0.18em",
+        letterSpacing: "0.16em",
         textTransform: "uppercase",
       }}
     >{ui.history.noPreview}</div>
@@ -358,6 +424,101 @@ setGenerations(data || []);
             );
           })}
         </div>
+      {showExportUnavailableDialog && (
+        <dialog
+          ref={exportUnavailableDialogRef}
+          aria-labelledby="history-export-unavailable-dialog-title"
+          onCancel={(event) => {
+            event.preventDefault();
+            setShowExportUnavailableDialog(false);
+          }}
+          onClick={(event) => {
+            if (event.target !== event.currentTarget) {
+              return;
+            }
+
+            const bounds = event.currentTarget.getBoundingClientRect();
+
+            if (
+              event.clientX < bounds.left ||
+              event.clientX > bounds.right ||
+              event.clientY < bounds.top ||
+              event.clientY > bounds.bottom
+            ) {
+              setShowExportUnavailableDialog(false);
+            }
+          }}
+          style={{
+            width: "420px",
+            maxWidth: "calc(100% - 44px)",
+            boxSizing: "border-box",
+            margin: "auto",
+            padding: "28px 24px",
+            background:
+              "linear-gradient(180deg, rgba(20,21,23,0.98), rgba(9,10,12,0.98))",
+            border: "1px solid rgba(var(--premivate-gold-rgb),0.18)",
+            borderRadius: "24px",
+            boxShadow: "0 30px 120px rgba(0,0,0,0.55)",
+            color: "white",
+            textAlign: "center",
+            position: "fixed",
+          }}
+        >
+          <style>{`
+            dialog[aria-labelledby="history-export-unavailable-dialog-title"]::backdrop {
+              background: rgba(0, 0, 0, 0.75);
+            }
+          `}</style>
+
+          <button
+            type="button"
+            autoFocus
+            aria-label={_t("Close")}
+            onClick={() => setShowExportUnavailableDialog(false)}
+            style={{
+              position: "absolute",
+              top: "14px",
+              right: "14px",
+              width: "32px",
+              height: "32px",
+              borderRadius: "999px",
+              border: "1px solid rgba(255,255,255,0.12)",
+              background: "rgba(255,255,255,0.06)",
+              color: "white",
+              cursor: "pointer",
+              fontWeight: "900",
+            }}
+          >
+            ×
+          </button>
+
+          <div
+            style={{
+              color: "var(--premivate-gold-muted)",
+              fontSize: "12px",
+              fontWeight: "700",
+              letterSpacing: "0.12em",
+              marginBottom: "14px",
+            }}
+          >
+            EXPORT PREVIEW
+          </div>
+
+          <p
+            id="history-export-unavailable-dialog-title"
+            style={{
+              color: "white",
+              fontSize: "17px",
+              fontWeight: "600",
+              lineHeight: "1.6",
+              margin: "0",
+              padding: "0 18px",
+            }}
+          >
+            {ui.history.noExportFile}
+          </p>
+        </dialog>
+      )}
       {pendingDeleteId && (
         <div
           onClick={() => setPendingDeleteId(null)}
@@ -382,7 +543,7 @@ setGenerations(data || []);
               borderRadius: "24px",
               background:
                 "linear-gradient(145deg, rgba(22,21,18,0.985) 0%, rgba(13,13,13,0.99) 58%, rgba(8,9,10,0.995) 100%)",
-              border: "1px solid rgba(216,181,106,0.18)",
+              border: "1px solid rgba(var(--premivate-gold-rgb),0.18)",
               boxShadow:
                 "0 32px 90px rgba(0,0,0,0.68), inset 0 1px 0 rgba(246,243,235,0.035)",
               color: "rgba(246,243,235,0.96)",
@@ -390,7 +551,7 @@ setGenerations(data || []);
           >
             <div
               style={{
-                color: "rgba(216,181,106,0.78)",
+                color: "rgba(var(--premivate-gold-rgb),0.78)",
                 fontSize: "10px",
                 fontWeight: "800",
                 letterSpacing: "0.2em",
@@ -476,14 +637,14 @@ const content = {
   flex: 1,
   padding: "70px",
   background:
-    "linear-gradient(90deg, rgba(7,7,8,0.94) 0%, rgba(7,7,8,0.80) 40%, rgba(7,7,8,0.54) 72%, rgba(7,7,8,0.46) 100%), linear-gradient(180deg, rgba(9,8,6,0.18) 0%, rgba(9,8,6,0.36) 58%, rgba(9,8,6,0.78) 100%), url('/framelab-premium-History-assets/ChatGPT Image 24. Sept. 2026, 14_37_35.png') center top / cover no-repeat, #090A0C",
+    "linear-gradient(90deg, rgba(7,7,8,0.94) 0%, rgba(7,7,8,0.80) 40%, rgba(7,7,8,0.54) 72%, rgba(7,7,8,0.46) 100%), linear-gradient(180deg, rgba(9,8,6,0.18) 0%, rgba(9,8,6,0.36) 58%, rgba(9,8,6,0.78) 100%), url('/framelab-premium-History-assets/ChatGPT Image 24. Sept. 2026, 14_37_35.png') center top / 100% auto no-repeat, #090A0C",
   minWidth: 0,
   maxWidth: "100%",
   overflow: "hidden",
 };
 
 const eyebrow = {
-  color: "#E7CC91",
+  color: "var(--premivate-gold-muted)",
   fontSize: "13px",
   letterSpacing: "0.28em",
   fontWeight: "800",
@@ -519,15 +680,16 @@ const emptyBox = {
 
 const grid = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(320px, 420px))",
-  justifyContent: "start",
-  gap: "32px",
+  gridTemplateColumns:
+    "repeat(auto-fit, minmax(min(360px, 100%), 1fr))",
+  alignItems: "start",
+  gap: "24px",
   width: "100%",
-  maxWidth: "100%",
+  maxWidth: "1080px",
 };
 
 const card = {
-  minHeight: "560px",
+  minHeight: "520px",
   padding: "28px",
   borderRadius: "30px",
   background:
@@ -541,13 +703,13 @@ const card = {
 };
 
 const textArea = {
-  minHeight: "300px",
+  minHeight: "220px",
   maxWidth: "100%",
   overflow: "hidden",
 };
 
 const smallLabel = {
-  color: "#E7CC91",
+  color: "var(--premivate-gold-muted)",
   fontWeight: "800",
   marginBottom: "16px",
 };
@@ -561,8 +723,10 @@ const title = {
 };
 
 const promptText = {
-  color: "rgba(255,255,255,0.66)",
-  lineHeight: "1.65",
+  marginTop: "18px",
+  color: "rgba(255,255,255,0.76)",
+  fontSize: "14px",
+  lineHeight: "1.7",
   whiteSpace: "pre-wrap",
 };
 
@@ -570,7 +734,7 @@ const videoArea = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  marginTop: "auto",
+  marginTop: "20px",
 };
 
 const video = {
@@ -605,7 +769,7 @@ const buttonPrimary = {
 padding: "10px 12px",
   borderRadius: "14px",
   border: "none",
-  background: "linear-gradient(90deg, #B88A3B, #E7CC91)",
+  background: "linear-gradient(90deg, var(--premivate-gold-primary), var(--premivate-gold-highlight))",
   color: "#17130C",
   fontSize: "12px",
   fontWeight: "800",

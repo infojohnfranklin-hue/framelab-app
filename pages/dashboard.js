@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { SignedIn } from "@clerk/nextjs";
 
-export default function DashboardPage({ ui, t }) {
+export default function DashboardPage({ ui, t, userPlan, planStatusLoaded }) {
   const _t = typeof t === "function" ? t : (value) => value;
   return (
     <div
+      className="dashboard-page"
       style={{
         minHeight: "100vh",
         background:
@@ -16,21 +18,22 @@ export default function DashboardPage({ ui, t }) {
         boxSizing: "border-box",
       }}
     >
-      <div style={{ maxWidth: "1080px" }}>
+      <div className="dashboard-page__content" style={{ maxWidth: "1080px" }}>
         <div
           style={{
             letterSpacing: "0.28em",
             textTransform: "uppercase",
-            color: "#D8B56A",
+            color: "var(--premivate-gold-muted)",
             fontSize: "13px",
             fontWeight: 800,
             marginBottom: "28px",
           }}
         >
-          {_t("FrameLab Dashboard")}
+          {_t("Premivate Dashboard")}
         </div>
 
         <h1
+          className="dashboard-page__headline"
           style={{
             fontSize: "72px",
             lineHeight: "0.95",
@@ -80,7 +83,7 @@ export default function DashboardPage({ ui, t }) {
 
           <DashboardCard
             title={_t("History")}
-            text={_t("Reopen, export and manage saved FrameLab generations.")}
+            text={_t("Reopen, export and manage saved Premivate generations.")}
             href="/history"
             button={_t("Open History")}
             image="/framelab-premium-dashboard-assets/06_History_Cinematic_Memory_Archive_FilmFrames.png"
@@ -103,7 +106,13 @@ export default function DashboardPage({ ui, t }) {
               {ui.dashboard.activeProjectLabel}:{" "}
               <strong style={{ color: "white" }}>{_t("Untitled Project")}</strong>
             </p>
-            <div style={badgeStyle}>{_t("Pro Unlimited Active")}</div>
+            <SignedIn>
+              {planStatusLoaded && userPlan === "pro" ? (
+                <div style={badgeStyle}>{_t("Pro Active")}</div>
+              ) : planStatusLoaded && userPlan === "free" ? (
+                <div style={badgeStyle}>{_t("Free plan active")}</div>
+              ) : null}
+            </SignedIn>
           </section>
 
           <section
@@ -165,6 +174,23 @@ export default function DashboardPage({ ui, t }) {
             .dashboard-primary-cta {
               min-width: 0;
             }
+
+            .dashboard-page {
+              padding: 56px 20px 120px !important;
+            }
+
+            .dashboard-page__content {
+              max-width: 100% !important;
+            }
+
+            .dashboard-page__headline {
+              font-size: clamp(46px, 12vw, 58px) !important;
+              line-height: 1.02 !important;
+              max-width: 100% !important;
+              overflow-wrap: anywhere;
+              padding-right: 8px;
+              box-sizing: border-box;
+            }
           }
         `}</style>
 </div>
@@ -199,12 +225,12 @@ function DashboardCard({ title, text, href, button, image }) {
           marginTop: "auto",
           padding: "13px 18px",
           borderRadius: "999px",
-          background: "linear-gradient(135deg, #B88A3B 0%, #E7CC91 100%)",
+          background: "linear-gradient(135deg, var(--premivate-gold-primary) 0%, var(--premivate-gold-highlight) 100%)",
           color: "#17130C",
           textDecoration: "none",
           fontWeight: 900,
           fontSize: "13px",
-          boxShadow: "0 18px 50px rgba(216,181,106,0.22)",
+          boxShadow: "0 18px 50px rgba(var(--premivate-gold-rgb),0.22)",
         }}
       >
         {button}
@@ -247,8 +273,8 @@ const badgeStyle = {
   padding: "10px 14px",
   borderRadius: "999px",
   background: "rgba(255,255,255,0.055)",
-  border: "1px solid rgba(216,181,106,0.16)",
-  color: "#E7CC91",
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.16)",
+  color: "var(--premivate-gold-muted)",
   fontSize: "13px",
   fontWeight: 800,
 };

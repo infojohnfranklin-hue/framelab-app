@@ -1,0 +1,594 @@
+[
+  {
+    "id": "tide",
+    "provenance": "synthetic contrast fixture using supplied Mara inputs; historical Pier Traces is a separate imperfect reference",
+    "synthetic": true,
+    "inputs": {
+      "artistName": "Mara Vale",
+      "trackName": "The Tide Keeps the Tape",
+      "genre": "Ambient",
+      "bpm": 92,
+      "mood": "Warm Cinematic Hope",
+      "visualStyle": "Soft Grain Cinema",
+      "directorMode": "Poetic Documentary",
+      "styleDNA": "Ocean Noir",
+      "era": "1970s Analog Film",
+      "reelPurpose": "Artist Identity Reel",
+      "language": "English",
+      "userReelVision": "At low tide, a fictional performer records a final message. The returning tide carries loose magnetic tape beyond the frame after recording stops.",
+      "meaning": "Holding a record of intimacy cannot arrest the changing moment.",
+      "desiredImpact": "Quiet ache and intimacy, with a modest sense of continuity."
+    },
+    "candidate": {
+      "reelConcept": "A performer records a farewell at low tide, then stops the recorder and opens the ejected cassette before water draws a tethered ribbon over the sand.",
+      "directorSummary": "Observe the stop key and ejection before approaching the opened cassette. Keep the waterline and the tether visible in the last close-up.",
+      "narrativeArc": {
+        "stage1": "A performer records a farewell into a cassette seated inside a dry recorder.",
+        "stage2": "The performer stops recording, ejects the cassette and opens its shell as water approaches.",
+        "stage3": "The cassette rests on wet sand; the tape remains attached to its spool while a loose ribbon travels beyond the frame."
+      },
+      "aiVideoPrompt": "The camera observes a cassette recording in a dry recorder. After the stop key is pressed, hands eject the cassette and open the shell. Water draws a ribbon over wet sand. The cassette rests on wet sand; the tape remains attached to its spool while a loose ribbon travels beyond the frame.",
+      "cinematicIdentity": {
+        "projectCodename": "Tidebound Tape Residue",
+        "creativeArchetype": "Tidebound Tape Discovery",
+        "visualDNA": [
+          "patient framing of tidebound tape residue",
+          "textured surfaces and spatial relationships",
+          "light on the existing subjects"
+        ],
+        "emotionalTone": [
+          "tender attention to specific gestures",
+          "restrained warmth in the shared space",
+          "gentle distance in the final frame"
+        ],
+        "audienceEmotion": [
+          "The stopped recorder makes the farewell feel finite before the water arrives.",
+          "Aches of separation emerge as wet sand receives the ribbon once held between careful hands.",
+          "A tethered length of tape carries a small sense of continuity past the edge of sight."
+        ],
+        "snowflakeSignature": "STUDY-4278"
+      },
+      "hooks": {
+        "hook": "A farewell finds a longer shoreline.",
+        "curiosityHook": "Which small detail changes how this scene is understood?",
+        "emotionalHook": "The smallest gesture can leave the deepest trace.",
+        "viralHook": "A farewell finds a longer shoreline."
+      },
+      "captions": {
+        "mainCaption": "Intimacy changes its shape at the waterline.",
+        "instagramCaption": "Intimacy changes its shape at the waterline.",
+        "tiktokCaption": "Intimacy changes its shape at the waterline.",
+        "youtubeShortsCaption": "Intimacy changes its shape at the waterline."
+      },
+      "thumbnailPrompt": "A performer records a farewell into a cassette seated inside a dry recorder.",
+      "hashtags": "#CinematicStudy #VisualMusic",
+      "scores": {
+        "viralScore": 0,
+        "emotionScore": 0,
+        "curiosityScore": 0,
+        "visualNoveltyScore": 0,
+        "replayScore": 0,
+        "brandabilityScore": 0
+      }
+    },
+    "score_note": "Synthetic placeholders required by existing schema, not quality ratings."
+  },
+  {
+    "id": "held",
+    "provenance": "expanded existing minimalist Meaning fixture; no live output claim",
+    "synthetic": true,
+    "inputs": {
+      "artistName": "Elian Voss",
+      "trackName": "Unfixed Negative",
+      "genre": "Downtempo",
+      "bpm": 92,
+      "mood": "Warm Cinematic Hope",
+      "visualStyle": "Soft Grain Cinema",
+      "directorMode": "Poetic Documentary",
+      "styleDNA": "Luxury Underground",
+      "era": "1970s Analog Film",
+      "reelPurpose": "Artist Identity Reel",
+      "language": "English",
+      "userReelVision": "Only the camera changes. Two contact prints remain intact and unchanged. No hidden clue or resolved answer appears.",
+      "meaning": "Uncertainty can be freedom.",
+      "desiredImpact": "Quiet unsentimental permission."
+    },
+    "candidate": {
+      "reelConcept": "Two unchanged contact prints share a worktable. A sideways camera move grants both images equal room without selecting a correct memory.",
+      "directorSummary": "Keep both prints untouched. Move the camera sideways to widen their shared space, then hold the two imperfect surfaces in equal light.",
+      "narrativeArc": {
+        "stage1": "A technician studies the same room from a narrow viewing position.",
+        "stage2": "The camera moves sideways while the prints remain unchanged.",
+        "stage3": "A wider held view gives equal space to both imperfect prints without a solution."
+      },
+      "aiVideoPrompt": "A close view begins on two intact contact prints. The camera moves sideways rather than altering either photograph. A wider view gives each print equal space. A long held view preserves the distance between two unchanged photographs.",
+      "cinematicIdentity": {
+        "projectCodename": "Parallel Negatives",
+        "creativeArchetype": "Equal Space Study",
+        "visualDNA": [
+          "patient framing of parallel negatives",
+          "textured surfaces and spatial relationships",
+          "light on the existing subjects"
+        ],
+        "emotionalTone": [
+          "tender attention to specific gestures",
+          "restrained warmth in the shared space",
+          "gentle distance in the final frame"
+        ],
+        "audienceEmotion": [
+          "The equal light on both prints permits an answer to remain undecided without discomfort.",
+          "Distance between the intact photographs feels generous rather than empty as the camera widens.",
+          "The shared space leaves a quiet freedom to hold two incompatible memories together."
+        ],
+        "snowflakeSignature": "STUDY-4278"
+      },
+      "hooks": {
+        "hook": "Two images can share a place without agreeing.",
+        "curiosityHook": "Which small detail changes how this scene is understood?",
+        "emotionalHook": "The smallest gesture can leave the deepest trace.",
+        "viralHook": "Two images can share a place without agreeing."
+      },
+      "captions": {
+        "mainCaption": "Room for an answer that never arrives.",
+        "instagramCaption": "Room for an answer that never arrives.",
+        "tiktokCaption": "Room for an answer that never arrives.",
+        "youtubeShortsCaption": "Room for an answer that never arrives."
+      },
+      "thumbnailPrompt": "A technician studies the same room from a narrow viewing position.",
+      "hashtags": "#CinematicStudy #VisualMusic",
+      "scores": {
+        "viralScore": 0,
+        "emotionScore": 0,
+        "curiosityScore": 0,
+        "visualNoveltyScore": 0,
+        "replayScore": 0,
+        "brandabilityScore": 0
+      }
+    },
+    "score_note": "Synthetic placeholders required by existing schema, not quality ratings."
+  },
+  {
+    "id": "craft",
+    "provenance": "expanded existing watchmaker semantic-audit fixture",
+    "synthetic": true,
+    "inputs": {
+      "artistName": "Iris Coda",
+      "trackName": "Small Repairs",
+      "genre": "Jazz",
+      "bpm": 68,
+      "mood": "Warm Cinematic Hope",
+      "visualStyle": "Soft Grain Cinema",
+      "directorMode": "Indie Realism",
+      "styleDNA": "Natural Workshop",
+      "era": "Contemporary",
+      "reelPurpose": "Artist Identity Reel",
+      "language": "English",
+      "userReelVision": "A watchmaker repairs a watch. A spring slips into a tray, and she retrieves it with tweezers. End on the loose part in her palm, without claiming the watch works.",
+      "meaning": "Care can be valuable before a task is finished.",
+      "desiredImpact": "Patient respect for imperfect work."
+    },
+    "candidate": {
+      "reelConcept": "A watchmaker opens a brass watch and releases the wound spring into a tray. The unfinished repair becomes an exercise in care.",
+      "directorSummary": "The camera follows the watchmaker because the spring has slipped from its seat, then tracks the spring across the tray.",
+      "narrativeArc": {
+        "stage1": "A watchmaker removes the back of a brass watch over a shallow tray.",
+        "stage2": "The spring moves across the tray as the watchmaker reaches for tweezers.",
+        "stage3": "The spring settles into the watchmaker’s open palm and the watch remains silent."
+      },
+      "aiVideoPrompt": "After the spring slips from its seat, the camera follows it across the tray and ends on the spring resting in the watchmaker’s palm.",
+      "cinematicIdentity": {
+        "projectCodename": "Palm Escapement",
+        "creativeArchetype": "Patient Repair Study",
+        "visualDNA": [
+          "patient framing of palm escapement",
+          "textured surfaces and spatial relationships",
+          "light on the existing subjects"
+        ],
+        "emotionalTone": [
+          "tender attention to specific gestures",
+          "restrained warmth in the shared space",
+          "gentle distance in the final frame"
+        ],
+        "audienceEmotion": [
+          "The patient hand makes unfinished work feel worthy of care rather than apology.",
+          "The tiny spring in the tray gives the delay a tangible vulnerability and weight.",
+          "The silent watch beside an open palm leaves respect for attention without completed repair."
+        ],
+        "snowflakeSignature": "STUDY-4278"
+      },
+      "hooks": {
+        "hook": "A tiny spring changes the entire repair.",
+        "curiosityHook": "Which small detail changes how this scene is understood?",
+        "emotionalHook": "The smallest gesture can leave the deepest trace.",
+        "viralHook": "A tiny spring changes the entire repair."
+      },
+      "captions": {
+        "mainCaption": "One unfinished repair deserves a careful hand.",
+        "instagramCaption": "One unfinished repair deserves a careful hand.",
+        "tiktokCaption": "One unfinished repair deserves a careful hand.",
+        "youtubeShortsCaption": "One unfinished repair deserves a careful hand."
+      },
+      "thumbnailPrompt": "A watchmaker removes the back of a brass watch over a shallow tray.",
+      "hashtags": "#CinematicStudy #VisualMusic",
+      "scores": {
+        "viralScore": 0,
+        "emotionScore": 0,
+        "curiosityScore": 0,
+        "visualNoveltyScore": 0,
+        "replayScore": 0,
+        "brandabilityScore": 0
+      }
+    },
+    "score_note": "Synthetic placeholders required by existing schema, not quality ratings."
+  },
+  {
+    "id": "abstract",
+    "provenance": "expanded existing projected-memory semantic-audit fixture",
+    "synthetic": true,
+    "inputs": {
+      "artistName": "Sora Kline",
+      "trackName": "Room Remembering",
+      "genre": "Ambient",
+      "bpm": 80,
+      "mood": "Warm Cinematic Hope",
+      "visualStyle": "Soft Grain Cinema",
+      "directorMode": "Spatial Architecture",
+      "styleDNA": "Projected Color",
+      "era": "Future Minimal",
+      "reelPurpose": "Artist Identity Reel",
+      "language": "English",
+      "userReelVision": "A room of projected light changes shape as a memory is revisited. No person or literal recovered photograph appears.",
+      "meaning": "Remembering changes the space from which we look.",
+      "desiredImpact": "Recognition without certainty."
+    },
+    "candidate": {
+      "reelConcept": "A room of projected light slowly changes shape as a memory is revisited.",
+      "directorSummary": "The camera observes projected light crossing the room while each recalled detail alters the pattern.",
+      "narrativeArc": {
+        "stage1": "Projected bands trace one corner of an empty room.",
+        "stage2": "The projected light shifts across the walls as the remembered room opens.",
+        "stage3": "The pattern keeps moving across the room, leaving the memory unresolved."
+      },
+      "aiVideoPrompt": "The camera follows projected light across the room as each remembered detail changes the pattern, ending with the movement continuing beyond the final frame.",
+      "cinematicIdentity": {
+        "projectCodename": "Prismatic Room",
+        "creativeArchetype": "Remembered Spatial Drift",
+        "visualDNA": [
+          "patient framing of prismatic room",
+          "textured surfaces and spatial relationships",
+          "light on the existing subjects"
+        ],
+        "emotionalTone": [
+          "tender attention to specific gestures",
+          "restrained warmth in the shared space",
+          "gentle distance in the final frame"
+        ],
+        "audienceEmotion": [
+          "The shifting light makes remembered space feel intimate without becoming fully knowable again.",
+          "A wall that opens through projection carries the bodily sensation of revisiting an uncertain place.",
+          "The unclosed room leaves tenderness for memories that continue changing as they are recalled."
+        ],
+        "snowflakeSignature": "STUDY-4278"
+      },
+      "hooks": {
+        "hook": "What changes when a room remembers?",
+        "curiosityHook": "Which small detail changes how this scene is understood?",
+        "emotionalHook": "The smallest gesture can leave the deepest trace.",
+        "viralHook": "What changes when a room remembers?"
+      },
+      "captions": {
+        "mainCaption": "A memory changes the light without closing the room.",
+        "instagramCaption": "A memory changes the light without closing the room.",
+        "tiktokCaption": "A memory changes the light without closing the room.",
+        "youtubeShortsCaption": "A memory changes the light without closing the room."
+      },
+      "thumbnailPrompt": "Projected bands trace one corner of an empty room.",
+      "hashtags": "#CinematicStudy #VisualMusic",
+      "scores": {
+        "viralScore": 0,
+        "emotionScore": 0,
+        "curiosityScore": 0,
+        "visualNoveltyScore": 0,
+        "replayScore": 0,
+        "brandabilityScore": 0
+      }
+    },
+    "score_note": "Synthetic placeholders required by existing schema, not quality ratings."
+  },
+  {
+    "id": "surreal",
+    "provenance": "expanded existing surreal semantic-audit fixture",
+    "synthetic": true,
+    "inputs": {
+      "artistName": "Leda Moss",
+      "trackName": "Second Shore",
+      "genre": "Electronic",
+      "bpm": 126,
+      "mood": "Warm Cinematic Hope",
+      "visualStyle": "Soft Grain Cinema",
+      "directorMode": "Surreal Dream Cinema",
+      "styleDNA": "Domestic Dream",
+      "era": "1970s Analog Film",
+      "reelPurpose": "Artist Identity Reel",
+      "language": "English",
+      "userReelVision": "A paper moon floats in a kitchen sink. Its reflection creates a shoreline on the ceiling; this is the declared impossible rule. The moon remains in the sink.",
+      "meaning": "A small domestic space can contain an impossible distance.",
+      "desiredImpact": "Tender estrangement with no rational explanation."
+    },
+    "candidate": {
+      "reelConcept": "A paper moon floats in a kitchen sink and casts a second shoreline across the ceiling.",
+      "directorSummary": "The camera watches the paper moon because the sink water reflects a shoreline that cannot exist indoors.",
+      "narrativeArc": {
+        "stage1": "A paper moon floats on the sink water beneath a tiled wall.",
+        "stage2": "The reflected shoreline climbs from the sink toward the ceiling.",
+        "stage3": "The second shoreline keeps spreading across the ceiling while the paper moon remains in the sink."
+      },
+      "aiVideoPrompt": "As the sink reflection climbs toward the ceiling, the camera ends on the second shoreline spreading while the paper moon remains below.",
+      "cinematicIdentity": {
+        "projectCodename": "Porcelain Horizon",
+        "creativeArchetype": "Domestic Tidal Dream",
+        "visualDNA": [
+          "patient framing of porcelain horizon",
+          "textured surfaces and spatial relationships",
+          "light on the existing subjects"
+        ],
+        "emotionalTone": [
+          "tender attention to specific gestures",
+          "restrained warmth in the shared space",
+          "gentle distance in the final frame"
+        ],
+        "audienceEmotion": [
+          "The impossible reflection makes a familiar kitchen feel privately expansive and gently strange.",
+          "Distance between the small moon and ceiling shoreline invites a tender sense of displacement.",
+          "The floating paper leaves affection for an impossible world that needs no explanation."
+        ],
+        "snowflakeSignature": "STUDY-4278"
+      },
+      "hooks": {
+        "hook": "A shoreline appears where no sea exists.",
+        "curiosityHook": "Which small detail changes how this scene is understood?",
+        "emotionalHook": "The smallest gesture can leave the deepest trace.",
+        "viralHook": "A shoreline appears where no sea exists."
+      },
+      "captions": {
+        "mainCaption": "The impossible shoreline keeps moving across the ceiling.",
+        "instagramCaption": "The impossible shoreline keeps moving across the ceiling.",
+        "tiktokCaption": "The impossible shoreline keeps moving across the ceiling.",
+        "youtubeShortsCaption": "The impossible shoreline keeps moving across the ceiling."
+      },
+      "thumbnailPrompt": "A paper moon floats on the sink water beneath a tiled wall.",
+      "hashtags": "#CinematicStudy #VisualMusic",
+      "scores": {
+        "viralScore": 0,
+        "emotionScore": 0,
+        "curiosityScore": 0,
+        "visualNoveltyScore": 0,
+        "replayScore": 0,
+        "brandabilityScore": 0
+      }
+    },
+    "score_note": "Synthetic placeholders required by existing schema, not quality ratings."
+  },
+  {
+    "id": "performance",
+    "provenance": "expanded existing singer semantic-audit fixture with medium-BPM coverage",
+    "synthetic": true,
+    "inputs": {
+      "artistName": "Nia Sol",
+      "trackName": "One More Harmony",
+      "genre": "Soul",
+      "bpm": 118,
+      "mood": "Warm Cinematic Hope",
+      "visualStyle": "Soft Grain Cinema",
+      "directorMode": "Gloss Music Video",
+      "styleDNA": "Warm Studio",
+      "era": "Contemporary",
+      "reelPurpose": "Artist Identity Reel",
+      "language": "English",
+      "userReelVision": "A singer holds her final harmony in a rehearsal room while the lights dim. The same note persists into darkness; no new performer appears.",
+      "meaning": "A voice can leave a room before its presence disappears.",
+      "desiredImpact": "Warm pride edged with separation."
+    },
+    "candidate": {
+      "reelConcept": "A singer records one final harmony in an empty rehearsal room before the lights go out.",
+      "directorSummary": "Use measured cutting around breath and hands. The camera stays with the singer because the last harmony must be held until the room falls quiet.",
+      "narrativeArc": {
+        "stage1": "The singer draws breath beside a single microphone in the rehearsal room.",
+        "stage2": "The singer repeats the harmony as the room’s lights begin to dim.",
+        "stage3": "The final note continues after the lights go out, leaving the empty room listening."
+      },
+      "aiVideoPrompt": "When the lights begin to dim, the camera holds on the singer’s final harmony and ends in the dark room after the note continues.",
+      "cinematicIdentity": {
+        "projectCodename": "Residual Harmony",
+        "creativeArchetype": "Last Light Performance",
+        "visualDNA": [
+          "patient framing of residual harmony",
+          "textured surfaces and spatial relationships",
+          "light on the existing subjects"
+        ],
+        "emotionalTone": [
+          "tender attention to specific gestures",
+          "restrained warmth in the shared space",
+          "gentle distance in the final frame"
+        ],
+        "audienceEmotion": [
+          "The held breath makes the singer’s effort feel close enough to share physically.",
+          "The dimming lights lend the harmony a warmth that persists as visibility recedes.",
+          "The audible note in darkness leaves pride and separation sounding together without reassurance."
+        ],
+        "snowflakeSignature": "STUDY-4278"
+      },
+      "hooks": {
+        "hook": "The room hears the last note after the lights disappear.",
+        "curiosityHook": "Which small detail changes how this scene is understood?",
+        "emotionalHook": "The smallest gesture can leave the deepest trace.",
+        "viralHook": "The room hears the last note after the lights disappear."
+      },
+      "captions": {
+        "mainCaption": "One final harmony remains after the room goes dark.",
+        "instagramCaption": "One final harmony remains after the room goes dark.",
+        "tiktokCaption": "One final harmony remains after the room goes dark.",
+        "youtubeShortsCaption": "One final harmony remains after the room goes dark."
+      },
+      "thumbnailPrompt": "The singer draws breath beside a single microphone in the rehearsal room.",
+      "hashtags": "#CinematicStudy #VisualMusic",
+      "scores": {
+        "viralScore": 0,
+        "emotionScore": 0,
+        "curiosityScore": 0,
+        "visualNoveltyScore": 0,
+        "replayScore": 0,
+        "brandabilityScore": 0
+      }
+    },
+    "score_note": "Synthetic placeholders required by existing schema, not quality ratings."
+  },
+  {
+    "id": "road",
+    "provenance": "new adversarial title/name fixture for action-route override; no live output claim",
+    "synthetic": true,
+    "inputs": {
+      "artistName": "Juno Road",
+      "trackName": "Getaway",
+      "genre": "House",
+      "bpm": 124,
+      "mood": "Warm Cinematic Hope",
+      "visualStyle": "Soft Grain Cinema",
+      "directorMode": "Minimal Ritual Cinema",
+      "styleDNA": "Morning Interior",
+      "era": "Contemporary",
+      "reelPurpose": "Artist Identity Reel",
+      "language": "English",
+      "userReelVision": "Two friends sit at a kitchen table. One slides an empty chair closer without touching the other person. No travel, roads or vehicles.",
+      "meaning": "An invitation can create space without demanding an answer.",
+      "desiredImpact": "Unpressured belonging."
+    },
+    "candidate": {
+      "reelConcept": "Two friends share a kitchen table; moving an empty chair closer turns the space between them into an invitation.",
+      "directorSummary": "Use measured cutting between hands and chair legs. Keep both people seated as the empty chair slides closer; end on the space it leaves for an answer.",
+      "narrativeArc": {
+        "stage1": "Two friends sit across a kitchen table with an empty chair beside them.",
+        "stage2": "One friend slides the empty chair closer as the other continues listening.",
+        "stage3": "Both friends remain seated with the empty chair between them, leaving the invitation open."
+      },
+      "aiVideoPrompt": "Frame the table with both friends already seated. A hand slides the empty chair closer. Keep the camera at chair height. End with both friends seated and the empty chair between them.",
+      "cinematicIdentity": {
+        "projectCodename": "Offered Place",
+        "creativeArchetype": "Seated Invitation",
+        "visualDNA": [
+          "patient framing of offered place",
+          "textured surfaces and spatial relationships",
+          "light on the existing subjects"
+        ],
+        "emotionalTone": [
+          "tender attention to specific gestures",
+          "restrained warmth in the shared space",
+          "gentle distance in the final frame"
+        ],
+        "audienceEmotion": [
+          "The unoccupied chair makes the invitation feel patient rather than an obligation to respond.",
+          "Distance between the seated friends feels softer when the available place moves closer.",
+          "The unfilled space leaves belonging possible without demanding a gesture or spoken answer."
+        ],
+        "snowflakeSignature": "STUDY-4278"
+      },
+      "hooks": {
+        "hook": "An empty chair makes room for an answer.",
+        "curiosityHook": "Which small detail changes how this scene is understood?",
+        "emotionalHook": "The smallest gesture can leave the deepest trace.",
+        "viralHook": "An empty chair makes room for an answer."
+      },
+      "captions": {
+        "mainCaption": "An invitation can stay open.",
+        "instagramCaption": "An invitation can stay open.",
+        "tiktokCaption": "An invitation can stay open.",
+        "youtubeShortsCaption": "An invitation can stay open."
+      },
+      "thumbnailPrompt": "Two friends sit across a kitchen table with an empty chair beside them.",
+      "hashtags": "#CinematicStudy #VisualMusic",
+      "scores": {
+        "viralScore": 0,
+        "emotionScore": 0,
+        "curiosityScore": 0,
+        "visualNoveltyScore": 0,
+        "replayScore": 0,
+        "brandabilityScore": 0
+      }
+    },
+    "score_note": "Synthetic placeholders required by existing schema, not quality ratings."
+  },
+  {
+    "id": "acid",
+    "provenance": "new adversarial acid/303 fixture; no live output claim",
+    "synthetic": true,
+    "inputs": {
+      "artistName": "303 Lumen",
+      "trackName": "Open Weave",
+      "genre": "Acid House",
+      "bpm": 132,
+      "mood": "Warm Cinematic Hope",
+      "visualStyle": "Soft Grain Cinema",
+      "directorMode": "Editorial Fashion Film",
+      "styleDNA": "Woven Daylight",
+      "era": "Contemporary",
+      "reelPurpose": "Artist Identity Reel",
+      "language": "English",
+      "userReelVision": "Two dancers pass a long woven cloth between their hands in daylight. The cloth stays intact. No synthesizer, melting or machine imagery.",
+      "meaning": "Trust is coordinated movement, not identical movement.",
+      "desiredImpact": "Playful solidarity and bodily ease."
+    },
+    "candidate": {
+      "reelConcept": "Two dancers pass an intact woven cloth between their hands, answering the rhythm with alternating steps rather than matching poses.",
+      "directorSummary": "Frame the changing distance between hands and follow the cloth in lateral movement. Keep the weave intact and let alternating footsteps shape the cuts.",
+      "narrativeArc": {
+        "stage1": "Two dancers hold opposite ends of an intact woven cloth in daylight.",
+        "stage2": "One steps back as the other steps forward, passing the slack between their hands.",
+        "stage3": "The cloth remains intact between both dancers as their alternating steps carry the movement beyond the frame."
+      },
+      "aiVideoPrompt": "Begin with two dancers holding the woven cloth. Follow the slack as one steps back and the other advances. Keep both hands visible at each exchange. End with the cloth intact between both dancers as the alternating steps continue.",
+      "cinematicIdentity": {
+        "projectCodename": "Counterstep Weave",
+        "creativeArchetype": "Reciprocal Cloth Dance",
+        "visualDNA": [
+          "patient framing of counterstep weave",
+          "textured surfaces and spatial relationships",
+          "light on the existing subjects"
+        ],
+        "emotionalTone": [
+          "tender attention to specific gestures",
+          "restrained warmth in the shared space",
+          "gentle distance in the final frame"
+        ],
+        "audienceEmotion": [
+          "The intact cloth makes trust visible through the different steps of both dancers.",
+          "The travelling slack creates bodily ease as each dancer makes room for the other.",
+          "Their continuing exchange leaves a playful solidarity that does not require identical movement."
+        ],
+        "snowflakeSignature": "STUDY-4278"
+      },
+      "hooks": {
+        "hook": "Together does not have to mean in unison.",
+        "curiosityHook": "Which small detail changes how this scene is understood?",
+        "emotionalHook": "The smallest gesture can leave the deepest trace.",
+        "viralHook": "Together does not have to mean in unison."
+      },
+      "captions": {
+        "mainCaption": "Shared rhythm leaves room for different steps.",
+        "instagramCaption": "Shared rhythm leaves room for different steps.",
+        "tiktokCaption": "Shared rhythm leaves room for different steps.",
+        "youtubeShortsCaption": "Shared rhythm leaves room for different steps."
+      },
+      "thumbnailPrompt": "Two dancers hold opposite ends of an intact woven cloth in daylight.",
+      "hashtags": "#CinematicStudy #VisualMusic",
+      "scores": {
+        "viralScore": 0,
+        "emotionScore": 0,
+        "curiosityScore": 0,
+        "visualNoveltyScore": 0,
+        "replayScore": 0,
+        "brandabilityScore": 0
+      }
+    },
+    "score_note": "Synthetic placeholders required by existing schema, not quality ratings."
+  }
+]

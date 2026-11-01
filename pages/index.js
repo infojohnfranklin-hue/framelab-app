@@ -242,8 +242,8 @@ const globalCss = `
   .premium-action-button:hover {
     transform: translateY(-3px) scale(1.015);
     box-shadow:
-      0 0 40px rgba(216,181,106,0.26),
-      0 18px 70px rgba(216,181,106,0.20) !important;
+      0 0 40px rgba(var(--premivate-gold-rgb),0.26),
+      0 18px 70px rgba(var(--premivate-gold-rgb),0.20) !important;
     filter: brightness(1.08);
   }
 
@@ -258,7 +258,7 @@ const globalCss = `
   .premium-export-button:hover {
     transform: translateY(-3px) scale(1.018);
     box-shadow:
-      0 0 42px rgba(216,181,106,0.24),
+      0 0 42px rgba(var(--premivate-gold-rgb),0.24),
       0 14px 42px rgba(0,0,0,0.32) !important;
     filter: brightness(1.06);
   }
@@ -333,14 +333,25 @@ const globalCss = `
       width: auto !important;
       max-width: fit-content !important;
     }
+
+    .generate-hero-copy {
+      padding: 0 !important;
+    }
+
+    .generate-briefing-shell {
+      width: 100% !important;
+      max-width: 100% !important;
+      margin-left: 0 !important;
+    }
   }
 `;
 
 const inputStyle = {
   width: "100%",
+  boxSizing: "border-box",
   padding: "15px 16px",
   borderRadius: "16px",
-  border: "1px solid rgba(216,181,106,0.16)",
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.16)",
   background: "rgba(13,13,18,0.72)",
   color: "white",
   outline: "none",
@@ -358,7 +369,7 @@ const copyButton = {
   padding: "12px 18px",
   borderRadius: "999px",
   border: "none",
-  background: "linear-gradient(90deg, #B88A3B, #E7CC91)",
+  background: "linear-gradient(90deg, var(--premivate-gold-primary), var(--premivate-gold-highlight))",
   color: "#17130C",
   cursor: "pointer",
   fontWeight: "800",
@@ -450,7 +461,7 @@ function OutputCard({ title, text, t = (value) => value }) {
         background:
           "linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025))",
         border: isHovered
-          ? "1px solid rgba(216,181,106,0.18)"
+          ? "1px solid rgba(var(--premivate-gold-rgb),0.18)"
           : "1px solid rgba(255,255,255,0.08)",
         boxShadow: isHovered
           ? "0 24px 80px rgba(0,0,0,0.32)"
@@ -529,13 +540,13 @@ function ResultSectionHeader({ eyebrow, title, description }) {
         borderRadius: "24px",
         background:
           "linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.028))",
-        border: "1px solid rgba(216,181,106,0.14)",
+        border: "1px solid rgba(var(--premivate-gold-rgb),0.14)",
         boxShadow: "0 18px 60px rgba(0,0,0,0.22)",
       }}
     >
       <div
         style={{
-          color: "#E7CC91",
+          color: "var(--premivate-gold-muted)",
           fontSize: "11px",
           fontWeight: "900",
           letterSpacing: "0.16em",
@@ -606,7 +617,7 @@ function ProgressMetric({ label, value }) {
           style={{
             width: `${width}%`,
             height: "100%",
-            background: "linear-gradient(90deg, #B88A3B 0%, #D8B56A 50%, #E7CC91 100%)",
+            background: "linear-gradient(90deg, var(--premivate-gold-primary) 0%, var(--premivate-gold-muted) 50%, var(--premivate-gold-highlight) 100%)",
           }}
         />
       </div>
@@ -718,11 +729,17 @@ SNOWFLAKE SIGNATURE:
 ${identity.snowflakeSignature || ""}`;
 }
 
-export default function Home({ language, ui, t = (value) => value }) {
+export default function Home({
+  language,
+  ui,
+  userPlan,
+  planStatusLoaded,
+  t = (value) => value,
+}) {
   const { isSignedIn, user } = useUser();
 
-  const [artist, setArtist] = useState("Aurora Wolves");
-  const [track, setTrack] = useState("Northern Migration");
+  const [artist, setArtist] = useState("John Franklin");
+  const [track, setTrack] = useState("Noir Current");
   const [genre, setGenre] = useState("Ambient");
   const [bpm, setBpm] = useState("92");
   const [mood, setMood] = useState("Warm Cinematic Hope");
@@ -731,19 +748,49 @@ export default function Home({ language, ui, t = (value) => value }) {
   const [era, setEra] = useState("1970s Analog Film");
   const [reelPurpose, setReelPurpose] = useState("Artist Identity Reel");
   const [userReelVision, setUserReelVision] = useState("");
+  const [meaning, setMeaning] = useState("");
+  const [desiredImpact, setDesiredImpact] = useState("");
   const [directorMode, setDirectorMode] = useState("Poetic Documentary");
 
   const [loading, setLoading] = useState(false);
-  const [userPlan, setUserPlan] = useState("free");
   const [remainingCredits, setRemainingCredits] = useState(2);
   const [mounted, setMounted] = useState(false);
   const generationRequestIdRef = useRef(null);
+  const generationPlan =
+    planStatusLoaded && ["free", "standard", "pro"].includes(userPlan)
+      ? userPlan
+      : "free";
 
   const [result, setResult] = useState(null);
   const [thumbnailLoading, setThumbnailLoading] = useState(false);
   const [thumbnailImage, setThumbnailImage] = useState(null);
   const [history, setHistory] = useState([]);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showAlreadyProDialog, setShowAlreadyProDialog] = useState(false);
+  const alreadyProDialogRef = useRef(null);
+
+  useEffect(() => {
+    if (!showAlreadyProDialog) {
+      return;
+    }
+
+    const dialog = alreadyProDialogRef.current;
+
+    if (!dialog) {
+      return;
+    }
+
+    if (!dialog.open) {
+      dialog.showModal();
+    }
+
+    return () => {
+      if (dialog.open) {
+        dialog.close();
+      }
+    };
+  }, [showAlreadyProDialog]);
+
   const [exportCopyLabel, setExportCopyLabel] = useState(
     ui.generate.copyFullPackage
   );
@@ -1256,8 +1303,8 @@ export default function Home({ language, ui, t = (value) => value }) {
 
       const test = matrixTests[normalizedTestNumber];
 
-      setArtist("Aurora Wolves");
-      setTrack("Northern Migration");
+      setArtist("John Franklin");
+      setTrack("Noir Current");
       setBpm("120");
 
       setGenre(test.genre);
@@ -1291,10 +1338,6 @@ export default function Home({ language, ui, t = (value) => value }) {
           setRemainingCredits(creditsData.remaining);
         }
 
-        const planRes = await fetch("/api/me-plan");
-        const planData = await planRes.json();
-
-        setUserPlan(planData.plan || "free");
       } catch (error) {
         console.error(error);
       } finally {
@@ -1440,6 +1483,7 @@ export default function Home({ language, ui, t = (value) => value }) {
     if (loading) return ui.common.generating;
 
     if (!isSignedIn) return ui.generate.createAccount;
+    if (!planStatusLoaded) return ui.common.loading;
 
     if (userPlan === "pro") return ui.generate.generatePro;
     if (userPlan === "standard") return ui.generate.generateStandard;
@@ -1459,8 +1503,8 @@ export default function Home({ language, ui, t = (value) => value }) {
   }
 
   async function handleUpgrade() {
-    if (userPlan === "pro") {
-      alert(ui.common.alreadyPro);
+    if (generationPlan === "pro") {
+      setShowAlreadyProDialog(true);
       return;
     }
 
@@ -1545,14 +1589,14 @@ export default function Home({ language, ui, t = (value) => value }) {
       return;
     }
 
-    if (userPlan === "free" && remainingCredits <= 0) {
+    if (generationPlan === "free" && remainingCredits <= 0) {
       window.location.href = "/pricing?reason=credits-used";
       return;
     }
 
     let generationRequestId = null;
 
-    if (userPlan === "free") {
+    if (generationPlan === "free") {
       if (!generationRequestIdRef.current) {
         generationRequestIdRef.current =
           globalThis.crypto.randomUUID();
@@ -1587,6 +1631,8 @@ export default function Home({ language, ui, t = (value) => value }) {
           era,
           reelPurpose,
           userReelVision,
+          meaning,
+          desiredImpact,
           generationRequestId,
         }),
             });
@@ -1640,10 +1686,10 @@ export default function Home({ language, ui, t = (value) => value }) {
           preservationStatus !== "uncertain";
 
         const preservationMessage = isEvaluationFailure
-          ? "FrameLab couldn't safely verify this result, so it wasn't returned. You can choose whether to generate again."
+          ? "Premivate couldn't safely verify this result, so it wasn't returned. You can choose whether to generate again."
           : hasObservedRegularNonPass
-          ? "This result didn't receive a preservation pass, so FrameLab didn't return it. You can choose whether to generate again."
-          : "Generation couldn't be completed, and FrameLab didn't return this result. You can choose whether to generate again.";
+          ? "This result didn't receive a preservation pass, so Premivate didn't return it. You can choose whether to generate again."
+          : "Generation couldn't be completed, and Premivate didn't return this result. You can choose whether to generate again.";
 
         console.error("Generate preservation check blocked output:", {
           status: response.status,
@@ -1720,6 +1766,7 @@ export default function Home({ language, ui, t = (value) => value }) {
         prompt: data.aiVideoPrompt || "",
 
         caption:
+          data.captions?.mainCaption ||
           data.captions?.caption ||
           data.captions?.instagramCaption ||
           "",
@@ -1788,7 +1835,7 @@ Stage 3: ${data.narrativeArc.stage3 || ""}`
       setResult(newResult);
       generationRequestIdRef.current = null;
 
-      if (userPlan === "free") {
+      if (generationPlan === "free") {
         try {
           const creditsRes = await fetch(
             `/api/credits?ts=${Date.now()}`,
@@ -1897,7 +1944,7 @@ Stage 3: ${data.narrativeArc.stage3 || ""}`
     const exportEra = generatedProject.era ?? era;
     const exportReelPurpose = generatedProject.reelPurpose ?? reelPurpose;
 
-    return `FRAMELAB CREATIVE PACKAGE
+    return `PREMIVATE CREATIVE PACKAGE
 
 ══════════════════════
 PROJECT
@@ -1999,7 +2046,7 @@ THUMBNAIL CONCEPT
 ${result?.thumbnailPrompt || ""}
 
 ══════════════════════
-GENERATED BY FRAMELAB
+GENERATED BY PREMIVATE
 ══════════════════════`;
   }
 
@@ -2018,7 +2065,7 @@ GENERATED BY FRAMELAB
       "linear-gradient(180deg, rgba(18,18,16,0.96) 0%, rgba(10,11,13,0.98) 100%)",
     border: "1px solid rgba(255,255,255,0.08)",
     boxShadow:
-      "0 30px 120px rgba(0,0,0,0.55), 0 0 70px rgba(216,181,106,0.08)",
+      "0 30px 120px rgba(0,0,0,0.55), 0 0 70px rgba(var(--premivate-gold-rgb),0.08)",
   };
 
   return (
@@ -2092,6 +2139,7 @@ GENERATED BY FRAMELAB
           }}
         >
           <div
+            className="generate-hero-copy"
             style={{
               width: "100%",
               padding: "0 72px",
@@ -2100,7 +2148,7 @@ GENERATED BY FRAMELAB
           >
             <p
               style={{
-                color: "#D8B56A",
+                color: "var(--premivate-gold-muted)",
                 fontSize: "13px",
                 fontWeight: "800",
                 letterSpacing: "0.28em",
@@ -2145,6 +2193,7 @@ GENERATED BY FRAMELAB
           </div>
 
           <div
+            className="generate-briefing-shell"
             style={{
               width: "calc(100% - 72px)",
               maxWidth: "1180px",
@@ -2154,7 +2203,7 @@ GENERATED BY FRAMELAB
               borderRadius: "32px",
               background:
                 "linear-gradient(180deg, rgba(22,23,25,0.94), rgba(10,11,13,0.98))",
-              border: "1px solid rgba(216,181,106,0.18)",
+              border: "1px solid rgba(var(--premivate-gold-rgb),0.18)",
               boxShadow:
                 "0 30px 110px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.04)",
             }}
@@ -2174,14 +2223,14 @@ GENERATED BY FRAMELAB
                   borderRadius: "22px",
                   background:
                     "linear-gradient(180deg, rgba(10,11,13,0.98), rgba(6,7,9,0.99))",
-                  border: "1px solid rgba(216,181,106,0.18)",
+                  border: "1px solid rgba(var(--premivate-gold-rgb),0.18)",
                   boxShadow:
                     "0 32px 90px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.035)",
                 }}
               >
                 <div
                   style={{
-                    color: "#E7CC91",
+                    color: "var(--premivate-gold-muted)",
                     fontSize: "10px",
                     fontWeight: "900",
                     letterSpacing: "0.2em",
@@ -2282,7 +2331,7 @@ GENERATED BY FRAMELAB
                           borderRadius: "16px",
                           background:
                             "linear-gradient(180deg, rgba(24,25,27,0.96), rgba(16,17,19,0.98))",
-                          border: "1px solid rgba(216,181,106,0.12)",
+                          border: "1px solid rgba(var(--premivate-gold-rgb),0.12)",
                           boxShadow:
                             "0 18px 48px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.035)",
                           position: "relative",
@@ -2328,7 +2377,7 @@ GENERATED BY FRAMELAB
                               position: "absolute",
                               inset: 0,
                               background:
-                                "linear-gradient(110deg, rgba(216,181,106,0.10), transparent 38%, rgba(0,0,0,0.12) 78%)",
+                                "linear-gradient(110deg, rgba(var(--premivate-gold-rgb),0.10), transparent 38%, rgba(0,0,0,0.12) 78%)",
                               mixBlendMode: "screen",
                               opacity: 0.42,
                             }}
@@ -2354,14 +2403,14 @@ GENERATED BY FRAMELAB
                                 width: "7px",
                                 height: "7px",
                                 borderRadius: "999px",
-                                background: "#D8B56A",
-                                boxShadow: "0 0 14px rgba(216,181,106,0.55)",
+                                background: "var(--premivate-gold-muted)",
+                                boxShadow: "0 0 14px rgba(var(--premivate-gold-rgb),0.55)",
                                 flexShrink: 0,
                               }}
                             />
                             <span
                               style={{
-                                color: "#E7CC91",
+                                color: "var(--premivate-gold-muted)",
                                 fontSize: "9px",
                                 fontWeight: "950",
                                 letterSpacing: "0.14em",
@@ -2410,7 +2459,7 @@ GENERATED BY FRAMELAB
                             padding: "11px 12px 11px 14px",
                             borderRadius: "6px",
                             background: "rgba(0,0,0,0.18)",
-                            borderLeft: "2px solid rgba(216,181,106,0.28)",
+                            borderLeft: "2px solid rgba(var(--premivate-gold-rgb),0.28)",
                             color: "rgba(255,255,255,0.76)",
                             fontSize: "10px",
                             lineHeight: "1.55",
@@ -2429,7 +2478,7 @@ GENERATED BY FRAMELAB
                             padding: "11px 12px 11px 14px",
                             borderRadius: "6px",
                             background: "rgba(0,0,0,0.18)",
-                            borderLeft: "2px solid rgba(216,181,106,0.28)",
+                            borderLeft: "2px solid rgba(var(--premivate-gold-rgb),0.28)",
                             color: "rgba(255,255,255,0.76)",
                             fontSize: "10px",
                             lineHeight: "1.55",
@@ -2448,7 +2497,7 @@ GENERATED BY FRAMELAB
                             padding: "11px 12px 11px 14px",
                             borderRadius: "6px",
                             background: "rgba(0,0,0,0.18)",
-                            borderLeft: "2px solid rgba(216,181,106,0.28)",
+                            borderLeft: "2px solid rgba(var(--premivate-gold-rgb),0.28)",
                             color: "rgba(255,255,255,0.76)",
                             fontSize: "10px",
                             lineHeight: "1.55",
@@ -2467,7 +2516,7 @@ GENERATED BY FRAMELAB
                             padding: "11px 12px 11px 14px",
                             borderRadius: "6px",
                             background: "rgba(0,0,0,0.18)",
-                            borderLeft: "2px solid rgba(216,181,106,0.28)",
+                            borderLeft: "2px solid rgba(var(--premivate-gold-rgb),0.28)",
                             color: "rgba(255,255,255,0.76)",
                             fontSize: "10px",
                             lineHeight: "1.55",
@@ -2486,7 +2535,7 @@ GENERATED BY FRAMELAB
                             padding: "11px 12px 11px 14px",
                             borderRadius: "6px",
                             background: "rgba(0,0,0,0.18)",
-                            borderLeft: "2px solid rgba(216,181,106,0.28)",
+                            borderLeft: "2px solid rgba(var(--premivate-gold-rgb),0.28)",
                             color: "rgba(255,255,255,0.76)",
                             fontSize: "10px",
                             lineHeight: "1.55",
@@ -2505,7 +2554,7 @@ GENERATED BY FRAMELAB
                             padding: "11px 12px 11px 14px",
                             borderRadius: "6px",
                             background: "rgba(0,0,0,0.18)",
-                            borderLeft: "2px solid rgba(216,181,106,0.28)",
+                            borderLeft: "2px solid rgba(var(--premivate-gold-rgb),0.28)",
                             color: "rgba(255,255,255,0.76)",
                             fontSize: "10px",
                             lineHeight: "1.55",
@@ -2530,7 +2579,7 @@ GENERATED BY FRAMELAB
                   height: "1px",
                   margin: "10px 0 8px",
                   background:
-                    "linear-gradient(90deg, transparent, rgba(216,181,106,0.20) 18%, rgba(216,181,106,0.20) 82%, transparent)",
+                    "linear-gradient(90deg, transparent, rgba(var(--premivate-gold-rgb),0.20) 18%, rgba(var(--premivate-gold-rgb),0.20) 82%, transparent)",
                 }}
               />
 
@@ -2558,7 +2607,7 @@ GENERATED BY FRAMELAB
                 style={{
                   paddingTop: "18px",
                   marginTop: "6px",
-                  borderTop: "1px solid rgba(216,181,106,0.10)",
+                  borderTop: "1px solid rgba(var(--premivate-gold-rgb),0.10)",
                 }}
               >
                 <FieldLabel>{ui.generate.genre}</FieldLabel>
@@ -2577,7 +2626,7 @@ GENERATED BY FRAMELAB
                 style={{
                   paddingTop: "18px",
                   marginTop: "6px",
-                  borderTop: "1px solid rgba(216,181,106,0.10)",
+                  borderTop: "1px solid rgba(var(--premivate-gold-rgb),0.10)",
                 }}
               >
                 <FieldLabel>{ui.generate.bpm}</FieldLabel>
@@ -2617,7 +2666,7 @@ GENERATED BY FRAMELAB
                 style={{
                   paddingTop: "18px",
                   marginTop: "6px",
-                  borderTop: "1px solid rgba(216,181,106,0.10)",
+                  borderTop: "1px solid rgba(var(--premivate-gold-rgb),0.10)",
                 }}
               >
                 <FieldLabel>{ui.generate.directorMode}</FieldLabel>
@@ -2638,7 +2687,7 @@ GENERATED BY FRAMELAB
                 style={{
                   paddingTop: "18px",
                   marginTop: "6px",
-                  borderTop: "1px solid rgba(216,181,106,0.10)",
+                  borderTop: "1px solid rgba(var(--premivate-gold-rgb),0.10)",
                 }}
               >
                 <FieldLabel>{ui.generate.cinematicDNA}</FieldLabel>
@@ -2657,7 +2706,7 @@ GENERATED BY FRAMELAB
                 style={{
                   paddingTop: "18px",
                   marginTop: "6px",
-                  borderTop: "1px solid rgba(216,181,106,0.10)",
+                  borderTop: "1px solid rgba(var(--premivate-gold-rgb),0.10)",
                 }}
               >
                 <FieldLabel>{ui.generate.era}</FieldLabel>
@@ -2676,7 +2725,7 @@ GENERATED BY FRAMELAB
                 style={{
                   paddingTop: "18px",
                   marginTop: "6px",
-                  borderTop: "1px solid rgba(216,181,106,0.10)",
+                  borderTop: "1px solid rgba(var(--premivate-gold-rgb),0.10)",
                 }}
               >
                 <FieldLabel>{ui.generate.reelPurpose}</FieldLabel>
@@ -2691,31 +2740,126 @@ GENERATED BY FRAMELAB
                 </select>
               </div>
 
-              <div>
-                <FieldLabel>{ui.generate.reelVisionOptional}</FieldLabel>
-                <textarea
-                  value={userReelVision}
-                  onChange={(e) => setUserReelVision(e.target.value)}
-                  maxLength={600}
-                  rows={4}
-                  placeholder="1–3 sentences: describe the scene, moment, relationship, action, or feeling you want FrameLab to professionally direct."
+              <div
+                style={{
+                  gridColumn: "1 / -1",
+                  minWidth: 0,
+                  padding: "clamp(20px, 2.6vw, 34px)",
+                  borderRadius: "30px",
+                  background:
+                    "linear-gradient(140deg, rgba(25,24,22,0.97), rgba(13,14,15,0.985) 64%, rgba(9,10,12,0.99))",
+                  border: "1px solid rgba(var(--premivate-gold-rgb),0.18)",
+                  boxShadow:
+                    "0 22px 76px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.055)",
+                }}
+              >
+                <div style={{ marginBottom: "22px" }}>
+                  <FieldLabel>{ui.generate.intentTitle}</FieldLabel>
+                </div>
+
+                <div
                   style={{
-                    ...selectStyle,
-                    minHeight: "112px",
-                    resize: "vertical",
-                    lineHeight: "1.5",
+                    padding: "clamp(18px, 2.2vw, 30px)",
+                    borderRadius: "24px",
+                    background:
+                      "radial-gradient(ellipse at top left, rgba(var(--premivate-gold-rgb),0.10), rgba(255,255,255,0.025) 54%, rgba(7,8,10,0.24))",
+                    border: "1px solid rgba(var(--premivate-gold-rgb),0.17)",
+                    boxShadow:
+                      "inset 0 1px 0 rgba(255,255,255,0.055)",
                   }}
-                />
+                >
+                  <div style={{ marginBottom: "14px" }}>
+                    <FieldLabel>{ui.generate.intentVisionTitle}</FieldLabel>
+                  </div>
+
+                  <textarea
+                    value={userReelVision}
+                    onChange={(e) => setUserReelVision(e.target.value)}
+                    maxLength={600}
+                    rows={4}
+                    placeholder={ui.generate.intentVisionPlaceholder}
+                    style={{
+                      ...selectStyle,
+                      minHeight: "176px",
+                      resize: "vertical",
+                      lineHeight: "1.65",
+                    }}
+                  />
+                </div>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns:
+                      "repeat(auto-fit, minmax(min(100%, 280px), 1fr))",
+                    gap: "24px",
+                    marginTop: "26px",
+                    alignItems: "start",
+                  }}
+                >
+                  <div
+                    style={{
+                      minWidth: 0,
+                      paddingTop: "18px",
+                      borderTop:
+                        "1px solid rgba(var(--premivate-gold-rgb),0.22)",
+                    }}
+                  >
+                    <div style={{ marginBottom: "12px" }}>
+                      <FieldLabel>{ui.generate.intentMeaningTitle}</FieldLabel>
+                    </div>
+
+                    <textarea
+                      value={meaning}
+                      onChange={(e) => setMeaning(e.target.value)}
+                      maxLength={400}
+                      rows={3}
+                      placeholder={ui.generate.intentMeaningPlaceholder}
+                      style={{
+                        ...selectStyle,
+                        minHeight: "90px",
+                        resize: "vertical",
+                        lineHeight: "1.5",
+                      }}
+                    />
+                  </div>
+
+                  <div
+                    style={{
+                      minWidth: 0,
+                      paddingTop: "18px",
+                      borderTop:
+                        "1px solid rgba(var(--premivate-gold-rgb),0.22)",
+                    }}
+                  >
+                    <div style={{ marginBottom: "12px" }}>
+                      <FieldLabel>{ui.generate.intentImpactTitle}</FieldLabel>
+                    </div>
+
+                    <textarea
+                      value={desiredImpact}
+                      onChange={(e) => setDesiredImpact(e.target.value)}
+                      maxLength={400}
+                      rows={3}
+                      placeholder={ui.generate.intentImpactPlaceholder}
+                      style={{
+                        ...selectStyle,
+                        minHeight: "90px",
+                        resize: "vertical",
+                        lineHeight: "1.5",
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
-              
               <div
                 style={{
                   gridColumn: "1 / -1",
                   padding: "24px",
                   borderRadius: "26px",
                   background:
-                    "radial-gradient(circle at top left, rgba(216,181,106,0.10), rgba(255,255,255,0.035) 62%)",
-                  border: "1px solid rgba(216,181,106,0.14)",
+                    "radial-gradient(circle at top left, rgba(var(--premivate-gold-rgb),0.10), rgba(255,255,255,0.035) 62%)",
+                  border: "1px solid rgba(var(--premivate-gold-rgb),0.14)",
                   boxShadow: "0 18px 60px rgba(0,0,0,0.22)",
                 }}
               >
@@ -2754,7 +2898,7 @@ GENERATED BY FRAMELAB
                           fontWeight: "900",
                           fontSize: "18px",
                           boxShadow:
-                            "0 0 0 1px rgba(216,181,106,0.24), 0 12px 32px rgba(0,0,0,0.28)",
+                            "0 0 0 1px rgba(var(--premivate-gold-rgb),0.24), 0 12px 32px rgba(0,0,0,0.28)",
                         }}
                       >
                         {selectedDirector?.avatar || "◆"}
@@ -2807,7 +2951,7 @@ GENERATED BY FRAMELAB
                     >
                       <div
                         style={{
-                          color: "#E7CC91",
+                          color: "var(--premivate-gold-muted)",
                           fontSize: "10px",
                           fontWeight: "900",
                           letterSpacing: "0.14em",
@@ -2833,9 +2977,9 @@ GENERATED BY FRAMELAB
                               style={{
                                 padding: "7px 10px",
                                 borderRadius: "999px",
-                                background: "rgba(216,181,106,0.10)",
-                                border: "1px solid rgba(216,181,106,0.14)",
-                                color: "#E7CC91",
+                                background: "rgba(var(--premivate-gold-rgb),0.10)",
+                                border: "1px solid rgba(var(--premivate-gold-rgb),0.14)",
+                                color: "var(--premivate-gold-muted)",
                                 fontSize: "11px",
                                 fontWeight: "800",
                               }}
@@ -2857,7 +3001,7 @@ GENERATED BY FRAMELAB
                     >
                       <div
                         style={{
-                          color: "#E7CC91",
+                          color: "var(--premivate-gold-muted)",
                           fontSize: "10px",
                           fontWeight: "900",
                           letterSpacing: "0.14em",
@@ -2890,8 +3034,8 @@ GENERATED BY FRAMELAB
                   padding: "22px",
                   borderRadius: "24px",
                   background:
-                    "radial-gradient(circle at top left, rgba(216,181,106,0.10), rgba(255,255,255,0.025) 65%)",
-                  border: "1px solid rgba(216,181,106,0.14)",
+                    "radial-gradient(circle at top left, rgba(var(--premivate-gold-rgb),0.10), rgba(255,255,255,0.025) 65%)",
+                  border: "1px solid rgba(var(--premivate-gold-rgb),0.14)",
                 }}
               >
                 <div
@@ -2905,7 +3049,7 @@ GENERATED BY FRAMELAB
                   <div>
                     <div
                       style={{
-                        color: "#E7CC91",
+                        color: "var(--premivate-gold-muted)",
                         fontSize: "11px",
                         fontWeight: "900",
                         letterSpacing: "0.14em",
@@ -2933,7 +3077,7 @@ GENERATED BY FRAMELAB
                       <div style={{ marginTop: "16px" }}>
                         <div
                           style={{
-                            color: "#E7CC91",
+                            color: "var(--premivate-gold-muted)",
                             fontSize: "11px",
                             fontWeight: "900",
                             letterSpacing: "0.14em",
@@ -2975,7 +3119,7 @@ GENERATED BY FRAMELAB
                   <div>
                     <div
                       style={{
-                        color: "#E7CC91",
+                        color: "var(--premivate-gold-muted)",
                         fontSize: "11px",
                         fontWeight: "900",
                         letterSpacing: "0.14em",
@@ -3026,7 +3170,7 @@ GENERATED BY FRAMELAB
                       >
                         <div
                           style={{
-                            color: "#E7CC91",
+                            color: "var(--premivate-gold-muted)",
                             fontSize: "11px",
                             fontWeight: "900",
                             letterSpacing: "0.14em",
@@ -3069,7 +3213,7 @@ GENERATED BY FRAMELAB
                 background:
                   loading || !mounted
                     ? "rgba(255,255,255,0.12)"
-                    : "linear-gradient(90deg, #B88A3B, #E7CC91)",
+                    : "linear-gradient(90deg, var(--premivate-gold-primary), var(--premivate-gold-highlight))",
                 color: loading || !mounted ? "white" : "#17130C",
                 fontWeight: "950",
                 fontSize: "16px",
@@ -3077,13 +3221,13 @@ GENERATED BY FRAMELAB
                 boxShadow:
                   loading || !mounted
                     ? "none"
-                    : "0 18px 60px rgba(216,181,106,0.30)",
+                    : "0 18px 60px rgba(var(--premivate-gold-rgb),0.30)",
               }}
             >
               {getButtonText()}
             </button>
             
-            {isSignedIn && userPlan === "free" && (
+            {isSignedIn && planStatusLoaded && userPlan === "free" && (
               <p
                 style={{
                   marginTop: "12px",
@@ -3096,14 +3240,16 @@ GENERATED BY FRAMELAB
               </p>
             )}
 
-            {isSignedIn && userPlan !== "pro" && (
+            {isSignedIn &&
+              planStatusLoaded &&
+              (userPlan === "free" || userPlan === "standard") && (
               <div style={{ textAlign: "center", marginTop: "14px" }}>
                 <button
                   onClick={handleUpgrade}
                   style={{
                     border: "none",
                     background: "transparent",
-                    color: "#E7CC91",
+                    color: "var(--premivate-gold-muted)",
                     textDecoration: "underline",
                     cursor: "pointer",
                     fontSize: "13px",
@@ -3115,7 +3261,7 @@ GENERATED BY FRAMELAB
               </div>
             )}
 
-            {userPlan === "pro" && (
+            {isSignedIn && planStatusLoaded && userPlan === "pro" && (
               <div style={{ textAlign: "center", marginTop: "14px" }}>
                 <button
                   type="button"
@@ -3124,7 +3270,7 @@ GENERATED BY FRAMELAB
                     border: "none",
                     padding: 0,
                     background: "transparent",
-                    color: "#E7CC91",
+                    color: "var(--premivate-gold-muted)",
                     textDecoration: "underline",
                     cursor: "pointer",
                     font: "inherit",
@@ -3162,7 +3308,7 @@ GENERATED BY FRAMELAB
                     "linear-gradient(180deg, rgba(18,18,16,0.96) 0%, rgba(10,11,13,0.98) 100%)",
                   border: "1px solid rgba(255,255,255,0.08)",
                   boxShadow:
-                    "0 30px 120px rgba(0,0,0,0.55), 0 0 70px rgba(216,181,106,0.10)",
+                    "0 30px 120px rgba(0,0,0,0.55), 0 0 70px rgba(var(--premivate-gold-rgb),0.10)",
                   textAlign: "center",
                 }}
               >
@@ -3173,7 +3319,7 @@ GENERATED BY FRAMELAB
                     margin: "0 auto 24px",
                     borderRadius: "999px",
                     border: "3px solid rgba(255,255,255,0.08)",
-                    borderTop: "3px solid #D8B56A",
+                    borderTop: "3px solid var(--premivate-gold-muted)",
                     animation: "spin 1s linear infinite",
                   }}
                 />
@@ -3196,7 +3342,7 @@ GENERATED BY FRAMELAB
                     fontSize: "15px",
                   }}
                 >
-                  FrameLab AI is generating cinematic concepts, visual
+                  Premivate AI is generating cinematic concepts, visual
                   direction and viral-ready reel assets.
                 </p>
               </div>
@@ -3214,7 +3360,7 @@ GENERATED BY FRAMELAB
                     borderRadius: "28px",
                     marginBottom: "30px",
                     objectFit: "cover",
-                    boxShadow: "0 0 36px rgba(216,181,106,0.14)",
+                    boxShadow: "0 0 36px rgba(var(--premivate-gold-rgb),0.14)",
                   }}
                 />
               )}
@@ -3250,7 +3396,7 @@ GENERATED BY FRAMELAB
                   padding: "32px",
                   borderRadius: "28px",
                   background:
-                    "radial-gradient(circle at top, rgba(216,181,106,0.07), rgba(10,11,13,0.96) 70%)",
+                    "radial-gradient(circle at top, rgba(var(--premivate-gold-rgb),0.07), rgba(10,11,13,0.96) 70%)",
                   border: "1px solid rgba(255,255,255,0.10)",
                   boxShadow: "0 20px 70px rgba(0,0,0,0.28)",
                   textAlign: "center",
@@ -3258,7 +3404,7 @@ GENERATED BY FRAMELAB
               >
                 <div
                   style={{
-                    color: "#E7CC91",
+                    color: "var(--premivate-gold-muted)",
                     fontSize: "12px",
                     fontWeight: "800",
                     letterSpacing: "0.14em",
@@ -3283,10 +3429,10 @@ GENERATED BY FRAMELAB
                     maxWidth: "420px",
                     height: "46px",
                     background:
-                      "linear-gradient(90deg, #B88A3B 0%, #D8B56A 50%, #E7CC91 100%)",
+                      "linear-gradient(90deg, var(--premivate-gold-primary) 0%, var(--premivate-gold-muted) 50%, var(--premivate-gold-highlight) 100%)",
                     color: "#17130C",
                     boxShadow:
-                      "0 0 30px rgba(216,181,106,0.24), 0 10px 35px rgba(0,0,0,0.35)",
+                      "0 0 30px rgba(var(--premivate-gold-rgb),0.24), 0 10px 35px rgba(0,0,0,0.35)",
                   }}
                   onClick={() => setShowExportModal(true)}
                 >
@@ -3352,7 +3498,7 @@ COMPOSITION PRIORITY: ${result.formatIntent.compositionPriority || ""}`}
                       marginTop: "38px",
                       paddingTop: "28px",
                       background:
-                        "linear-gradient(180deg, rgba(216,181,106,0.045) 0%, rgba(216,181,106,0.012) 42%, rgba(216,181,106,0) 100%)",
+                        "linear-gradient(180deg, rgba(var(--premivate-gold-rgb),0.045) 0%, rgba(var(--premivate-gold-rgb),0.012) 42%, rgba(var(--premivate-gold-rgb),0) 100%)",
                     }}
                   >
                     <div
@@ -3364,8 +3510,8 @@ COMPOSITION PRIORITY: ${result.formatIntent.compositionPriority || ""}`}
                         width: "100%",
                         height: "1px",
                         background:
-                          "linear-gradient(90deg, rgba(216,181,106,0) 0%, rgba(216,181,106,0.58) 18%, rgba(216,181,106,0.22) 72%, rgba(216,181,106,0) 100%)",
-                        boxShadow: "0 0 24px rgba(216,181,106,0.14)",
+                          "linear-gradient(90deg, rgba(var(--premivate-gold-rgb),0) 0%, rgba(var(--premivate-gold-rgb),0.58) 18%, rgba(var(--premivate-gold-rgb),0.22) 72%, rgba(var(--premivate-gold-rgb),0) 100%)",
+                        boxShadow: "0 0 24px rgba(var(--premivate-gold-rgb),0.14)",
                       }}
                     />
                     <ResultSectionHeader
@@ -3459,7 +3605,7 @@ ${result.viralHook}`}
                 >
                   <div
                     style={{
-                      color: "#E7CC91",
+                      color: "var(--premivate-gold-muted)",
                       fontSize: "11px",
                       fontWeight: "900",
                       letterSpacing: "0.16em",
@@ -3507,8 +3653,8 @@ ${result.viralHook}`}
                         height: "100%",
                         borderRadius: "999px",
                         background:
-                          "linear-gradient(90deg, #B88A3B, #D8B56A, #E7CC91)",
-                        boxShadow: "0 0 22px rgba(216,181,106,0.20)",
+                          "linear-gradient(90deg, var(--premivate-gold-primary), var(--premivate-gold-muted), var(--premivate-gold-highlight))",
+                        boxShadow: "0 0 22px rgba(var(--premivate-gold-rgb),0.20)",
                       }}
                     />
                   </div>
@@ -3527,7 +3673,7 @@ ${result.viralHook}`}
                 >
                   <div
                     style={{
-                      color: "#E7CC91",
+                      color: "var(--premivate-gold-muted)",
                       fontSize: "11px",
                       fontWeight: "900",
                       letterSpacing: "0.16em",
@@ -3689,7 +3835,7 @@ ${result.viralHook}`}
                       >
                         <div
                           style={{
-                            color: "#D8B56A",
+                            color: "var(--premivate-gold-muted)",
                             fontSize: "11px",
                             letterSpacing: "1px",
                             fontWeight: 800,
@@ -3805,7 +3951,7 @@ ${result.viralHook}`}
                     style={{
                       background:
                         "linear-gradient(180deg, rgba(20,21,23,0.96) 0%, rgba(10,11,13,0.98) 100%)",
-                      border: "1px solid rgba(216,181,106,0.14)",
+                      border: "1px solid rgba(var(--premivate-gold-rgb),0.14)",
                       borderRadius: "28px",
                       padding: "24px",
                       marginBottom: "24px",
@@ -3814,10 +3960,10 @@ ${result.viralHook}`}
                       position: "relative",
                       overflow: "hidden",
                       boxShadow:
-                        "0 30px 90px rgba(0,0,0,0.45), 0 0 80px rgba(216,181,106,0.08), inset 0 1px 0 rgba(255,255,255,0.04)",
+                        "0 30px 90px rgba(0,0,0,0.45), 0 0 80px rgba(var(--premivate-gold-rgb),0.08), inset 0 1px 0 rgba(255,255,255,0.04)",
                     }}
                   >
-                    <p style={{ color: "#E7CC91", fontWeight: "bold" }}>
+                    <p style={{ color: "var(--premivate-gold-muted)", fontWeight: "bold" }}>
                       {item.artist} — {item.track}
                     </p>
 
@@ -3827,7 +3973,7 @@ ${result.viralHook}`}
 
                     <p
                       style={{
-                        color: "#D8B56A",
+                        color: "var(--premivate-gold-muted)",
                         marginTop: "8px",
                         fontSize: "12px",
                         fontWeight: "600",
@@ -3862,8 +4008,8 @@ ${result.viralHook}`}
                         style={{
                           padding: "6px 10px",
                           borderRadius: "999px",
-                          background: "rgba(216,181,106,0.12)",
-                          color: "#E7CC91",
+                          background: "rgba(var(--premivate-gold-rgb),0.12)",
+                          color: "var(--premivate-gold-muted)",
                           fontSize: "11px",
                           fontWeight: "700",
                         }}
@@ -3966,7 +4112,7 @@ ${result.viralHook}`}
                   "linear-gradient(180deg, rgba(20,21,23,0.98), rgba(9,10,12,0.98))",
                 borderRadius: "24px",
                 padding: "24px",
-                border: "1px solid rgba(216,181,106,0.18)",
+                border: "1px solid rgba(var(--premivate-gold-rgb),0.18)",
                 position: "relative",
                 boxShadow: "0 30px 120px rgba(0,0,0,0.55)",
               }}
@@ -4070,6 +4216,102 @@ ${result.viralHook}`}
                 </button>
                             </div>
           </div>
+        )}
+
+        {isSignedIn && planStatusLoaded && userPlan === "pro" && showAlreadyProDialog && (
+          <dialog
+            ref={alreadyProDialogRef}
+            aria-labelledby="already-pro-dialog-title"
+            onCancel={(event) => {
+              event.preventDefault();
+              setShowAlreadyProDialog(false);
+            }}
+            onClick={(event) => {
+              if (event.target !== event.currentTarget) {
+                return;
+              }
+
+              const bounds = event.currentTarget.getBoundingClientRect();
+
+              if (
+                event.clientX < bounds.left ||
+                event.clientX > bounds.right ||
+                event.clientY < bounds.top ||
+                event.clientY > bounds.bottom
+              ) {
+                setShowAlreadyProDialog(false);
+              }
+            }}
+            style={{
+              width: "420px",
+              maxWidth: "calc(100% - 44px)",
+              boxSizing: "border-box",
+              margin: "auto",
+              padding: "28px 24px",
+              background:
+                "linear-gradient(180deg, rgba(20,21,23,0.98), rgba(9,10,12,0.98))",
+              border: "1px solid rgba(var(--premivate-gold-rgb),0.18)",
+              borderRadius: "24px",
+              boxShadow: "0 30px 120px rgba(0,0,0,0.55)",
+              color: "white",
+              textAlign: "center",
+              position: "fixed",
+            }}
+          >
+            <style>{`
+              dialog[aria-labelledby="already-pro-dialog-title"]::backdrop {
+                background: rgba(0, 0, 0, 0.75);
+              }
+            `}</style>
+
+            <button
+              type="button"
+              autoFocus
+              aria-label={t("Close")}
+              onClick={() => setShowAlreadyProDialog(false)}
+              style={{
+                position: "absolute",
+                top: "14px",
+                right: "14px",
+                width: "32px",
+                height: "32px",
+                borderRadius: "999px",
+                border: "1px solid rgba(255,255,255,0.12)",
+                background: "rgba(255,255,255,0.06)",
+                color: "white",
+                cursor: "pointer",
+                fontWeight: "900",
+              }}
+            >
+              ×
+            </button>
+
+            <div
+              style={{
+                color: "var(--premivate-gold-muted)",
+                fontSize: "12px",
+                fontWeight: "700",
+                letterSpacing: "0.12em",
+                marginBottom: "14px",
+              }}
+            >
+              PRO
+            </div>
+
+            <p
+              id="already-pro-dialog-title"
+              style={{
+                color: "white",
+                fontSize: "17px",
+                fontWeight: "600",
+                lineHeight: "1.6",
+                margin: "0",
+                padding: "0 18px",
+              }}
+            >
+              {ui.common.alreadyPro}
+            </p>
+          </dialog>
         )}
       </main>
     </div>

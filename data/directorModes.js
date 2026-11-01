@@ -3,7 +3,7 @@ export const directorModes = [
     name: "Neo Noir Sci-Fi",
     premium: true,
     category: "Atmospheric Sci-Fi",
-    creator: "FrameLab Originals",
+    creator: "Premivate Originals",
     version: "2.0",
     thumbnail: "/directors/blade-runner.jpg",
     prompt:
@@ -83,7 +83,7 @@ export const directorModes = [
     name: "Indie Realism",
     premium: false,
     category: "Emotional Realism",
-    creator: "FrameLab Originals",
+    creator: "Premivate Originals",
     version: "2.0",
     thumbnail: "/directors/a24.jpg",
     prompt:
@@ -163,7 +163,7 @@ export const directorModes = [
     name: "Cyberpunk Motion",
     premium: false,
     category: "Kinetic Futurism",
-    creator: "FrameLab Originals",
+    creator: "Premivate Originals",
     version: "2.0",
     thumbnail: "/directors/neo-tokyo.jpg",
     prompt:
@@ -244,7 +244,7 @@ export const directorModes = [
     name: "Luxury Sci-Fi",
     premium: true,
     category: "Premium Futurism",
-    creator: "FrameLab Originals",
+    creator: "Premivate Originals",
     version: "2.0",
     thumbnail: "/directors/chrome-dreams.jpg",
     prompt:
@@ -325,7 +325,7 @@ export const directorModes = [
     name: "Symmetry Cinema",
     premium: true,
     category: "Geometric Visual Design",
-    creator: "FrameLab Originals",
+    creator: "Premivate Originals",
     version: "2.0",
     thumbnail: "/directors/sacred-geometry.jpg",
     prompt:
@@ -405,7 +405,7 @@ export const directorModes = [
     name: "Spatial Architecture",
     premium: true,
     category: "Spatial Cinema",
-    creator: "FrameLab Originals",
+    creator: "Premivate Originals",
     version: "2.0",
     thumbnail: "/directors/architect.jpg",
     prompt:
@@ -486,7 +486,7 @@ export const directorModes = [
     name: "Monumental Minimalism",
     premium: true,
     category: "Epic Minimalism",
-    creator: "FrameLab Originals",
+    creator: "Premivate Originals",
     version: "2.0",
     thumbnail: "/directors/desert-monument.jpg",
     prompt:
@@ -566,7 +566,7 @@ export const directorModes = [
     name: "Submerged Noir",
     premium: true,
     category: "Submerged Cinema",
-    creator: "FrameLab Originals",
+    creator: "Premivate Originals",
     version: "2.0",
     thumbnail: "/directors/ocean-noir.jpg",
     prompt:
@@ -646,7 +646,7 @@ export const directorModes = [
     name: "Editorial Fashion Film",
     premium: true,
     category: "Luxury Editorial",
-    creator: "FrameLab Originals",
+    creator: "Premivate Originals",
     version: "2.0",
     thumbnail: "/directors/editorial-fashion.jpg",
     prompt:
@@ -726,7 +726,7 @@ export const directorModes = [
     name: "Analog Memory",
     premium: true,
     category: "Distorted Archive",
-    creator: "FrameLab Originals",
+    creator: "Premivate Originals",
     version: "2.0",
     thumbnail: "/directors/analog-horror.jpg",
     prompt:
@@ -806,7 +806,7 @@ export const directorModes = [
     name: "Surreal Dream Cinema",
     premium: true,
     category: "Surreal Cinema",
-    creator: "FrameLab Originals",
+    creator: "Premivate Originals",
     version: "2.0",
     thumbnail: "/directors/dream-logic.jpg",
     prompt:
@@ -886,7 +886,7 @@ export const directorModes = [
     name: "Poetic Documentary",
     premium: false,
     category: "Poetic Observation",
-    creator: "FrameLab Originals",
+    creator: "Premivate Originals",
     version: "2.0",
     thumbnail: "/directors/documentary-dreamer.jpg",
     prompt:
@@ -967,7 +967,7 @@ export const directorModes = [
     name: "Minimal Ritual Cinema",
     premium: true,
     category: "Controlled Ceremony",
-    creator: "FrameLab Originals",
+    creator: "Premivate Originals",
     version: "2.0",
     thumbnail: "/directors/minimal-ritual.jpg",
     prompt:
@@ -1047,7 +1047,7 @@ export const directorModes = [
     name: "Gloss Music Video",
     premium: false,
     category: "Commercial Motion",
-    creator: "FrameLab Originals",
+    creator: "Premivate Originals",
     version: "2.0",
     thumbnail: "/directors/music-video-gloss.jpg",
     prompt:

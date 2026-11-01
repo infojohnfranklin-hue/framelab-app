@@ -1,3 +1,4 @@
+import { getAuth } from "@clerk/nextjs/server";
 import { createClient } from "@supabase/supabase-js";
 
 export default async function handler(req, res) {
@@ -6,22 +7,25 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log("DELETE API BODY:", req.body);
-    console.log(
-      "SUPABASE URL EXISTS:",
-      !!process.env.NEXT_PUBLIC_SUPABASE_URL
-    );
-    console.log(
-      "SERVICE KEY EXISTS:",
-      !!process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
+    const { userId } = getAuth(req);
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
 
-    const { id } = req.body;
+    const rawId = req.body?.id;
+    let generationId = null;
 
-    if (!id) {
-      return res.status(400).json({
-        error: "Missing generation id",
-      });
+    if (typeof rawId === "number" && Number.isSafeInteger(rawId) && rawId > 0) {
+      generationId = String(rawId);
+    } else if (typeof rawId === "string" && /^\d{1,19}$/.test(rawId)) {
+      const parsedId = BigInt(rawId);
+      if (parsedId > 0n && parsedId <= 9223372036854775807n) {
+        generationId = parsedId.toString();
+      }
+    }
+
+    if (generationId === null) {
+      return res.status(400).json({ error: "Invalid generation id" });
     }
 
     const supabase = createClient(
@@ -29,31 +33,20 @@ export default async function handler(req, res) {
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("generations")
       .delete()
-      .eq("id", Number(id))
-      .select();
+      .eq("id", generationId)
+      .eq("user_id", userId);
 
     if (error) {
-      console.log("DELETE API ERROR:", error);
-
-      return res.status(500).json({
-        error: error.message,
-      });
+      console.error("DELETE_GENERATION_DATABASE_ERROR");
+      return res.status(500).json({ error: "Delete failed" });
     }
 
-    console.log("DELETE SUCCESS:", data);
-
-    return res.status(200).json({
-      success: true,
-      deleted: data,
-    });
-  } catch (error) {
-    console.log("DELETE API CRASH:", error);
-
-    return res.status(500).json({
-      error: error.message || "Delete failed",
-    });
+    return res.status(200).json({ success: true });
+  } catch {
+    console.error("DELETE_GENERATION_REQUEST_ERROR");
+    return res.status(500).json({ error: "Delete failed" });
   }
 }

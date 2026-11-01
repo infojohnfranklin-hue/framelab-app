@@ -1,3 +1,11 @@
+/* PREMIVATE logo: warm bronze midtones, amber highlights, restrained gold labels. */
+:root {
+  --premivate-gold-primary: #BE8B45;
+  --premivate-gold-highlight: #E5B468;
+  --premivate-gold-muted: #C49A61;
+  --premivate-gold-rgb: 196,154,97;
+}
+
 body {
   margin: 0;
   background: #0b0b12;

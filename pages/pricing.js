@@ -1,18 +1,104 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 export default function PricingPage({ ui, t }) {
   const _t = typeof t === "function" ? t : (value) => value;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [checkoutDialogOpen, setCheckoutDialogOpen] = useState(false);
+  const checkoutTriggerRef = useRef(null);
+  const cancelButtonRef = useRef(null);
+  const confirmButtonRef = useRef(null);
+  const checkoutStatusRef = useRef(null);
+  const checkoutStartedRef = useRef(false);
+  const restoreTriggerFocusRef = useRef(false);
+  const focusCheckoutStatusRef = useRef(false);
+
+  useEffect(() => {
+    if (!checkoutDialogOpen) return undefined;
+
+    cancelButtonRef.current?.focus();
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        restoreTriggerFocusRef.current = true;
+        setCheckoutDialogOpen(false);
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const focusableButtons = [
+        cancelButtonRef.current,
+        confirmButtonRef.current,
+      ].filter(Boolean);
+
+      if (focusableButtons.length < 2) return;
+
+      const first = focusableButtons[0];
+      const last = focusableButtons[focusableButtons.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+
+      if (restoreTriggerFocusRef.current) {
+        restoreTriggerFocusRef.current = false;
+
+        requestAnimationFrame(() => {
+          checkoutTriggerRef.current?.focus();
+        });
+      }
+    };
+  }, [checkoutDialogOpen]);
+
+  useEffect(() => {
+    if (!loading || !focusCheckoutStatusRef.current) return;
+
+    focusCheckoutStatusRef.current = false;
+
+    requestAnimationFrame(() => {
+      checkoutStatusRef.current?.focus();
+    });
+  }, [loading]);
+
+  function requestCheckout() {
+    if (loading || checkoutStartedRef.current) return;
+
+    restoreTriggerFocusRef.current = false;
+    focusCheckoutStatusRef.current = false;
+    setCheckoutDialogOpen(true);
+  }
+
+  function cancelCheckout() {
+    restoreTriggerFocusRef.current = true;
+    setCheckoutDialogOpen(false);
+  }
+
+  function confirmCheckout() {
+    if (loading || checkoutStartedRef.current) return;
+
+    restoreTriggerFocusRef.current = false;
+    focusCheckoutStatusRef.current = true;
+    setCheckoutDialogOpen(false);
+    startCheckout();
+  }
 
   async function startCheckout() {
-    const confirmed = window.confirm(
-      "Stripe Checkout öffnen? Nur fortfahren, wenn du den Checkout bewusst testen möchtest."
-    );
+    if (checkoutStartedRef.current) return;
 
-    if (!confirmed) return;
-
+    checkoutStartedRef.current = true;
     setLoading(true);
     setError("");
 
@@ -33,6 +119,7 @@ export default function PricingPage({ ui, t }) {
 
       window.location.href = data.url;
     } catch (err) {
+      checkoutStartedRef.current = false;
       setError(err.message || ui.pricing.checkoutCouldNotStart);
       setLoading(false);
     }
@@ -43,9 +130,9 @@ export default function PricingPage({ ui, t }) {
       style={{
         minHeight: "100vh",
         background:
-          "radial-gradient(circle at top left, rgba(124,58,237,0.26), transparent 34%), #050505",
+          "radial-gradient(circle at top left, rgba(var(--premivate-gold-rgb),0.20), transparent 34%), #050505",
         color: "white",
-        padding: "72px 72px 120px",
+        padding: "clamp(32px, 6vw, 72px) clamp(20px, 6vw, 72px) 96px",
         boxSizing: "border-box",
       }}
     >
@@ -54,7 +141,7 @@ export default function PricingPage({ ui, t }) {
           style={{
             letterSpacing: "0.28em",
             textTransform: "uppercase",
-            color: "#c084fc",
+            color: "rgb(var(--premivate-gold-rgb))",
             fontSize: "13px",
             fontWeight: 800,
             marginBottom: "28px",
@@ -63,7 +150,7 @@ export default function PricingPage({ ui, t }) {
 
         <h1
           style={{
-            fontSize: "72px",
+            fontSize: "clamp(46px, 7vw, 72px)",
             lineHeight: "0.95",
             margin: "0 0 28px",
             fontWeight: 900,
@@ -80,13 +167,14 @@ export default function PricingPage({ ui, t }) {
             marginBottom: "42px",
           }}
         >
-          FrameLab Pro is prepared for premium creative generation. Billing is currently in test/build phase and should be verified before public launch.
+          Premivate Pro brings premium creative generation, cinematic prompt systems and focused creative direction into one production workflow.
         </p>
 
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1.1fr 0.9fr",
+            gridTemplateColumns:
+              "repeat(auto-fit, minmax(min(100%, 320px), 1fr))",
             gap: "24px",
             alignItems: "stretch",
           }}
@@ -103,7 +191,7 @@ export default function PricingPage({ ui, t }) {
                 letterSpacing: "-0.04em",
               }}
             >
-              FrameLab Pro
+              Premivate Pro
             </h2>
 
             <p
@@ -114,7 +202,7 @@ export default function PricingPage({ ui, t }) {
                 marginBottom: "28px",
               }}
             >
-              Unlimited cinematic AI reel generations, premium prompt systems and creative direction workflows.
+              Premium cinematic AI reel concepts, prompt systems and creative direction workflows.
             </p>
 
             <div
@@ -130,65 +218,116 @@ export default function PricingPage({ ui, t }) {
                   fontSize: "54px",
                   fontWeight: 900,
                   letterSpacing: "-0.06em",
+                  color: "rgb(var(--premivate-gold-rgb))",
                 }}
               >
-                CHF 19
+                CHF 24.00
               </span>
               <span style={{ color: "rgba(255,255,255,0.52)" }}>/ month</span>
             </div>
 
             <button
-              onClick={startCheckout}
+              ref={checkoutTriggerRef}
+              onClick={requestCheckout}
               disabled={loading}
               style={{
                 width: "100%",
                 padding: "16px 18px",
                 borderRadius: "16px",
-                border: "none",
+                border: "1px solid rgba(var(--premivate-gold-rgb),0.28)",
                 background: loading
-                  ? "rgba(168,85,247,0.42)"
-                  : "linear-gradient(135deg, #7c3aed 0%, #c084fc 100%)",
-                color: "white",
+                  ? "rgba(var(--premivate-gold-rgb),0.20)"
+                  : "rgb(var(--premivate-gold-rgb))",
+                color: "#17130C",
                 fontWeight: 900,
                 fontSize: "15px",
                 cursor: loading ? "not-allowed" : "pointer",
-                boxShadow: "0 18px 50px rgba(124,58,237,0.32)",
+                boxShadow: "0 18px 40px rgba(var(--premivate-gold-rgb),0.28)",
               }}
             >
               {loading ? "Opening Checkout..." : "Start Pro Checkout"}
             </button>
 
-            {error && (
-              <p
-                style={{
-                  marginTop: "18px",
-                  color: "#fca5a5",
-                  lineHeight: 1.5,
-                }}
-              >
-                {error}
-              </p>
-            )}
+            <div
+              ref={checkoutStatusRef}
+              tabIndex={-1}
+              role="status"
+              aria-live="polite"
+              style={{
+                marginTop: loading || error ? "16px" : 0,
+                minHeight: loading || error ? "20px" : 0,
+                color: error ? "#fca5a5" : "rgba(255,255,255,0.62)",
+                fontSize: "13px",
+                lineHeight: 1.5,
+                outline: "none",
+              }}
+            >
+              {loading ? "Opening Checkout..." : error}
+            </div>
           </section>
 
           <section style={sideCardStyle}>
-            <h2 style={cardTitle}>Current Restore Status</h2>
+            <h2 style={cardTitle}>Checkout Preview</h2>
 
-            <p style={cardText}>{ui.pricing.restoreText}</p>
-
-            <div style={miniList}>
-              <div style={miniItem}>✓ Premium page exists</div>
-              <div style={miniItem}>✓ Checkout API connected</div>
-              <div style={miniItem}>✓ Test confirmation before redirect</div>
-              <div style={miniItemMuted}>Webhook automation still pending</div>
-              <div style={miniItemMuted}>Billing portal still pending</div>
-            </div>
+            <p style={cardText}>
+              Billing is currently being verified before public launch. Continue
+              only if you intentionally want to test the checkout flow.
+            </p>
 
             <Link href="/" style={secondaryButtonStyle}>
               Back to Generate
             </Link>
           </section>
         </div>
+
+        {checkoutDialogOpen && (
+          <div
+            style={modalOverlayStyle}
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) {
+                cancelCheckout();
+              }
+            }}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="checkout-dialog-title"
+              aria-describedby="checkout-dialog-description"
+              style={modalStyle}
+            >
+              <div style={modalEyebrowStyle}>Checkout confirmation</div>
+
+              <h2 id="checkout-dialog-title" style={modalTitleStyle}>
+                Stripe Checkout öffnen?
+              </h2>
+
+              <p id="checkout-dialog-description" style={modalTextStyle}>
+                Nur fortfahren, wenn du den Checkout bewusst testen möchtest.
+              </p>
+
+              <div style={modalActionsStyle}>
+                <button
+                  ref={cancelButtonRef}
+                  type="button"
+                  onClick={cancelCheckout}
+                  style={modalCancelButtonStyle}
+                >
+                  Abbrechen
+                </button>
+
+                <button
+                  ref={confirmButtonRef}
+                  type="button"
+                  onClick={confirmCheckout}
+                  style={modalConfirmButtonStyle}
+                >
+                  Checkout öffnen
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -198,8 +337,8 @@ const proCardStyle = {
   padding: "34px",
   borderRadius: "28px",
   background:
-    "linear-gradient(180deg, rgba(124,58,237,0.18), rgba(255,255,255,0.045))",
-  border: "1px solid rgba(168,85,247,0.28)",
+    "linear-gradient(180deg, rgba(var(--premivate-gold-rgb),0.20), rgba(255,255,255,0.045))",
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.28)",
   boxShadow: "0 28px 100px rgba(0,0,0,0.36)",
 };
 
@@ -215,9 +354,9 @@ const badgeStyle = {
   display: "inline-flex",
   padding: "10px 14px",
   borderRadius: "999px",
-  background: "rgba(168,85,247,0.18)",
-  border: "1px solid rgba(168,85,247,0.28)",
-  color: "#f5d0fe",
+  background: "rgba(var(--premivate-gold-rgb),0.20)",
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.28)",
+  color: "rgb(var(--premivate-gold-rgb))",
   fontSize: "13px",
   fontWeight: 800,
 };
@@ -234,23 +373,6 @@ const cardText = {
   lineHeight: 1.6,
 };
 
-const miniList = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "12px",
-  marginBottom: "28px",
-};
-
-const miniItem = {
-  color: "rgba(255,255,255,0.88)",
-  fontWeight: 700,
-};
-
-const miniItemMuted = {
-  color: "rgba(255,255,255,0.45)",
-  fontWeight: 700,
-};
-
 const secondaryButtonStyle = {
   display: "inline-flex",
   padding: "13px 18px",
@@ -261,4 +383,77 @@ const secondaryButtonStyle = {
   textDecoration: "none",
   fontWeight: 900,
   fontSize: "13px",
+};
+
+const modalOverlayStyle = {
+  position: "fixed",
+  inset: 0,
+  display: "grid",
+  placeItems: "center",
+  padding: "20px",
+  background: "rgba(0,0,0,0.72)",
+  zIndex: 1000,
+};
+
+const modalStyle = {
+  width: "min(100%, 520px)",
+  padding: "clamp(24px, 5vw, 34px)",
+  borderRadius: "24px",
+  background: "#050505",
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.28)",
+  boxShadow: "0 28px 100px rgba(0,0,0,0.36)",
+  boxSizing: "border-box",
+};
+
+const modalEyebrowStyle = {
+  marginBottom: "14px",
+  color: "rgb(var(--premivate-gold-rgb))",
+  fontSize: "12px",
+  fontWeight: 900,
+  letterSpacing: "0.18em",
+  textTransform: "uppercase",
+};
+
+const modalTitleStyle = {
+  margin: "0 0 14px",
+  fontSize: "28px",
+  lineHeight: 1.1,
+  fontWeight: 900,
+  letterSpacing: "-0.03em",
+};
+
+const modalTextStyle = {
+  margin: "0 0 26px",
+  color: "rgba(255,255,255,0.68)",
+  lineHeight: 1.6,
+};
+
+const modalActionsStyle = {
+  display: "flex",
+  justifyContent: "flex-end",
+  gap: "12px",
+  flexWrap: "wrap",
+};
+
+const modalCancelButtonStyle = {
+  minWidth: "132px",
+  padding: "13px 18px",
+  borderRadius: "999px",
+  background: "rgba(255,255,255,0.07)",
+  border: "1px solid rgba(255,255,255,0.1)",
+  color: "white",
+  fontWeight: 900,
+  cursor: "pointer",
+};
+
+const modalConfirmButtonStyle = {
+  minWidth: "160px",
+  padding: "13px 18px",
+  borderRadius: "999px",
+  background: "rgb(var(--premivate-gold-rgb))",
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.28)",
+  color: "#17130C",
+  fontWeight: 900,
+  cursor: "pointer",
+  boxShadow: "0 10px 30px rgba(var(--premivate-gold-rgb),0.20)",
 };

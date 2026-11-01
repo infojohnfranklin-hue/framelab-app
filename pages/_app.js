@@ -3,6 +3,7 @@ import {
   SignedIn,
   SignedOut,
   UserButton,
+  useUser,
 } from "@clerk/nextjs";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
@@ -17,10 +18,64 @@ import {
 } from "../data/languages";
 import "../styles/premium.css";
 
+function PlanStatusController({ onPlanStatus }) {
+  const { isLoaded, isSignedIn, user } = useUser();
+
+  useEffect(() => {
+    let active = true;
+    onPlanStatus(null, false);
+
+    if (!isLoaded || !isSignedIn || !user?.id) {
+      return () => {
+        active = false;
+      };
+    }
+
+    async function loadPlan() {
+      try {
+        const res = await fetch(`/api/me-plan?ts=${Date.now()}`, {
+          cache: "no-store",
+          headers: { "Cache-Control": "no-cache" },
+        });
+
+        if (!res.ok) {
+          throw new Error("Plan status request failed");
+        }
+
+        const data = await res.json();
+        const plan =
+          typeof data.plan === "string" && data.plan ? data.plan : null;
+
+        if (active) {
+          onPlanStatus(plan, plan !== null);
+        }
+      } catch {
+        if (active) {
+          onPlanStatus(null, false);
+        }
+      }
+    }
+
+    loadPlan();
+
+    return () => {
+      active = false;
+    };
+  }, [isLoaded, isSignedIn, user?.id, onPlanStatus]);
+
+  return null;
+}
+
 export default function App({ Component, pageProps }) {
   const router = useRouter();
-  const [userPlan, setUserPlan] = useState("free");
+  const [userPlan, setUserPlan] = useState(null);
+  const [planStatusLoaded, setPlanStatusLoaded] = useState(false);
   const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
+
+  const handlePlanStatus = useCallback((plan, loaded) => {
+    setUserPlan(plan);
+    setPlanStatusLoaded(loaded);
+  }, []);
 
   useEffect(() => {
     const savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
@@ -46,25 +101,6 @@ export default function App({ Component, pageProps }) {
     (value) => getUiText(language, value),
     [language]
   );
-
-  useEffect(() => {
-    async function loadPlan() {
-      try {
-        const res = await fetch(`/api/me-plan?ts=${Date.now()}`, {
-          cache: "no-store",
-          headers: { "Cache-Control": "no-cache" },
-        });
-
-        const data = await res.json();
-        setUserPlan(data.plan || "free");
-      } catch (error) {
-        console.error("Failed to load user plan:", error);
-        setUserPlan("free");
-      }
-    }
-
-    loadPlan();
-  }, []);
 
   const mobileNavItems = [
     {
@@ -103,6 +139,7 @@ export default function App({ Component, pageProps }) {
 
   return (
     <ClerkProvider>
+      <PlanStatusController onPlanStatus={handlePlanStatus} />
       <div
         className="framelab-app-shell"
         style={{
@@ -123,7 +160,7 @@ export default function App({ Component, pageProps }) {
             padding: "8px",
             borderRadius: "18px",
             background: "rgba(10, 11, 13, 0.72)",
-            border: "1px solid rgba(216,181,106,0.18)",
+            border: "1px solid rgba(var(--premivate-gold-rgb),0.18)",
             boxShadow: "0 12px 40px rgba(0,0,0,0.28)",
             backdropFilter: "blur(14px)",
           }}
@@ -135,8 +172,8 @@ export default function App({ Component, pageProps }) {
                 padding: "10px 18px",
                 borderRadius: "12px",
                 border: "none",
-                background: "#B88A3B",
-                color: "white",
+                background: "var(--premivate-gold-primary)",
+                color: "#17130C",
                 fontWeight: "bold",
                 cursor: "pointer",
               }}
@@ -146,12 +183,57 @@ export default function App({ Component, pageProps }) {
           </SignedOut>
 
           <SignedIn>
-            <UserButton afterSignOutUrl="/" />
+            <UserButton
+              afterSignOutUrl="/"
+              userProfileProps={{
+                appearance: {
+                  variables: {
+                    colorPrimary: "rgb(var(--premivate-gold-rgb))",
+                    colorPrimaryForeground: "#17130C",
+                    colorBackground: "#0a0a0a",
+                    colorForeground: "#ffffff",
+                    colorMuted: "#141414",
+                    colorMutedForeground: "rgba(255,255,255,0.62)",
+                    colorNeutral: "#cfc7b8",
+                    colorBorder: "rgba(var(--premivate-gold-rgb),0.28)",
+                    colorRing: "rgb(var(--premivate-gold-rgb))",
+                    colorShadow: "#000000",
+                    borderRadius: "16px",
+                  },
+                },
+              }}
+              appearance={{
+                variables: {
+                  colorPrimary: "rgb(var(--premivate-gold-rgb))",
+                  colorPrimaryForeground: "#17130C",
+                  colorBackground: "#0a0a0a",
+                  colorForeground: "#ffffff",
+                  colorMuted: "#141414",
+                  colorMutedForeground: "rgba(255,255,255,0.62)",
+                  colorNeutral: "#cfc7b8",
+                  colorBorder: "rgba(var(--premivate-gold-rgb),0.28)",
+                  colorRing: "rgb(var(--premivate-gold-rgb))",
+                  colorShadow: "#000000",
+                  borderRadius: "16px",
+                },
+                elements: {
+                  userButtonPopoverActionButton: {
+                    color: "#f5f1e8",
+                    borderRadius: "10px",
+                    "&:hover, &:focus": {
+                      backgroundColor: "rgba(var(--premivate-gold-rgb),0.12)",
+                      color: "#ffffff",
+                    },
+                  },
+                },
+              }}
+            />
           </SignedIn>
         </div>
         <div className="desktop-sidebar">
           <Sidebar
             userPlan={userPlan}
+            planStatusLoaded={planStatusLoaded}
             language={language}
             ui={ui}
             t={t}
@@ -173,6 +255,8 @@ export default function App({ Component, pageProps }) {
             setLanguage={handleLanguageChange}
             ui={ui}
             t={t}
+            userPlan={userPlan}
+            planStatusLoaded={planStatusLoaded}
           />
         </main>
       </div>

@@ -2,17 +2,101 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useUser } from "@clerk/nextjs";
 import Layout from "../components/Layout";
-import { supabase } from "../lib/supabaseClient";
 import { directorModes } from "../data/directorModes";
 import {
   directorStyles,
   buildCinematicPrompt,
 } from "../lib/promptEngine.js";
 
-export default function VideosPage({ ui, t }) {
+export function mapStructuredBlueprint(output) {
+  return output.shots.map((shot) => ({
+    title: shot.title,
+    sequenceRole: shot.sequenceRole,
+    description: shot.visibleAction,
+    causalLink: shot.causalLink,
+    emotion: shot.emotion,
+    camera: shot.camera,
+    movement: shot.motion,
+    lens: shot.lens,
+    lighting: shot.lighting,
+    directorNotes: shot.directorDecision,
+    shotPrompt: shot.videoPrompt,
+  }));
+}
+
+export function formatStructuredBlueprint(output, vision, directorMode, visualReferenceType, language = "English", visualReferencePixelsSent = false) {
+  const labels = {
+    English: { summary: "DIRECTOR SUMMARY", idea: "GOVERNING IDEA", vision: "SOURCE VISION", mode: "DIRECTOR MODE", reference: "VISUAL REFERENCE TYPE", referenceUse: visualReferencePixelsSent ? "Image data was included in this Blueprint request." : "Only the visual reference type was sent; image pixels were not included.", plan: "SIX-SHOT PRODUCTION PLAN", hook: "HOOK", voiceover: "VOICEOVER", music: "MUSIC DIRECTION", caption: "CAPTION", end: "END OF PREMIVATE CINEMATIC BLUEPRINT" },
+    Deutsch: { summary: "REGIEZUSAMMENFASSUNG", idea: "LEITIDEE", vision: "AUSGANGSVISION", mode: "REGIEMODUS", reference: "ART DER VISUELLEN REFERENZ", referenceUse: visualReferencePixelsSent ? "Bilddaten wurden in diese Blueprint-Anfrage übermittelt." : "Übermittelt wurde nur der Referenztyp, nicht die Bildpixel.", plan: "SECHSTEILIGER PRODUKTIONSPLAN", hook: "HOOK", voiceover: "VOICEOVER", music: "MUSIKRICHTUNG", caption: "CAPTION", end: "ENDE DES PREMIVATE CINEMATIC BLUEPRINT" },
+    "Español": { summary: "RESUMEN DE DIRECCIÓN", idea: "IDEA RECTORA", vision: "VISIÓN DE PARTIDA", mode: "MODO DE DIRECCIÓN", reference: "TIPO DE REFERENCIA VISUAL", referenceUse: visualReferencePixelsSent ? "Los datos de imagen se incluyeron en esta solicitud de Blueprint." : "Solo se envió el tipo de referencia; no se incluyeron los píxeles de la imagen.", plan: "PLAN DE PRODUCCIÓN EN SEIS PLANOS", hook: "GANCHO", voiceover: "VOZ EN OFF", music: "DIRECCIÓN MUSICAL", caption: "TEXTO", end: "FIN DEL BLUEPRINT CINEMATOGRÁFICO DE PREMIVATE" },
+    "Français": { summary: "NOTE DE RÉALISATION", idea: "IDÉE DIRECTRICE", vision: "VISION DE DÉPART", mode: "MODE DE RÉALISATION", reference: "TYPE DE RÉFÉRENCE VISUELLE", referenceUse: visualReferencePixelsSent ? "Les données de l’image ont été incluses dans cette requête Blueprint." : "Seul le type de référence a été transmis ; les pixels de l’image n’ont pas été inclus.", plan: "PLAN DE PRODUCTION EN SIX PLANS", hook: "ACCROCHE", voiceover: "VOIX OFF", music: "DIRECTION MUSICALE", caption: "LÉGENDE", end: "FIN DU BLUEPRINT CINÉMATOGRAPHIQUE PREMIVATE" },
+    "Italiano": { summary: "SINTESI DI REGIA", idea: "IDEA GUIDA", vision: "VISIONE DI PARTENZA", mode: "MODALITÀ DI REGIA", reference: "TIPO DI RIFERIMENTO VISIVO", referenceUse: visualReferencePixelsSent ? "I dati dell’immagine sono stati inclusi in questa richiesta Blueprint." : "È stato inviato solo il tipo di riferimento, non i pixel dell’immagine.", plan: "PIANO DI PRODUZIONE IN SEI INQUADRATURE", hook: "HOOK", voiceover: "VOCE FUORI CAMPO", music: "DIREZIONE MUSICALE", caption: "DIDASCALIA", end: "FINE DEL BLUEPRINT CINEMATOGRAFICO PREMIVATE" },
+    "Português": { summary: "RESUMO DE DIREÇÃO", idea: "IDEIA CENTRAL", vision: "VISÃO DE PARTIDA", mode: "MODO DE DIREÇÃO", reference: "TIPO DE REFERÊNCIA VISUAL", referenceUse: visualReferencePixelsSent ? "Os dados da imagem foram incluídos neste pedido de Blueprint." : "Foi enviado apenas o tipo de referência; os píxeis da imagem não foram incluídos.", plan: "PLANO DE PRODUÇÃO EM SEIS PLANOS", hook: "GANCHO", voiceover: "NARRAÇÃO", music: "DIREÇÃO MUSICAL", caption: "LEGENDA", end: "FIM DO BLUEPRINT CINEMATOGRÁFICO PREMIVATE" },
+    "中文": { summary: "导演摘要", idea: "核心创意", vision: "原始创意构想", mode: "导演模式", reference: "视觉参考类型", referenceUse: visualReferencePixelsSent ? "图像数据已包含在本次 Blueprint 请求中。" : "本次仅传输了参考类型，未包含图像像素。", plan: "六镜头制作方案", hook: "开场钩子", voiceover: "旁白", music: "音乐方向", caption: "配文", end: "PREMIVATE 电影蓝图结束" },
+  }[language] || {
+    summary: "DIRECTOR SUMMARY", idea: "GOVERNING IDEA", vision: "SOURCE VISION", mode: "DIRECTOR MODE", reference: "VISUAL REFERENCE TYPE", referenceUse: visualReferencePixelsSent ? "Image data was included in this Blueprint request." : "Only the visual reference type was sent; image pixels were not included.", plan: "SIX-SHOT PRODUCTION PLAN", hook: "HOOK", voiceover: "VOICEOVER", music: "MUSIC DIRECTION", caption: "CAPTION", end: "END OF PREMIVATE CINEMATIC BLUEPRINT",
+  };
+  const shotText = output.shots.map((shot, index) => [
+    `SHOT ${String(index + 1).padStart(2, "0")} — ${shot.title}`,
+    `Sequence role: ${shot.sequenceRole}`,
+    `Visible action: ${shot.visibleAction}`,
+    `Causal link: ${shot.causalLink}`,
+    `Emotion: ${shot.emotion}`,
+    `Camera: ${shot.camera}`,
+    `Motion: ${shot.motion}`,
+    `Lens: ${shot.lens}`,
+    `Lighting: ${shot.lighting}`,
+    `Director decision: ${shot.directorDecision}`,
+    `AI video prompt: ${shot.videoPrompt}`,
+  ].join("\n")).join("\n\n");
+  const music = output.musicDirection.bpm == null
+    ? output.musicDirection.direction
+    : `${output.musicDirection.direction} · ${output.musicDirection.bpm} BPM`;
+
+  return [
+    "PREMIVATE CINEMATIC BLUEPRINT",
+    "",
+    labels.summary,
+    output.directorSummary,
+    "",
+    labels.idea,
+    output.governingIdea,
+    "",
+    labels.vision,
+    vision,
+    "",
+    labels.mode,
+    directorMode,
+    ...(visualReferenceType ? [
+      labels.reference,
+      visualReferenceType,
+      labels.referenceUse,
+      "",
+    ] : []),
+    "",
+    labels.plan,
+    shotText,
+    "",
+    labels.hook,
+    output.hook,
+    "",
+    labels.voiceover,
+    output.voiceover,
+    "",
+    labels.music,
+    music,
+    "",
+    labels.caption,
+    output.caption,
+    "",
+    labels.end,
+  ].join("\n");
+}
+
+export default function VideosPage({ ui, t, language }) {
   const _t = typeof t === "function" ? t : (value) => value;
   const eyebrow = {
-  color: "#E7CC91",
+  color: "var(--premivate-gold-muted)",
   fontSize: "13px",
   letterSpacing: "0.28em",
   fontWeight: "800",
@@ -37,6 +121,15 @@ const subline = {
   textAlign: "center",
 };
 
+// Blueprints-only surfaces; shared PREMIVATE gold and status colors stay unchanged.
+const blueprintSurfaces = {
+  panel: "linear-gradient(180deg, #0C0D0F, #08090B)",
+  reference: "linear-gradient(180deg, #121315, #0D0E10)",
+  input: "linear-gradient(180deg, #17181A, #111214)",
+  preset: "#101113",
+  inner: "#0B0C0E",
+};
+
 const generatorBox = {
   margin: "0 0 60px 72px",
   padding: "40px",
@@ -46,14 +139,14 @@ const generatorBox = {
   maxWidth: "1180px",
   boxSizing: "border-box",
   background:
-    "linear-gradient(180deg, rgba(20,21,23,0.97), rgba(10,11,13,0.98))",
-  border: "1px solid rgba(216,181,106,0.16)",
+    blueprintSurfaces.panel,
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.16)",
   boxShadow: "0 24px 80px rgba(0,0,0,0.30)",
   backdropFilter: "blur(16px)",
 };
 
 const generatorEyebrow = {
-  color: "#E7CC91",
+  color: "var(--premivate-gold-muted)",
   fontWeight: "800",
   letterSpacing: "3px",
   marginBottom: "18px",
@@ -69,12 +162,12 @@ const audioUploadBox = {
   padding: "12px",
   borderRadius: "20px",
   background:
-    "linear-gradient(180deg, rgba(20,21,23,0.92), rgba(10,11,13,0.96))",
-  border: "1px solid rgba(216,181,106,0.16)",
+    blueprintSurfaces.reference,
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.16)",
 };
 
 const audioUploadLabel = {
-  color: "#E7CC91",
+  color: "var(--premivate-gold-muted)",
   fontSize: "11px",
   fontWeight: "800",
   letterSpacing: "2px",
@@ -101,7 +194,7 @@ const moodSuggestionRow = {
 const moodSuggestionChip = {
   padding: "10px 14px",
   borderRadius: "999px",
-  border: "1px solid rgba(216,181,106,0.14)",
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.14)",
   background: "rgba(255,255,255,0.045)",
   color: "white",
   fontSize: "13px",
@@ -114,12 +207,12 @@ const hookBox = {
   marginBottom: "24px",
   padding: "24px",
   borderRadius: "24px",
-  border: "1px solid rgba(216,181,106,0.16)",
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.16)",
   background: "rgba(255,255,255,0.04)",
 };
 
 const hookLabel = {
-  color: "#E7CC91",
+  color: "var(--premivate-gold-muted)",
   fontSize: "12px",
   fontWeight: "800",
   letterSpacing: "2px",
@@ -138,7 +231,7 @@ const textareaStyle = {
   width: "100%",
   boxSizing: "border-box",
   height: "260px",
-  padding: "42px",
+  padding: "42px 42px 42px 22px",
   borderRadius: "26px",
   border: "1px solid rgba(255,255,255,0.10)",
   background:
@@ -213,14 +306,14 @@ const generateButton = {
   borderRadius: "999px",
   border: "none",
   background:
-    "linear-gradient(90deg, #B88A3B 0%, #D8B56A 50%, #E7CC91 100%)",
+    "linear-gradient(90deg, var(--premivate-gold-primary) 0%, var(--premivate-gold-muted) 50%, var(--premivate-gold-highlight) 100%)",
   color: "#17130C",
   fontSize: "16px",
   fontWeight: "950",
   cursor: "pointer",
   transition: "all 0.22s ease",
   boxShadow:
-    "0 20px 78px rgba(216,181,106,0.24), 0 0 90px rgba(216,181,106,0.12)",
+    "0 20px 78px rgba(var(--premivate-gold-rgb),0.24), 0 0 90px rgba(var(--premivate-gold-rgb),0.12)",
   letterSpacing: "-0.02em",
   textShadow: "none",
   backdropFilter: "blur(14px)",
@@ -231,9 +324,9 @@ const saveButton = {
   minWidth: "180px",
   padding: "10px 18px",
   borderRadius: "999px",
-  border: "1px solid rgba(216,181,106,0.16)",
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.16)",
   background: "rgba(255,255,255,0.045)",
-  color: "#E7CC91",
+  color: "var(--premivate-gold-muted)",
   fontWeight: "800",
   fontSize: "13px",
   cursor: "pointer",
@@ -247,7 +340,7 @@ const resultBox = {
 };
 
 const resultEyebrow = {
-  color: "#E7CC91",
+  color: "var(--premivate-gold-muted)",
   fontWeight: "800",
   marginBottom: "14px",
 };
@@ -287,7 +380,7 @@ const shotMetaBadge = {
   fontWeight: "800",
 };
 const shotsTitle = {
-  color: "#E7CC91",
+  color: "var(--premivate-gold-muted)",
   fontWeight: "800",
   marginBottom: "18px",
   letterSpacing: "2px",
@@ -299,7 +392,7 @@ const shotCard = {
   marginBottom: "18px",
   background:
     "linear-gradient(180deg, rgba(20,21,23,0.94), rgba(10,11,13,0.98))",
-  border: "1px solid rgba(216,181,106,0.16)",
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.16)",
   boxShadow: "0 18px 48px rgba(0,0,0,0.22)",
   backdropFilter: "blur(16px)",
   transition: "all 0.3s ease",
@@ -309,7 +402,7 @@ overflowX: "hidden",
 };
 
 const shotLabel = {
-  color: "#E7CC91",
+  color: "var(--premivate-gold-muted)",
   fontWeight: "900",
   marginBottom: "14px",
   letterSpacing: "3px",
@@ -330,15 +423,15 @@ const premiumCopyButton = {
   height: "34px",
   padding: "0 14px",
   borderRadius: "999px",
-  border: "1px solid rgba(216,181,106,0.24)",
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.24)",
   background:
-    "linear-gradient(180deg, rgba(216,181,106,0.16), rgba(184,138,59,0.12))",
+    "linear-gradient(180deg, rgba(var(--premivate-gold-rgb),0.16), rgba(var(--premivate-gold-rgb),0.12))",
   color: "#F6F3EB",
   fontSize: "12px",
   fontWeight: "850",
   letterSpacing: "0.01em",
   cursor: "pointer",
-  boxShadow: "0 0 18px rgba(216,181,106,0.10)",
+  boxShadow: "0 0 18px rgba(var(--premivate-gold-rgb),0.10)",
   whiteSpace: "nowrap",
 };
 
@@ -354,7 +447,7 @@ const premiumCopyButtonCopied = {
 const premiumSecondaryButton = {
   ...premiumCopyButton,
   minWidth: "154px",
-  border: "1px solid rgba(216,181,106,0.16)",
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.16)",
   background: "rgba(255,255,255,0.055)",
   color: "#F6F3EB",
   boxShadow: "none",
@@ -399,7 +492,7 @@ const videoText = {
 };
 
 const featuredLabel = {
-  color: "#E7CC91",
+  color: "var(--premivate-gold-muted)",
   fontWeight: "800",
   letterSpacing: "3px",
   marginBottom: "16px",
@@ -411,7 +504,7 @@ const featuredHeadline = {
   fontWeight: "900",
   maxWidth: "820px",
   letterSpacing: "-2px",
-  textShadow: "0 0 36px rgba(216,181,106,0.12)",
+  textShadow: "0 0 36px rgba(var(--premivate-gold-rgb),0.12)",
 };
 
 const grid = {
@@ -426,7 +519,7 @@ const reelCard = {
   overflow: "hidden",
   background:
     "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
-  border: "1px solid rgba(216,181,106,0.12)",
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.12)",
   transition: "0.35s ease",
   cursor: "pointer",
   boxShadow: "0 18px 48px rgba(0,0,0,0.22)",
@@ -480,7 +573,7 @@ const loadingBar = {
   overflow: "hidden",
   background: "rgba(255,255,255,0.07)",
   marginTop: "22px",
-  border: "1px solid rgba(216,181,106,0.16)",
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.16)",
 };
 
 const loadingProgress = {
@@ -488,15 +581,15 @@ const loadingProgress = {
   height: "100%",
   borderRadius: "999px",
   background:
-    "linear-gradient(90deg, #B88A3B 0%, #D8B56A 50%, #E7CC91 100%)",
-  boxShadow: "0 0 28px rgba(216,181,106,0.24)",
+    "linear-gradient(90deg, var(--premivate-gold-primary) 0%, var(--premivate-gold-muted) 50%, var(--premivate-gold-highlight) 100%)",
+  boxShadow: "0 0 28px rgba(var(--premivate-gold-rgb),0.24)",
   animation: "pulse 1.8s ease-in-out infinite",
 };
 const spinner = {
   width: "60px",
   height: "60px",
   border: "4px solid rgba(255,255,255,0.1)",
-  borderTop: "4px solid #D8B56A",
+  borderTop: "4px solid var(--premivate-gold-muted)",
   borderRadius: "999px",
   animation: "spin 1s linear infinite",
 };
@@ -690,12 +783,18 @@ function startTypingEffect(text) {
 function handleVisualReferenceUpload(file) {
   if (!file) return;
 
-  if (!file.type || !file.type.startsWith("image/")) {
+  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+    if (visualReferencePreview) URL.revokeObjectURL(visualReferencePreview);
+    setVisualReferenceFile(null);
+    setVisualReferencePreview("");
     setVisualReferenceError(ui.blueprints.uploadImage);
     return;
   }
 
-  if (file.size > 10 * 1024 * 1024) {
+  if (file.size > 2 * 1024 * 1024) {
+    if (visualReferencePreview) URL.revokeObjectURL(visualReferencePreview);
+    setVisualReferenceFile(null);
+    setVisualReferencePreview("");
     setVisualReferenceError(ui.blueprints.imageTooLarge);
     return;
   }
@@ -710,6 +809,17 @@ function handleVisualReferenceUpload(file) {
   setVisualReferencePreview(previewUrl);
   setVisualReferenceType("portrait");
   setVisualReferenceError("");
+}
+
+function readVisualReferenceAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => typeof reader.result === "string"
+      ? resolve(reader.result)
+      : reject(new Error("The visual reference could not be read."));
+    reader.onerror = () => reject(new Error("The visual reference could not be read."));
+    reader.readAsDataURL(file);
+  });
 }
 
 function clearVisualReference(event) {
@@ -875,6 +985,125 @@ Resolve with a restrained final memory frame.`;
 }
 
 async function handleGenerate() {
+  if (userPlan === "free" && credits <= 0) {
+    router.push("/pricing?reason=credits-used");
+    return;
+  }
+  if (isPremiumMode && userPlan !== "pro") {
+    router.push("/pricing?reason=generate-premium");
+    return;
+  }
+  if (!hasAccess) {
+    router.push("/pricing?reason=premium-director");
+    return;
+  }
+
+  const vision = typeof prompt === "string" ? prompt.trim() : "";
+  if (!vision) {
+    alert(ui.blueprints.generateError);
+    return;
+  }
+
+  setSaved(false);
+  setGenerated(false);
+  setGeneratedShots([]);
+  setShots([]);
+  setProductionAssets(null);
+  setDirectorSummary("");
+  setGeneratedHook("");
+  setVideoUrl("");
+  setGenerating(true);
+  setSelectedShot(null);
+  setExpandedPrompt("");
+  setDisplayedPrompt("");
+
+  try {
+    const audioReferenceAnalysis = audioAnalysis
+      ? {
+          durationLabel: audioAnalysis.durationLabel,
+          energyLabel: audioAnalysis.energyLabel,
+          rhythmLabel: audioAnalysis.rhythmLabel,
+          blueprintInfluence: audioAnalysis.blueprintInfluence,
+          motionLanguage: audioAnalysis.motionLanguage,
+          musicDirection: audioAnalysis.musicDirection,
+          editRhythm: audioAnalysis.editRhythm,
+          ...(Number.isInteger(audioAnalysis.bpm) ? { bpm: audioAnalysis.bpm } : {}),
+        }
+      : undefined;
+    const visualReferenceImageDataUrl = visualReferenceFile
+      ? await readVisualReferenceAsDataUrl(visualReferenceFile)
+      : undefined;
+    const response = await fetch("/api/generate-blueprint", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        vision,
+        directorMode: selectedMode,
+        outputLanguage: language || "English",
+        ...(audioReferenceAnalysis ? { audioReferenceAnalysis } : {}),
+        ...(visualReferenceFile ? { visualReferenceType } : {}),
+        ...(visualReferenceImageDataUrl ? { visualReferenceImageDataUrl } : {}),
+      }),
+    });
+    const output = await response.json();
+    if (!response.ok) throw new Error(output?.error || "Blueprint generation failed.");
+
+    const mappedShots = mapStructuredBlueprint(output);
+    const finalPrompt = formatStructuredBlueprint(
+      output,
+      vision,
+      selectedMode,
+      visualReferenceFile ? visualReferenceType : null,
+      language || "English",
+      output.visualReferenceTransport === "pixels_received"
+    );
+    const music = output.musicDirection.bpm == null
+      ? output.musicDirection.direction
+      : `${output.musicDirection.direction} · ${output.musicDirection.bpm} BPM`;
+
+    setDirectorSummary(output.directorSummary);
+    setGeneratedHook(output.hook);
+    setProductionAssets({
+      hook: output.hook,
+      voiceover: output.voiceover,
+      music,
+      caption: output.caption,
+      audioReference: audioAnalysis || null,
+      visualReference: visualReferenceFile
+        ? {
+            fileName: visualReferenceFile.name,
+            type: visualReferenceType,
+            pixelsTransmitted: output.visualReferenceTransport === "pixels_received",
+          }
+        : null,
+    });
+    setExpandedPrompt(finalPrompt);
+    startTypingEffect(finalPrompt);
+    setShots(mappedShots);
+    setGeneratedShots(mappedShots);
+    setVideoUrl("");
+    localStorage.setItem("framelabActiveProject", vision.slice(0, 60));
+    localStorage.setItem("framelabActiveDirector", selectedMode);
+    localStorage.setItem("framelabActivePrompt", finalPrompt);
+
+    if (userPlan === "free") {
+      try {
+        await fetch("/api/use-credit", { method: "POST" });
+        setCredits((previous) => Math.max(previous - 1, 0));
+      } catch (creditError) {
+        console.error("PREMIVATE Blueprint credit update failed", creditError?.message || creditError);
+      }
+    }
+    setGenerated(true);
+  } catch (error) {
+    console.error("PREMIVATE Blueprint generation failed", error?.message || error);
+    alert(error?.message || ui.blueprints.generateError);
+  } finally {
+    setGenerating(false);
+  }
+}
+
+async function handleLegacyTemplateGenerate() {
   if (userPlan === "free" && credits <= 0) {
   router.push("/pricing?reason=credits-used");
   return;
@@ -2649,46 +2878,44 @@ async function handleSaveToHistory() {
   }
 
 const payload = {
+  recordType: "blueprint",
   title:
     generatedShots?.[0]?.title ||
     "Untitled Cinematic Vision",
-
   prompt:
     prompt && !prompt.startsWith("Cinematic Untitled cinematic vision")
       ? prompt
       : generatedShots?.[0]?.description || "Untitled cinematic vision",
-
   director_mode: selectedMode,
   shots: generatedShots,
-  user_id: user?.id || null,
   video_url: videoUrl || "",
-
   director_summary: directorSummary,
   production_assets: productionAssets,
   expanded_prompt: expandedPrompt,
 };
 
-console.log("VIDEO URL SAVED:", videoUrl);
-console.log("FIRST SHOT IMAGE:", generatedShots?.[0]?.image);
-console.log("HISTORY PAYLOAD:", payload);
+try {
+  const response = await fetch("/api/save-history", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const result = await response.json().catch(() => null);
 
-const { data, error } = await supabase
-    .from("generations")
-    .insert([payload]);
-
-  if (error) {
-    console.log("Supabase save error:", error);
-    alert(error.message);
-    setSaving(false);
+  if (!response.ok) {
+    alert(result?.error || "Failed to save generation");
     return;
   }
 
   setSaved(true);
-  setSaving(false);
-
   setTimeout(() => {
     setSaved(false);
   }, 1600);
+} catch {
+  alert("Failed to save generation");
+} finally {
+  setSaving(false);
+}
 }
 function generateShotSequence(mode, prompt) {
   const idea = prompt || "Untitled cinematic concept";
@@ -2768,6 +2995,19 @@ return (
 
 .cinematicTextarea::-webkit-scrollbar {
   display: none;
+}
+
+.blueprints-page .blueprintsOutputCopyAction {
+  box-sizing: border-box !important;
+  width: 176px !important;
+  min-width: 176px !important;
+  max-width: 176px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  padding: 0 10px !important;
+  flex: 0 0 176px !important;
+  margin-left: auto !important;
 }
 
 @media (max-width: 768px) {
@@ -2863,13 +3103,55 @@ div[style*="space-between"] {
   align-items: flex-start !important;
 }
 
+.blueprints-page .blueprints-page__hero-copy {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 48px 20px 20px !important;
+}
+
+.blueprints-page .blueprints-page__headline {
+  max-width: 100% !important;
+  font-size: clamp(42px, 12vw, 58px) !important;
+  line-height: 1.02 !important;
+  overflow-wrap: anywhere;
+}
+
+.blueprints-page .blueprints-page__generator {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 0 40px !important;
+  padding: 22px !important;
+  box-sizing: border-box !important;
+}
+
+.blueprints-page .blueprints-page__reference-grid,
+.blueprints-page .blueprints-page__steps-grid,
+.blueprints-page .blueprints-page__copy-grid,
+.blueprints-page .blueprints-page__shot-grid,
+.blueprints-page .blueprints-page__inspector-grid {
+  grid-template-columns: minmax(0, 1fr) !important;
+  min-width: 0 !important;
+}
+
+.blueprints-page .blueprints-page__reference-grid > *,
+.blueprints-page .blueprints-page__steps-grid > *,
+.blueprints-page .blueprints-page__copy-grid > *,
+.blueprints-page .blueprints-page__shot-grid > *,
+.blueprints-page .blueprints-page__inspector-grid > * {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: anywhere;
+}
+
 }
     `}</style>
 
 <div
+  className="blueprints-page"
   style={{
     backgroundImage:
-      "linear-gradient(90deg, rgba(5,5,6,0.96) 0%, rgba(5,5,6,0.78) 36%, rgba(5,5,6,0.30) 68%, rgba(5,5,6,0.10) 100%), linear-gradient(180deg, rgba(5,5,6,0.06) 48%, rgba(5,5,6,0.92) 100%), url('/framelab-premium-blueprints-assets/01_FrameLab_Blueprints_Hero_Studio_Wide.png')",
+      "linear-gradient(90deg, rgba(5,5,6,0.96) 0%, rgba(5,5,6,0.78) 36%, rgba(5,5,6,0.30) 68%, rgba(5,5,6,0.10) 100%), linear-gradient(180deg, rgba(84,49,25,0.12) 0%, rgba(62,38,24,0.07) 48%, rgba(5,5,6,0.92) 100%), url('/framelab-premium-blueprints-assets/01_FrameLab_Blueprints_Hero_Studio_Wide.png')",
     backgroundSize: "100% 100%, 100% 100%, cover",
     backgroundPosition: "center, center, center center",
     backgroundRepeat: "no-repeat, no-repeat, no-repeat",
@@ -2885,6 +3167,7 @@ div[style*="space-between"] {
     }}
   >
     <div
+      className="blueprints-page__hero-copy"
       style={{
         position: "relative",
         zIndex: 1,
@@ -2902,6 +3185,7 @@ div[style*="space-between"] {
       </p>
 
       <h1
+        className="blueprints-page__headline"
         style={{
           ...headline,
           fontSize: "68px",
@@ -2926,21 +3210,21 @@ div[style*="space-between"] {
     </div>
   </div>
 
-  <div style={generatorBox}>
+  <div className="blueprints-page__generator" style={generatorBox}>
 <p style={generatorEyebrow}>{ui.blueprints.generatorEyebrow}</p>
 <div
   style={{
     marginBottom: "26px",
     padding: "22px",
     borderRadius: "24px",
-    background: "rgba(255,255,255,0.035)",
-    border: "1px solid rgba(216,181,106,0.16)",
+    background: blueprintSurfaces.inner,
+    border: "1px solid rgba(var(--premivate-gold-rgb),0.16)",
     boxShadow: "0 24px 80px rgba(0,0,0,0.30)",
   }}
 >
 <p
   style={{
-    color: "#E7CC91",
+    color: "var(--premivate-gold-muted)",
     fontSize: "38px",
     marginBottom: "14px",
   }}
@@ -2978,6 +3262,7 @@ div[style*="space-between"] {
 
 <div style={audioUploadBox}>
   <div
+  className="blueprints-page__reference-grid"
   style={{
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
@@ -3007,9 +3292,9 @@ style={{
   display: "block",
   padding: "10px",
   borderRadius: "18px",
-  border: "1px dashed rgba(216,181,106,0.22)",
+  border: "1px dashed rgba(var(--premivate-gold-rgb),0.22)",
   background:
-    "linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025))",
+    blueprintSurfaces.reference,
   cursor: "pointer",
   textAlign: "center",
   transform: "scale(1)",
@@ -3025,9 +3310,9 @@ style={{
     margin: "0 auto 8px",
     borderRadius: "16px",
     background: isDragging
-      ? "linear-gradient(180deg, rgba(216,181,106,0.18), rgba(255,255,255,0.055))"
-      : "linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.035))",
-    border: "1px solid rgba(216,181,106,0.18)",
+      ? "linear-gradient(180deg, rgba(var(--premivate-gold-rgb),0.18), rgba(255,255,255,0.055))"
+      : blueprintSurfaces.input,
+    border: "1px solid rgba(var(--premivate-gold-rgb),0.18)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -3037,7 +3322,7 @@ style={{
       : "scale(1) translateY(0px)",
     animation: isDragging ? "iconPulse 0.9s infinite" : "none",
     boxShadow: isDragging
-      ? "0 0 30px rgba(216,181,106,0.18)"
+      ? "0 0 30px rgba(var(--premivate-gold-rgb),0.18)"
       : "none",
   }}
 >
@@ -3048,10 +3333,11 @@ style={{
     borderRadius: "999px",
     border: "2px solid rgba(255,255,255,0.9)",
     position: "relative",
-    boxShadow: "0 0 18px rgba(216,181,106,0.18)",
+    boxShadow: "0 0 18px rgba(var(--premivate-gold-rgb),0.18)",
   }}
 >
   <div
+    className="blueprints-page__steps-grid"
     style={{
       position: "absolute",
       top: "50%",
@@ -3089,7 +3375,7 @@ style={{
             0.5 + index * 0.08
           }s ease-in-out infinite`,
           animationDelay: `${index * 0.08}s`,
-          boxShadow: "0 0 12px rgba(216,181,106,0.18)",
+          boxShadow: "0 0 12px rgba(var(--premivate-gold-rgb),0.18)",
         }}
       />
     ))}
@@ -3129,7 +3415,7 @@ style={{
           padding: "14px",
           borderRadius: "16px",
           background: "rgba(255,255,255,0.045)",
-          border: "1px solid rgba(216,181,106,0.14)",
+          border: "1px solid rgba(var(--premivate-gold-rgb),0.14)",
         }}
       >
         <p style={audioFileName}>
@@ -3139,7 +3425,7 @@ style={{
         {audioAnalyzing && (
           <p
             style={{
-              color: "#E7CC91",
+              color: "var(--premivate-gold-muted)",
               fontSize: "13px",
               marginTop: "8px",
             }}
@@ -3201,9 +3487,9 @@ style={{
   display: "block",
   padding: "10px",
   borderRadius: "18px",
-  border: "1px dashed rgba(216,181,106,0.22)",
+  border: "1px dashed rgba(var(--premivate-gold-rgb),0.22)",
   background:
-    "linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025))",
+    blueprintSurfaces.reference,
   cursor: "pointer",
   textAlign: "center",
   transform: "scale(1)",
@@ -3231,8 +3517,8 @@ style={{
           backgroundImage: `url(${visualReferencePreview})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          border: "1px solid rgba(216,181,106,0.20)",
-          boxShadow: "0 0 24px rgba(216,181,106,0.10)",
+          border: "1px solid rgba(var(--premivate-gold-rgb),0.20)",
+          boxShadow: "0 0 24px rgba(var(--premivate-gold-rgb),0.10)",
           flexShrink: 0,
         }}
       />
@@ -3263,9 +3549,9 @@ style={{
           margin: "0 auto 12px",
           borderRadius: "16px",
           background: visualReferenceDragging
-            ? "linear-gradient(180deg, rgba(216,181,106,0.18), rgba(255,255,255,0.055))"
-            : "linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.035))",
-          border: "1px solid rgba(216,181,106,0.18)",
+            ? "linear-gradient(180deg, rgba(var(--premivate-gold-rgb),0.18), rgba(255,255,255,0.055))"
+            : blueprintSurfaces.input,
+          border: "1px solid rgba(var(--premivate-gold-rgb),0.18)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -3275,7 +3561,7 @@ style={{
             : "scale(1) translateY(0px)",
           animation: visualReferenceDragging ? "iconPulse 0.9s infinite" : "none",
           boxShadow: visualReferenceDragging
-            ? "0 0 30px rgba(216,181,106,0.18)"
+            ? "0 0 30px rgba(var(--premivate-gold-rgb),0.18)"
             : "none",
         }}
       >
@@ -3286,7 +3572,7 @@ style={{
             borderRadius: "6px",
             border: "2px solid rgba(255,255,255,0.9)",
             position: "relative",
-            boxShadow: "0 0 18px rgba(216,181,106,0.18)",
+            boxShadow: "0 0 18px rgba(var(--premivate-gold-rgb),0.18)",
           }}
         >
           <div
@@ -3321,7 +3607,7 @@ style={{
   <input
     id="visual-reference-upload"
     type="file"
-    accept="image/*"
+    accept="image/jpeg,image/png,image/webp"
     onChange={(e) => {
       const file = e.target.files?.[0];
 
@@ -3339,7 +3625,7 @@ style={{
         padding: "14px",
         borderRadius: "16px",
         background: "rgba(255,255,255,0.045)",
-        border: "1px solid rgba(216,181,106,0.14)",
+        border: "1px solid rgba(var(--premivate-gold-rgb),0.14)",
         textAlign: "left",
       }}
     >
@@ -3379,11 +3665,11 @@ style={{
               borderRadius: "999px",
               border:
                 visualReferenceType === referenceOption.id
-                  ? "1px solid rgba(216,181,106,0.42)"
+                  ? "1px solid rgba(var(--premivate-gold-rgb),0.42)"
                   : "1px solid rgba(255,255,255,0.14)",
               background:
                 visualReferenceType === referenceOption.id
-                  ? "linear-gradient(180deg, rgba(216,181,106,0.12), rgba(255,255,255,0.055))"
+                  ? "linear-gradient(180deg, rgba(var(--premivate-gold-rgb),0.12), rgba(255,255,255,0.055))"
                   : "rgba(255,255,255,0.055)",
               color: "#f5f3ff",
               fontSize: "12px",
@@ -3445,9 +3731,9 @@ style={{
           style={{
             padding: "8px 12px",
             borderRadius: "999px",
-            border: "1px solid rgba(216,181,106,0.22)",
+            border: "1px solid rgba(var(--premivate-gold-rgb),0.22)",
             background:
-              "linear-gradient(180deg, rgba(216,181,106,0.12), rgba(255,255,255,0.045))",
+              "linear-gradient(180deg, rgba(var(--premivate-gold-rgb),0.12), rgba(255,255,255,0.045))",
             color: "#F6F3EB",
             fontSize: "12px",
             fontWeight: "850",
@@ -3593,6 +3879,7 @@ Include:
     fontSize: "28px",
     fontWeight: "900",
     marginBottom: "10px",
+    paddingLeft: "22px",
   }}
 >
 {ui.blueprints.visionTitle}
@@ -3604,6 +3891,7 @@ Include:
     fontSize: "14px",
     lineHeight: "1.7",
     marginBottom: "18px",
+    paddingLeft: "22px",
   }}
 >
 {ui.blueprints.visionHelp}
@@ -3653,7 +3941,7 @@ style={{
   background:
     selectedMode === mode.name
       ? "linear-gradient(180deg, rgba(20,21,23,0.92), rgba(10,11,13,0.96))"
-      : "rgba(255,255,255,0.045)",
+      : blueprintSurfaces.preset,
 
   transform:
     selectedMode === mode.name
@@ -3662,12 +3950,12 @@ style={{
 
   boxShadow:
     selectedMode === mode.name
-      ? "0 0 0 1px rgba(216,181,106,0.24), 0 10px 24px rgba(0,0,0,0.24)"
+      ? "0 0 0 1px rgba(var(--premivate-gold-rgb),0.24), 0 10px 24px rgba(0,0,0,0.24)"
       : "0 0 0px transparent",
 
   outline:
     selectedMode === mode.name
-      ? "1px solid rgba(216,181,106,0.24)"
+      ? "1px solid rgba(var(--premivate-gold-rgb),0.24)"
       : "1px solid transparent",
 
   outlineOffset: "-1px",
@@ -3732,13 +4020,13 @@ onMouseLeave={(e) => {
     {mode.specialty}
   </div>
 
-  {mode.premium && (
+  {mode.premium && userPlan !== "pro" && (
     <div
       style={{
         fontSize: "9px",
         letterSpacing: "1.5px",
         textTransform: "uppercase",
-        color: "#E7CC91",
+        color: "var(--premivate-gold-muted)",
         opacity: 0.82,
       }}
     >
@@ -3768,14 +4056,14 @@ onMouseEnter={(e) => {
     e.currentTarget.style.transform =
       "translateY(-2px) scale(1.01)";
     e.currentTarget.style.boxShadow =
-      "0 22px 86px rgba(216,181,106,0.34), 0 0 110px rgba(216,181,106,0.16)";
+      "0 22px 86px rgba(var(--premivate-gold-rgb),0.34), 0 0 110px rgba(var(--premivate-gold-rgb),0.16)";
   }
 }}
 onMouseLeave={(e) => {
   e.currentTarget.style.transform =
     generating ? "scale(0.98)" : "scale(1)";
   e.currentTarget.style.boxShadow =
-    "0 18px 60px rgba(216,181,106,0.24)";
+    "0 18px 60px rgba(var(--premivate-gold-rgb),0.24)";
 }}
   >
 {generating
@@ -3797,14 +4085,14 @@ style={{
 onMouseEnter={(e) => {
   if (!saved && !generating) {
     e.currentTarget.style.transform = "translateY(-2px) scale(1.01)";
-    e.currentTarget.style.boxShadow = "0 0 32px rgba(216,181,106,0.14)";
-    e.currentTarget.style.borderColor = "rgba(216,181,106,0.28)";
+    e.currentTarget.style.boxShadow = "0 0 32px rgba(var(--premivate-gold-rgb),0.14)";
+    e.currentTarget.style.borderColor = "rgba(var(--premivate-gold-rgb),0.28)";
   }
 }}
 onMouseLeave={(e) => {
   e.currentTarget.style.transform = "scale(1)";
   e.currentTarget.style.boxShadow = "none";
-  e.currentTarget.style.borderColor = "rgba(216,181,106,0.16)";
+  e.currentTarget.style.borderColor = "rgba(var(--premivate-gold-rgb),0.16)";
 }}
 >
 {saving
@@ -3839,7 +4127,7 @@ onMouseLeave={(e) => {
       animation: "fadeUp 0.45s ease-out",
       background:
         "linear-gradient(135deg, rgba(20,21,23,0.97), rgba(10,11,13,0.98))",
-      border: "1px solid rgba(216,181,106,0.16)",
+      border: "1px solid rgba(var(--premivate-gold-rgb),0.16)",
       boxShadow: "0 24px 70px rgba(0,0,0,0.28)",
     }}
   >
@@ -3860,14 +4148,14 @@ onMouseLeave={(e) => {
     borderRadius: "24px",
     background:
       "linear-gradient(180deg, rgba(255,255,255,0.055), rgba(18,18,16,0.82))",
-    border: "1px solid rgba(216,181,106,0.18)",
+    border: "1px solid rgba(var(--premivate-gold-rgb),0.18)",
     boxShadow: "0 20px 70px rgba(0,0,0,0.24)",
   }}
 >
   <div
     style={{
       fontSize: "11px",
-      color: "#E7CC91",
+      color: "var(--premivate-gold-muted)",
       letterSpacing: "2.4px",
       fontWeight: "900",
       textTransform: "uppercase",
@@ -3947,7 +4235,7 @@ onMouseLeave={(e) => {
       >
         <div
           style={{
-            color: "#E7CC91",
+            color: "var(--premivate-gold-muted)",
             fontSize: "11px",
             fontWeight: "900",
             letterSpacing: "2px",
@@ -3988,7 +4276,7 @@ onMouseLeave={(e) => {
         padding: "22px",
         borderRadius: "24px",
         background: "rgba(10,11,13,0.94)",
-        border: "1px solid rgba(216,181,106,0.16)",
+        border: "1px solid rgba(var(--premivate-gold-rgb),0.16)",
         boxShadow: "0 24px 70px rgba(0,0,0,0.32)",
       }}
     >
@@ -4006,7 +4294,7 @@ onMouseLeave={(e) => {
           <div
             style={{
               fontSize: "11px",
-              color: "#E7CC91",
+              color: "var(--premivate-gold-muted)",
               letterSpacing: "2.4px",
               fontWeight: "900",
               textTransform: "uppercase",
@@ -4095,6 +4383,7 @@ onMouseLeave={(e) => {
   )}
 {productionAssets && (
   <div
+    className="blueprints-page__copy-grid"
     style={{
       marginBottom: "22px",
       display: "grid",
@@ -4109,9 +4398,9 @@ onMouseLeave={(e) => {
         borderRadius: "28px",
         background:
           "linear-gradient(180deg, rgba(20,21,23,0.94), rgba(10,11,13,0.98))",
-        border: "1px solid rgba(216,181,106,0.16)",
+        border: "1px solid rgba(var(--premivate-gold-rgb),0.16)",
         boxShadow:
-          "0 24px 80px rgba(0,0,0,0.38), 0 0 46px rgba(216,181,106,0.08)",
+          "0 24px 80px rgba(0,0,0,0.38), 0 0 46px rgba(var(--premivate-gold-rgb),0.08)",
       }}
     >
       <div
@@ -4127,7 +4416,7 @@ onMouseLeave={(e) => {
         <div
           style={{
             fontSize: "11px",
-            color: "#E7CC91",
+            color: "var(--premivate-gold-muted)",
             letterSpacing: "2.4px",
             fontWeight: "900",
             textTransform: "uppercase",
@@ -4143,7 +4432,7 @@ onMouseLeave={(e) => {
             setAssetCopyLabel("director");
             setTimeout(() => setAssetCopyLabel(""), 1200);
           }}
-          className="premiumCopyAction"
+          className="premiumCopyAction blueprintsOutputCopyAction"
           style={assetCopyLabel === "director" ? premiumCopyButtonCopied : premiumCopyButton}
         >
           {assetCopyLabel === "director" ? ui.blueprints.copied : ui.blueprints.copyDirection}
@@ -4229,7 +4518,7 @@ onMouseLeave={(e) => {
           <div
             style={{
               fontSize: "11px",
-              color: "#E7CC91",
+              color: "var(--premivate-gold-muted)",
               letterSpacing: "1.5px",
               fontWeight: "800",
             }}
@@ -4244,7 +4533,7 @@ onMouseLeave={(e) => {
               setAssetCopyLabel(item.key);
               setTimeout(() => setAssetCopyLabel(""), 1200);
             }}
-            className="premiumCopyAction"
+            className="premiumCopyAction blueprintsOutputCopyAction"
             style={assetCopyLabel === item.key ? premiumCopyButtonCopied : premiumCopyButton}
           >
             {assetCopyLabel === item.key ? ui.blueprints.copied : item.copyLabel}
@@ -4278,9 +4567,9 @@ onMouseLeave={(e) => {
     backgroundSize: "cover",
     backgroundPosition: "center right",
     backgroundRepeat: "no-repeat",
-    border: "1px solid rgba(216,181,106,0.16)",
+    border: "1px solid rgba(var(--premivate-gold-rgb),0.16)",
     boxShadow:
-      "0 18px 54px rgba(0,0,0,0.26), 0 0 34px rgba(216,181,106,0.05)",
+      "0 18px 54px rgba(0,0,0,0.26), 0 0 34px rgba(var(--premivate-gold-rgb),0.05)",
   }}
 >
   <div
@@ -4299,7 +4588,7 @@ onMouseLeave={(e) => {
     padding: "18px",
     borderRadius: "20px",
     background: "rgba(10,11,13,0.82)",
-    border: "1px solid rgba(216,181,106,0.14)",
+    border: "1px solid rgba(var(--premivate-gold-rgb),0.14)",
   }}
 >
   <div
@@ -4311,13 +4600,14 @@ onMouseLeave={(e) => {
       marginBottom: "12px",
     }}
   >
-    <p style={{ color: "rgba(231,204,145,0.82)", fontSize: "13px", margin: 0 }}>
+    <p style={{ color: "rgba(var(--premivate-gold-rgb),0.82)", fontSize: "13px", margin: 0 }}>
       SHOT OVERVIEW
     </p>
   </div>
 
   {generatedShots.length > 0 && (
     <div
+      className="blueprints-page__shot-grid"
       style={{
         marginTop: "22px",
         display: "grid",
@@ -4333,7 +4623,7 @@ onMouseLeave={(e) => {
             e.currentTarget.style.transform = "translateY(-5px)";
             e.currentTarget.style.boxShadow =
               "0 18px 60px rgba(0,0,0,0.30)";
-            e.currentTarget.style.border = "1px solid rgba(216,181,106,0.26)";
+            e.currentTarget.style.border = "1px solid rgba(var(--premivate-gold-rgb),0.26)";
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = "translateY(0)";
@@ -4341,8 +4631,8 @@ onMouseLeave={(e) => {
               "0 16px 34px rgba(0,0,0,0.26)";
             e.currentTarget.style.border =
               selectedShot === index
-                ? "1px solid rgba(216,181,106,0.48)"
-                : "1px solid rgba(216,181,106,0.10)";
+                ? "1px solid rgba(var(--premivate-gold-rgb),0.48)"
+                : "1px solid rgba(var(--premivate-gold-rgb),0.10)";
           }}
           style={{
             transition: "all 0.3s ease",
@@ -4355,12 +4645,12 @@ onMouseLeave={(e) => {
             flexDirection: "column",
             background:
               selectedShot === index
-                ? "linear-gradient(180deg, rgba(216,181,106,0.08), rgba(255,255,255,0.04))"
+                ? "linear-gradient(180deg, rgba(var(--premivate-gold-rgb),0.08), rgba(255,255,255,0.04))"
                 : "rgba(255,255,255,0.045)",
             border:
               selectedShot === index
-                ? "1px solid rgba(216,181,106,0.48)"
-                : "1px solid rgba(216,181,106,0.10)",
+                ? "1px solid rgba(var(--premivate-gold-rgb),0.48)"
+                : "1px solid rgba(var(--premivate-gold-rgb),0.10)",
           }}
         >
           <div
@@ -4378,7 +4668,7 @@ onMouseLeave={(e) => {
 
             <div
               style={{
-                color: "rgba(231,204,145,0.82)",
+                color: "rgba(var(--premivate-gold-rgb),0.82)",
                 fontSize: "10px",
                 fontWeight: "800",
                 letterSpacing: "1.4px",
@@ -4453,7 +4743,7 @@ onMouseLeave={(e) => {
               marginTop: "18px",
               paddingTop: "14px",
               borderTop: "1px solid rgba(246,243,235,0.08)",
-              color: "#E7CC91",
+              color: "var(--premivate-gold-muted)",
               fontSize: "12px",
               fontWeight: "800",
               letterSpacing: "1px",
@@ -4473,11 +4763,12 @@ onMouseLeave={(e) => {
       padding: "22px",
       borderRadius: "22px",
       background: "rgba(18,18,16,0.82)",
-      border: "1px solid rgba(216,181,106,0.16)",
+      border: "1px solid rgba(var(--premivate-gold-rgb),0.16)",
       boxShadow: "0 18px 50px rgba(0,0,0,0.24)",
     }}
   >
     <div
+      className="blueprints-page__inspector-grid"
       style={{
         display: "flex",
         justifyContent: "space-between",
@@ -4568,6 +4859,11 @@ onMouseLeave={(e) => {
           {generatedShots[selectedShot].description}
         </div>
 
+        <div style={{ marginBottom: "22px" }}>
+          <div style={shotLabel}>CAUSAL LINK</div>
+          <div style={shotValue}>{generatedShots[selectedShot].causalLink}</div>
+        </div>
+
         <div
           style={{
             display: "grid",
@@ -4610,8 +4906,8 @@ onMouseLeave={(e) => {
           padding: "20px",
           borderRadius: "20px",
           background: "rgba(24,22,17,0.82)",
-          border: "1px solid rgba(216,181,106,0.18)",
-          boxShadow: "0 18px 50px rgba(216,181,106,0.07)",
+          border: "1px solid rgba(var(--premivate-gold-rgb),0.18)",
+          boxShadow: "0 18px 50px rgba(var(--premivate-gold-rgb),0.07)",
         }}
       >
         <div

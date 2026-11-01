@@ -1,13 +1,17 @@
 import { LANGUAGES } from "../data/languages";
+import { SignedIn } from "@clerk/nextjs";
 
 export default function SettingsPage({
   language,
   setLanguage,
   ui,
+  userPlan,
+  planStatusLoaded,
   t = (value) => value,
 }) {
   return (
     <div
+      className="settings-page"
       style={{
         minHeight: "100vh",
         background:
@@ -25,16 +29,17 @@ export default function SettingsPage({
           style={{
             letterSpacing: "0.28em",
             textTransform: "uppercase",
-            color: "#D8B56A",
+            color: "var(--premivate-gold-muted)",
             fontSize: "13px",
             fontWeight: 800,
             marginBottom: "28px",
           }}
         >
-          {t("FrameLab Settings")}
+          {t("Premivate Settings")}
         </div>
 
         <h1
+          className="settings-page__headline"
           style={{
             fontSize: "72px",
             lineHeight: "0.95",
@@ -61,6 +66,7 @@ export default function SettingsPage({
         </p>
 
         <div
+          className="settings-page__grid"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
@@ -76,10 +82,11 @@ export default function SettingsPage({
               onChange={(event) => setLanguage(event.target.value)}
               aria-label={ui.settings.languageTitle}
               style={{
+                marginTop: "auto",
                 width: "100%",
                 padding: "12px 14px",
                 borderRadius: "14px",
-                border: "1px solid rgba(216,181,106,0.22)",
+                border: "1px solid rgba(var(--premivate-gold-rgb),0.22)",
                 background: "rgba(0,0,0,0.34)",
                 color: "rgba(246,243,235,0.96)",
                 fontSize: "14px",
@@ -98,7 +105,13 @@ export default function SettingsPage({
           <section style={{ ...cardStyle, ...contextCardStyle }}>
             <h2 style={cardTitle}>{t("Subscription")}</h2>
             <p style={cardText}>{t("Current plan status is shown in the sidebar.")}</p>
-            <div style={badgeStyle}>{t("Pro Unlimited Active")}</div>
+            <SignedIn>
+              {planStatusLoaded && userPlan === "pro" ? (
+                <div style={badgeStyle}>{t("Pro Active")}</div>
+              ) : planStatusLoaded && userPlan === "free" ? (
+                <div style={badgeStyle}>{t("Free plan active")}</div>
+              ) : null}
+            </SignedIn>
           </section>
 
           <section style={{ ...cardStyle, ...contextCardStyle }}>
@@ -124,11 +137,33 @@ export default function SettingsPage({
           </section>
         </div>
       </div>
+
+      <style jsx global>{`
+        @media (max-width: 900px) {
+          .settings-page {
+            padding: 72px 20px 120px !important;
+          }
+
+          .settings-page__headline {
+            font-size: clamp(42px, 12vw, 58px) !important;
+            line-height: 1.02 !important;
+            max-width: 100% !important;
+            overflow-wrap: anywhere;
+          }
+
+          .settings-page__grid {
+            grid-template-columns: minmax(0, 1fr) !important;
+            gap: 18px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
 
 const cardStyle = {
+  display: "flex",
+  flexDirection: "column",
   padding: "28px",
   borderRadius: "24px",
   background: "rgba(12,12,13,0.76)",
@@ -140,7 +175,7 @@ const cardStyle = {
 const primaryControlCardStyle = {
   background:
     "linear-gradient(145deg, rgba(42,35,22,0.92) 0%, rgba(17,16,14,0.90) 72%)",
-  border: "1px solid rgba(216,181,106,0.34)",
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.34)",
   boxShadow:
     "0 28px 86px rgba(0,0,0,0.38), inset 0 0 0 1px rgba(246,225,174,0.025)",
 };
@@ -169,12 +204,14 @@ const cardText = {
 };
 
 const badgeStyle = {
+  alignSelf: "flex-start",
   display: "inline-flex",
+  marginTop: "auto",
   padding: "10px 14px",
   borderRadius: "999px",
   background: "rgba(255,255,255,0.055)",
-  border: "1px solid rgba(216,181,106,0.16)",
-  color: "#E7CC91",
+  border: "1px solid rgba(var(--premivate-gold-rgb),0.16)",
+  color: "var(--premivate-gold-muted)",
   fontSize: "13px",
   fontWeight: 800,
 };
