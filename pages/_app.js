@@ -258,6 +258,21 @@ export default function App({ Component, pageProps }) {
             userPlan={userPlan}
             planStatusLoaded={planStatusLoaded}
           />
+          <footer
+            className="premivate-legal-footer"
+            aria-label={language === "Deutsch" ? "Rechtliche Informationen" : "Legal information"}
+          >
+            <span>{language === "Deutsch" ? "Rechtliches" : "Legal"}</span>
+            <Link href={language === "Deutsch" ? "/terms?lang=de" : "/terms"}>
+              {language === "Deutsch" ? "AGB" : "Terms"}
+            </Link>
+            <Link href={language === "Deutsch" ? "/privacy?lang=de" : "/privacy"}>
+              {language === "Deutsch" ? "Datenschutz" : "Privacy"}
+            </Link>
+            <Link href={language === "Deutsch" ? "/imprint?lang=de" : "/imprint"}>
+              {language === "Deutsch" ? "Impressum" : "Imprint"}
+            </Link>
+          </footer>
         </main>
       </div>
 
@@ -323,7 +338,37 @@ export default function App({ Component, pageProps }) {
           display: none;
         }
 
+        .premivate-legal-footer {
+          box-sizing: border-box;
+          width: min(100%, 1464px);
+          margin: 0 auto;
+          padding: 18px 72px 26px;
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 18px;
+          color: rgba(255, 255, 255, 0.42);
+          font-size: 12px;
+          letter-spacing: 0.02em;
+        }
+
+        .premivate-legal-footer a {
+          color: rgba(255, 255, 255, 0.64);
+          text-decoration: none;
+          transition: color 160ms ease;
+        }
+
+        .premivate-legal-footer a:hover,
+        .premivate-legal-footer a:focus-visible {
+          color: rgb(var(--premivate-gold-rgb));
+        }
+
         @media (max-width: 900px) {
+          .premivate-legal-footer {
+            padding: 16px 20px 24px;
+            gap: 14px;
+          }
+
           .framelab-app-shell {
             display: block !important;
           }
