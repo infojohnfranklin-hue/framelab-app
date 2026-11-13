@@ -1,5 +1,7 @@
 import { getAuth } from "@clerk/nextjs/server";
-import { getUserPlan } from "../../lib/pro";
+import { getEffectiveUserPlan } from "../../lib/pro";
+import { assertAccountNotDeleting } from "../../lib/account-deletion";
+import { supabase } from "../../lib/pro";
 
 export default async function handler(req, res) {
   try {
@@ -11,19 +13,20 @@ export default async function handler(req, res) {
       });
     }
 
-    // OWNER OVERRIDE
-    if (userId === "user_3DrEzh71zs0gCqttVokYBfwF6Jk") {
-      return res.status(200).json({
-        plan: "pro",
-      });
-    }
+    await assertAccountNotDeleting(supabase, userId, process.env);
 
-    const plan = await getUserPlan(userId);
+    const plan = await getEffectiveUserPlan(userId);
 
     return res.status(200).json({
       plan: plan || "free",
     });
   } catch (error) {
+    if (error?.safeCode === "ACCOUNT_DELETION_IN_PROGRESS") {
+      return res.status(410).json({ error: error.safeCode });
+    }
+    if (typeof error?.safeCode === "string" && error.safeCode.startsWith("ACCOUNT_DELETION_")) {
+      return res.status(503).json({ error: error.safeCode });
+    }
     console.error("me-plan error:", error);
 
     return res.status(500).json({

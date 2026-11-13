@@ -1,40 +1,75 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { useUser } from "@clerk/nextjs";
-import { supabase } from "../lib/supabaseClient";
 import Layout from "../components/Layout";
+import { storeReopenGeneration } from "../lib/browser-content-retention";
 
 export default function History({ ui, t }) {
   const _t = typeof t === "function" ? t : (value) => value;
   const router = useRouter();
-  const { user } = useUser();
+  const { isLoaded, user } = useUser();
   const [generations, setGenerations] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
+  const [historyError, setHistoryError] = useState("");
+  const [historyLoadRequest, setHistoryLoadRequest] = useState(0);
   const [hoveredId, setHoveredId] = useState(null);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
   const [showExportUnavailableDialog, setShowExportUnavailableDialog] = useState(false);
   const exportUnavailableDialogRef = useRef(null);
 
   useEffect(() => {
+    if (!isLoaded) return undefined;
+
+    let cancelled = false;
+
     async function loadGenerations() {
-      if (!user?.id) return;
+      setHistoryLoading(true);
+      setHistoryError("");
+      setGenerations([]);
 
-      const { data, error } = await supabase
-        .from("generations")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.log(error);
+      if (!user?.id) {
+        setHistoryError(
+          ui?.history?.loadFailed ||
+            "History could not be loaded. Please sign in and try again."
+        );
+        setHistoryLoading(false);
         return;
       }
 
-console.log("HISTORY DATA:", data);
-setGenerations(data || []);
+      try {
+        const response = await fetch("/api/history", {
+          method: "GET",
+          headers: { Accept: "application/json" },
+        });
+        const result = await response.json().catch(() => null);
+
+        if (
+          !response.ok ||
+          !result ||
+          !Array.isArray(result.generations)
+        ) {
+          throw new Error("HISTORY_LOAD_FAILED");
+        }
+
+        if (!cancelled) setGenerations(result.generations);
+      } catch {
+        if (!cancelled) {
+          setGenerations([]);
+          setHistoryError(
+            ui?.history?.loadFailed ||
+              "History could not be loaded. Please refresh and try again."
+          );
+        }
+      } finally {
+        if (!cancelled) setHistoryLoading(false);
+      }
     }
 
-    loadGenerations();
-  }, [user?.id]);
+    void loadGenerations();
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoaded, user?.id, historyLoadRequest, ui?.history?.loadFailed]);
 
   useEffect(() => {
     if (!showExportUnavailableDialog) {
@@ -71,8 +106,6 @@ setGenerations(data || []);
 
     const result = await response.json();
 
-    console.log("DELETE RESULT:", result);
-
     if (!response.ok) {
       alert(result.error || ui.history.deleteFailed);
       return;
@@ -82,12 +115,7 @@ setGenerations(data || []);
   }
 
   function reopenGeneration(item) {
-    console.log("REOPEN ITEM:", item);
-
-    localStorage.setItem(
-      "reopenGeneration",
-      JSON.stringify(item)
-    );
+    storeReopenGeneration(item);
 
     if (item.expanded_prompt) {
       router.push("/videos");
@@ -147,9 +175,9 @@ setGenerations(data || []);
   return (
     <Layout>
       <style jsx>{`
-        @media (max-width: 768px) {
+        @media (max-width: 760px) {
           .history-content {
-            padding: 28px 22px 118px !important;
+            padding: 56px 20px 120px !important;
           }
 
           .history-headline {
@@ -190,7 +218,33 @@ setGenerations(data || []);
           {ui.history.memoryIntro}
         </p>
 
-        {generations.length === 0 && (
+        {historyLoading && (
+          <div role="status" style={emptyBox}>
+            {ui?.history?.loading || "Loading history…"}
+          </div>
+        )}
+
+        {!historyLoading && historyError && (
+          <div role="alert" style={emptyBox}>
+            <p style={{ color: "#fff", margin: "0 0 14px" }}>{historyError}</p>
+            <button
+              type="button"
+              onClick={() => setHistoryLoadRequest((current) => current + 1)}
+              style={{
+                border: "1px solid rgba(255,255,255,0.2)",
+                borderRadius: "999px",
+                padding: "10px 16px",
+                background: "rgba(255,255,255,0.08)",
+                color: "#fff",
+                cursor: "pointer",
+              }}
+            >
+              {ui?.history?.retry || "Try again"}
+            </button>
+          </div>
+        )}
+
+        {!historyLoading && !historyError && generations.length === 0 && (
           <div style={emptyBox}>
             <h3
               style={{
@@ -214,6 +268,7 @@ setGenerations(data || []);
           </div>
         )}
 
+        {!historyLoading && !historyError && (
         <div className="history-grid" style={grid}>
           {generations.map((item) => {
             const isHovered = hoveredId === item.id;
@@ -424,6 +479,7 @@ setGenerations(data || []);
             );
           })}
         </div>
+        )}
       {showExportUnavailableDialog && (
         <dialog
           ref={exportUnavailableDialogRef}
@@ -635,9 +691,15 @@ setGenerations(data || []);
 
 const content = {
   flex: 1,
-  padding: "70px",
+  padding: "72px",
   background:
-    "linear-gradient(90deg, rgba(7,7,8,0.94) 0%, rgba(7,7,8,0.80) 40%, rgba(7,7,8,0.54) 72%, rgba(7,7,8,0.46) 100%), linear-gradient(180deg, rgba(9,8,6,0.18) 0%, rgba(9,8,6,0.36) 58%, rgba(9,8,6,0.78) 100%), url('/framelab-premium-History-assets/ChatGPT Image 24. Sept. 2026, 14_37_35.png') center top / 100% auto no-repeat, #090A0C",
+    "linear-gradient(90deg, rgba(7,7,8,0.94) 0%, rgba(7,7,8,0.80) 40%, rgba(7,7,8,0.54) 72%, rgba(7,7,8,0.46) 100%), linear-gradient(180deg, rgba(9,8,6,0.18) 0%, rgba(9,8,6,0.36) 58%, rgba(9,8,6,0.78) 100%), url('/framelab-premium-History-assets/ChatGPT Image 24. Sept. 2026, 14_37_35.png'), #090A0C",
+  backgroundSize: "100% 100%, 100% 100%, cover",
+  backgroundPosition: "center, center, center center",
+  backgroundRepeat: "no-repeat, no-repeat, no-repeat",
+  backgroundAttachment: "fixed, fixed, fixed",
+  minHeight: "100vh",
+  boxSizing: "border-box",
   minWidth: 0,
   maxWidth: "100%",
   overflow: "hidden",
@@ -648,15 +710,15 @@ const eyebrow = {
   fontSize: "13px",
   letterSpacing: "0.28em",
   fontWeight: "800",
-  marginBottom: "22px",
+  margin: "0 0 28px",
 };
 
 const headline = {
   fontSize: "72px",
-  lineHeight: "0.98",
+  lineHeight: "0.95",
   fontWeight: "900",
-  maxWidth: "100%",
-  marginBottom: "24px",
+  maxWidth: "1080px",
+  margin: "0 0 28px",
   wordBreak: "normal",
 };
 
@@ -664,13 +726,16 @@ const subtitle = {
   color: "rgba(255,255,255,0.7)",
   fontSize: "19px",
   lineHeight: "1.6",
-  maxWidth: "100%",
-  marginBottom: "48px",
+  maxWidth: "760px",
+  marginBottom: "42px",
 };
 
 const emptyBox = {
-  padding: "34px",
-  borderRadius: "28px",
+  width: "100%",
+  maxWidth: "1080px",
+  boxSizing: "border-box",
+  padding: "28px",
+  borderRadius: "24px",
   background:
     "linear-gradient(135deg, rgba(20,21,23,0.94), rgba(10,11,13,0.98))",
   border: "1px solid rgba(246,243,235,0.08)",
@@ -683,7 +748,7 @@ const grid = {
   gridTemplateColumns:
     "repeat(auto-fit, minmax(min(360px, 100%), 1fr))",
   alignItems: "start",
-  gap: "24px",
+  gap: "22px",
   width: "100%",
   maxWidth: "1080px",
 };
@@ -691,7 +756,7 @@ const grid = {
 const card = {
   minHeight: "520px",
   padding: "28px",
-  borderRadius: "30px",
+  borderRadius: "24px",
   background:
     "linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025))",
   display: "flex",

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { readFreshActiveProject } from "../lib/browser-content-retention";
 
 export default function Sidebar({
   userPlan,
@@ -16,7 +17,7 @@ export default function Sidebar({
   const alreadyProDialogRef = useRef(null);
 
   useEffect(() => {
-    const savedProject = localStorage.getItem("framelabActiveProject");
+    const savedProject = readFreshActiveProject();
 
     if (savedProject) {
       setActiveProject(savedProject);

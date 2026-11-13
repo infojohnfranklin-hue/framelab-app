@@ -4,6 +4,11 @@ import { useUser } from "@clerk/nextjs";
 import Layout from "../components/Layout";
 import { directorModes } from "../data/directorModes";
 import {
+  pruneLocalContentCopies,
+  readFreshReopenGeneration,
+  storeActiveProject,
+} from "../lib/browser-content-retention";
+import {
   directorStyles,
   buildCinematicPrompt,
 } from "../lib/promptEngine.js";
@@ -671,13 +676,13 @@ const hasAccess =
   const [directorSummary, setDirectorSummary] = useState("");
 
 useEffect(() => {
+  pruneLocalContentCopies();
   const reopenPrompt = localStorage.getItem("reopenPrompt");
   const reopenMode = localStorage.getItem("reopenMode");
   const reopenImage = localStorage.getItem("reopenImage");
-    const reopenGeneration = localStorage.getItem("reopenGeneration");
+    const parsedGeneration = readFreshReopenGeneration();
 
-if (reopenGeneration) {
-  const parsedGeneration = JSON.parse(reopenGeneration);
+if (parsedGeneration) {
 
   setPrompt(parsedGeneration.prompt || "");
   setExpandedPrompt(parsedGeneration.expanded_prompt || parsedGeneration.prompt || "");
@@ -707,10 +712,7 @@ if (reopenPrompt && !reopenPrompt.includes("cinematic shots generated")) {
   setExpandedPrompt(reopenPrompt);
   setGenerated(true);
 
-  localStorage.setItem(
-    "framelabActiveProject",
-    reopenPrompt.slice(0, 42) || "Untitled Project"
-  );
+  storeActiveProject(reopenPrompt.slice(0, 42) || "Untitled Project");
 }
 
 if (reopenPrompt?.includes("cinematic shots generated")) {
@@ -1082,9 +1084,8 @@ async function handleGenerate() {
     setShots(mappedShots);
     setGeneratedShots(mappedShots);
     setVideoUrl("");
-    localStorage.setItem("framelabActiveProject", vision.slice(0, 60));
+    storeActiveProject(vision.slice(0, 60));
     localStorage.setItem("framelabActiveDirector", selectedMode);
-    localStorage.setItem("framelabActivePrompt", finalPrompt);
 
     if (userPlan === "free") {
       try {
@@ -2830,8 +2831,7 @@ setGeneratedShots(generatedShots);
 setTimeout(async () => {
   setGenerating(false);
   setGenerated(true);
-localStorage.setItem(
-  "framelabActiveProject",
+storeActiveProject(
   prompt && !prompt.startsWith("Cinematic Untitled cinematic vision")
     ? prompt.slice(0, 60)
     : generatedShots?.[0]?.title || "Untitled Project"
@@ -2842,10 +2842,6 @@ localStorage.setItem(
   selectedMode
 );
 
-localStorage.setItem(
-  "framelabActivePrompt",
-  finalPrompt
-);
   if (userPlan === "free") {
     await fetch("/api/use-credit", {
       method: "POST",

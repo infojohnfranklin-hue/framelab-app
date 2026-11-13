@@ -1,7 +1,20 @@
 import OpenAI from "openai";
 import { reserveGlobalProviderAttempt } from "../../lib/credits";
 import { getAuth } from "@clerk/nextjs/server";
-import { getUserPlan } from "../../lib/pro";
+import {
+  assertAccountNotDeleting,
+  beginAccountRedisOperation,
+  createAccountDeletionRedis,
+  finishAccountRedisOperation,
+  isSelfServiceDeletionEnabled,
+} from "../../lib/account-deletion";
+import { getEffectiveUserPlan, isPremivateOwner, supabase } from "../../lib/pro";
+import {
+  reserve as reserveProCredit,
+  markProviderStarted as markProProviderStarted,
+  commit as commitProCredit,
+  release as releaseProCredit,
+} from "../../lib/credit-ledger";
 import { directorModes } from "../../data/directorModes";
 import { isSupportedLanguage } from "../../data/languages";
 import measurement from "../../lib/generation-cost-measurement";
@@ -9,6 +22,7 @@ import measurement from "../../lib/generation-cost-measurement";
 const {
   createGenerationCostMeasurementContext,
   measureOpenAICall,
+  finalizeGenerationCostMeasurement,
 } = measurement;
 
 const MODEL = "gpt-6-luna";
@@ -264,22 +278,55 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  let proBlueprintCredit = null;
+  let accountOperationRedis = null;
+  let accountOperationId = null;
+  let accountOperationUserId = null;
+  const reserveBlueprintProviderAttempt = async () => {
+    await reserveGlobalProviderAttempt();
+
+    if (!proBlueprintCredit?.reserved || proBlueprintCredit.providerStarted) {
+      return;
+    }
+
+    const started = await markProProviderStarted(supabase, {
+      userId: proBlueprintCredit.userId,
+      requestId: proBlueprintCredit.requestId,
+    });
+
+    if (started?.status !== "started") {
+      const error = new Error("PROVIDER_START_MARK_FAILED");
+      error.code = "PROVIDER_START_MARK_FAILED";
+      throw error;
+    }
+
+    proBlueprintCredit.providerStarted = true;
+  };
+
+  let costMeasurementOutcome = "unknown";
   const costMeasurement =
     createGenerationCostMeasurementContext(
       "blueprint",
       undefined,
-      reserveGlobalProviderAttempt
+      reserveBlueprintProviderAttempt
     );
 
   try {
     const devMode = process.env.FRAMELAB_DEV_MODE === "true";
     const { userId } = getAuth(req);
     if (!devMode && !userId) return res.status(401).json({ error: "Unauthorized" });
+    if (!devMode && userId && isSelfServiceDeletionEnabled(process.env)) {
+      await assertAccountNotDeleting(supabase, userId, process.env);
+      accountOperationRedis = createAccountDeletionRedis(process.env);
+      accountOperationId = await beginAccountRedisOperation(accountOperationRedis, userId);
+      accountOperationUserId = userId;
+    }
 
     const parsed = validateRequest(req.body);
     if (parsed.error) return res.status(400).json({ error: parsed.error });
     const input = parsed.value;
-    const plan = devMode ? "pro" : await getUserPlan(userId);
+    const isOwner = !devMode && isPremivateOwner(userId);
+    const plan = devMode ? "pro" : await getEffectiveUserPlan(userId);
     const normalizedPlan = String(plan || "free").toLowerCase();
     if (!devMode && !normalizedPlan.includes("pro") && !["free", "standard"].includes(normalizedPlan)) {
       return res.status(403).json({ error: "Blueprint generation is unavailable for this plan." });
@@ -287,6 +334,76 @@ export default async function handler(req, res) {
     const selectedMode = directorModes.find((mode) => mode.name === input.directorMode);
     if (!devMode && selectedMode?.premium && !normalizedPlan.includes("pro")) {
       return res.status(403).json({ error: "Pro subscription required for this director mode." });
+    }
+
+    const chargeProTextBlueprint =
+      !devMode &&
+      !isOwner &&
+      normalizedPlan.includes("pro") &&
+      !input.visualReferenceType &&
+      !input.visualReferenceImage &&
+      process.env.PREMIVATE_PRO_TEXT_BLUEPRINT_CREDIT_LEDGER_ENABLED === "true";
+
+    if (chargeProTextBlueprint) {
+      const requestId = req.body?.generationRequestId;
+      if (
+        typeof requestId !== "string" ||
+        !/^[A-Za-z0-9_-]{16,100}$/.test(requestId)
+      ) {
+        return res.status(400).json({
+          error: "Invalid generation request id",
+          code: "INVALID_GENERATION_REQUEST_ID",
+        });
+      }
+
+      proBlueprintCredit = {
+        userId,
+        requestId,
+        reserveAttempted: true,
+        reserved: false,
+        providerStarted: false,
+        committed: false,
+      };
+
+      let reservation;
+      try {
+        reservation = await reserveProCredit(supabase, {
+          userId,
+          requestId,
+          operation: "text_blueprint",
+          credits: 1,
+        });
+      } catch (error) {
+        if (
+          typeof error?.message === "string" &&
+          error.message.includes("CREDIT_BALANCE_INSUFFICIENT")
+        ) {
+          proBlueprintCredit = null;
+          return res.status(403).json({
+            error: "Pro credits exhausted",
+            code: "PRO_CREDITS_EXHAUSTED",
+          });
+        }
+        throw error;
+      }
+
+      if (reservation?.status === "duplicate") {
+        proBlueprintCredit = null;
+        return res.status(409).json({
+          error: "This generation request was already used",
+          code: "GENERATION_REQUEST_ALREADY_USED",
+          reservationStatus:
+            typeof reservation.reservationStatus === "string"
+              ? reservation.reservationStatus
+              : "unknown",
+        });
+      }
+
+      if (reservation?.status !== "reserved") {
+        throw new Error("PRO_CREDIT_RESERVATION_FAILED");
+      }
+
+      proBlueprintCredit.reserved = true;
     }
 
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, maxRetries: 0 });
@@ -339,6 +456,7 @@ export default async function handler(req, res) {
         },
       ],
     }, { maxRetries: 0, timeout: 60000 }));
+    costMeasurementOutcome = "error";
 
     const choice = completion?.choices?.[0];
     if (choice?.message?.refusal || choice?.finish_reason !== "stop") {
@@ -365,12 +483,68 @@ export default async function handler(req, res) {
       });
     }
 
+    if (proBlueprintCredit?.reserved) {
+      if (!proBlueprintCredit.providerStarted) {
+        throw new Error("PROVIDER_START_NOT_CONFIRMED");
+      }
+
+      const committed = await commitProCredit(supabase, {
+        userId: proBlueprintCredit.userId,
+        requestId: proBlueprintCredit.requestId,
+      });
+
+      if (committed?.status !== "committed") {
+        throw new Error("PRO_CREDIT_COMMIT_NOT_CONFIRMED");
+      }
+
+      proBlueprintCredit.committed = true;
+    }
+
+    costMeasurementOutcome = "success";
     return res.status(200).json({
       ...output,
       visualReferenceTransport: input.visualReferenceImage ? "pixels_received" : input.visualReferenceType ? "type_only" : "none",
     });
   } catch (error) {
+    costMeasurementOutcome = "error";
+    if (error?.safeCode === "ACCOUNT_DELETION_IN_PROGRESS") {
+      return res.status(410).json({ error: error.safeCode });
+    }
+    if (typeof error?.safeCode === "string" && error.safeCode.startsWith("ACCOUNT_DELETION_")) {
+      return res.status(503).json({ error: error.safeCode });
+    }
     console.error("PREMIVATE BLUEPRINT GENERATION FAILED", error?.code || "unknown error");
     return res.status(502).json({ error: "Blueprint generation failed. No fallback blueprint was returned." });
+  } finally {
+    if (
+      proBlueprintCredit?.reserveAttempted &&
+      !proBlueprintCredit.providerStarted &&
+      !proBlueprintCredit.committed
+    ) {
+      try {
+        const released = await releaseProCredit(supabase, {
+          userId: proBlueprintCredit.userId,
+          requestId: proBlueprintCredit.requestId,
+        });
+
+        if (!["released", "duplicate"].includes(released?.status)) {
+          console.error("PREMIVATE Pro Blueprint credit release not confirmed");
+        }
+      } catch (releaseError) {
+        console.error(
+          "PREMIVATE Pro Blueprint credit release failed:",
+          releaseError?.code || "UNKNOWN"
+        );
+      }
+    }
+
+    finalizeGenerationCostMeasurement(costMeasurement, costMeasurementOutcome);
+    if (accountOperationId) {
+      try {
+        await finishAccountRedisOperation(accountOperationRedis, accountOperationUserId, accountOperationId);
+      } catch (releaseError) {
+        console.error("PREMIVATE account operation release failed", releaseError?.safeCode || "UNKNOWN");
+      }
+    }
   }
 }

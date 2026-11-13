@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Sidebar from "../components/Sidebar";
+import { pruneLocalContentCopies } from "../lib/browser-content-retention";
 import {
   DEFAULT_LANGUAGE,
   LANGUAGE_STORAGE_KEY,
@@ -78,6 +79,7 @@ export default function App({ Component, pageProps }) {
   }, []);
 
   useEffect(() => {
+    pruneLocalContentCopies();
     const savedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
 
     if (savedLanguage && isSupportedLanguage(savedLanguage)) {

@@ -5,14 +5,28 @@ import {
   completeFreeGenerate,
   failFreeGenerate,
 } from "../../lib/credits";
-import { getUserPlan } from "../../lib/pro";
+import { getEffectiveUserPlan, isPremivateOwner, supabase } from "../../lib/pro";
+import {
+  reserve as reserveProCredit,
+  markProviderStarted as markProProviderStarted,
+  commit as commitProCredit,
+  release as releaseProCredit,
+} from "../../lib/credit-ledger";
 import { getAuth } from "@clerk/nextjs/server";
+import {
+  assertAccountNotDeleting,
+  beginAccountRedisOperation,
+  createAccountDeletionRedis,
+  finishAccountRedisOperation,
+  isSelfServiceDeletionEnabled,
+} from "../../lib/account-deletion";
 import { directorModes } from "../../data/directorModes";
 import measurement from "../../lib/generation-cost-measurement";
 
 const {
   createGenerationCostMeasurementContext,
   measureOpenAICall,
+  finalizeGenerationCostMeasurement,
 } = measurement;
 
 const client = new OpenAI({
@@ -25,12 +39,41 @@ function escapeRegExp(string = "") {
 }
 
 export default async function handler(req, res) {
+  let proGenerationContext = null;
+  let accountOperationRedis = null;
+  let accountOperationId = null;
+  let accountOperationUserId = null;
+  const reserveMainProviderAttempt = async () => {
+    await reserveGlobalProviderAttempt();
+
+    if (
+      !proGenerationContext?.reserved ||
+      proGenerationContext.providerStarted
+    ) {
+      return;
+    }
+
+    const started = await markProProviderStarted(supabase, {
+      userId: proGenerationContext.userId,
+      requestId: proGenerationContext.generationRequestId,
+    });
+
+    if (started?.status !== "started") {
+      const error = new Error("PROVIDER_START_MARK_FAILED");
+      error.code = "PROVIDER_START_MARK_FAILED";
+      throw error;
+    }
+
+    proGenerationContext.providerStarted = true;
+  };
+
   const costMeasurement =
     createGenerationCostMeasurementContext(
       "main_generator",
       undefined,
-      reserveGlobalProviderAttempt
+      reserveMainProviderAttempt
     );
+  let costMeasurementOutcome = "unknown";
   let freeGenerationContext = null;
   let fullIntentFilmicQualityGateActive = false;
   const archetypeProvenance = {
@@ -73,25 +116,16 @@ export default async function handler(req, res) {
     archetypeProvenance.finalSource = source;
     return true;
   };
-  const logArchetypeProvenance = (finalValue = undefined) => {
+  const logArchetypeProvenance = () => {
     if (archetypeProvenance.logged) return;
     archetypeProvenance.logged = true;
-    const finalArchetype =
-      finalValue === undefined
-        ? archetypeProvenance.currentArchetype
-        : archetypeLogValue(finalValue);
-    console.log("[FRAME-LAB ARCHETYPE PROVENANCE]", {
-      PRIMARY_ARCHETYPE_RAW: archetypeProvenance.primaryRaw,
-      PRIMARY_ARCHETYPE_NORMALIZED:
-        archetypeProvenance.primaryNormalized,
+    console.info("[FRAME-LAB ARCHETYPE PROVENANCE]", {
       PRIMARY_ARCHETYPE_ACCEPTED:
         archetypeProvenance.primaryAccepted === null
           ? "unavailable"
           : archetypeProvenance.primaryAccepted
             ? "yes"
             : "no",
-      PRIMARY_ARCHETYPE_REJECTION_REASONS:
-        archetypeProvenance.primaryRejectionReasons,
       DESCRIPTIVE_ONLY_RESULT:
         archetypeProvenance.descriptiveOnlyResult === null
           ? "unavailable"
@@ -110,22 +144,13 @@ export default async function handler(req, res) {
           : archetypeProvenance.mechanismWordPresent
             ? "yes"
             : "no",
-      FALLBACK_CALLED: archetypeProvenance.fallbackEvents.length > 0
-        ? "yes"
-        : "no",
-      FALLBACK_REASON: archetypeProvenance.fallbackEvents.map(
-        ({ stage, reason }) => ({ stage, reason })
-      ),
-      FALLBACK_RESULT: archetypeProvenance.fallbackEvents.map(
-        ({ stage, result }) => ({ stage, result })
-      ),
+      FALLBACK_CALLED: archetypeProvenance.fallbackEvents.length > 0,
       SEMANTIC_REPAIR_CHANGED_ARCHETYPE:
         archetypeProvenance.semanticRepairChanged ? "yes" : "no",
       SNOWFLAKE_CHANGED_ARCHETYPE:
         archetypeProvenance.snowflakeChanged ? "yes" : "no",
       FINAL_SANITIZER_CHANGED_ARCHETYPE:
         archetypeProvenance.finalSanitizerChanged ? "yes" : "no",
-      FINAL_ARCHETYPE: finalArchetype,
       FINAL_ARCHETYPE_SOURCE: archetypeProvenance.finalSource,
     });
   };
@@ -145,9 +170,17 @@ export default async function handler(req, res) {
       });
     }
 
+    if (!devMode && userId && isSelfServiceDeletionEnabled(process.env)) {
+      await assertAccountNotDeleting(supabase, userId, process.env);
+      accountOperationRedis = createAccountDeletionRedis(process.env);
+      accountOperationId = await beginAccountRedisOperation(accountOperationRedis, userId);
+      accountOperationUserId = userId;
+    }
+
+    const isOwner = !devMode && isPremivateOwner(userId);
     const plan = devMode
       ? "pro"
-      : await getUserPlan(userId);
+      : await getEffectiveUserPlan(userId);
 
     const normalizedPlan =
       String(plan || "free").toLowerCase();
@@ -365,6 +398,71 @@ if (process.env.FRAMELAB_GENERATE_MOCK === "true") {
     hashtags: "#Premivate #MockMode #SafeTest #NoOpenAICall",
     mockMode: true,
   });
+}
+
+if (
+  isProUser &&
+  !isOwner &&
+  !devMode &&
+  !mockMode &&
+  process.env.PREMIVATE_PRO_CREDIT_LEDGER_ENABLED === "true"
+) {
+  if (!/^[A-Za-z0-9_-]{16,100}$/.test(generationRequestId)) {
+    return res.status(400).json({
+      error: "Invalid generation request id",
+      code: "INVALID_GENERATION_REQUEST_ID",
+    });
+  }
+
+  proGenerationContext = {
+    userId,
+    generationRequestId,
+    reserveAttempted: true,
+    reserved: false,
+    providerStarted: false,
+    committed: false,
+  };
+
+  let reservation;
+  try {
+    reservation = await reserveProCredit(supabase, {
+      userId,
+      requestId: generationRequestId,
+      operation: "main",
+      credits: 1,
+    });
+  } catch (error) {
+    if (
+      typeof error?.message === "string" &&
+      error.message.includes("CREDIT_BALANCE_INSUFFICIENT")
+    ) {
+      proGenerationContext = null;
+      return res.status(403).json({
+        error: "Pro credits exhausted",
+        code: "PRO_CREDITS_EXHAUSTED",
+      });
+    }
+
+    throw error;
+  }
+
+  if (reservation?.status === "duplicate") {
+    proGenerationContext = null;
+    return res.status(409).json({
+      error: "This generation request was already used",
+      code: "GENERATION_REQUEST_ALREADY_USED",
+      reservationStatus:
+        typeof reservation.reservationStatus === "string"
+          ? reservation.reservationStatus
+          : "unknown",
+    });
+  }
+
+  if (reservation?.status !== "reserved") {
+    throw new Error("PRO_CREDIT_RESERVATION_FAILED");
+  }
+
+  proGenerationContext.reserved = true;
 }
 
 
@@ -1890,7 +1988,6 @@ const createAutonomousPremise = async () => {
       promptTokens: premiseCompletion.usage?.prompt_tokens ?? null,
       completionTokens: premiseCompletion.usage?.completion_tokens ?? null,
       maxCompletionTokens: 8192,
-      autonomousPremise: premise,
     });
     return premise;
   } catch (_) {
@@ -9553,8 +9650,6 @@ if (data.hooks) {
 // -------------------------------
 // VALIDATION LAYER
 // -------------------------------
-console.log("DIRECTOR SUMMARY:", data.directorSummary);
-
 const requiredFields = [
   "reelConcept",
   "aiVideoPrompt",
@@ -10924,11 +11019,11 @@ let selectedFamily = resolveCreativeState(creativeState);
   const renderPipeline = (prompt) => {
   // === FRAME-LAB LIGHT TRACE (NON-INTRUSIVE) ===
   const lightTrace = (layer, input, output) => {
-    console.log("\n[FRAME-LAB LIGHT TRACE]");
-    console.log("Layer:", layer);
-    console.log("Input Preview:", String(input).slice(0, 120));
-    console.log("Output Preview:", String(output).slice(0, 120));
-    console.log("-----------------------------");
+    console.info("[FRAME-LAB LIGHT TRACE]", {
+      layer,
+      inputLength: String(input).length,
+      outputLength: String(output).length,
+    });
   };
 
 
@@ -14127,12 +14222,21 @@ const getFilmicMeaningEvidenceCandidate = (candidate) =>
     ])
   );
 
-const filmicMeaningEvidenceMatches = (fields, path, quote) =>
-  FILMIC_MEANING_EVIDENCE_PATHS.includes(path) &&
-  typeof quote === "string" &&
-  quote.trim().length >= 12 &&
-  quote.length <= 240 &&
-  String(fields[path] || "").includes(quote);
+const filmicMeaningEvidenceMatches = (fields, path, quote) => {
+  if (
+    !FILMIC_MEANING_EVIDENCE_PATHS.includes(path) ||
+    typeof quote !== "string"
+  ) {
+    return false;
+  }
+
+  const exactQuote = quote.trim();
+  return (
+    exactQuote.length >= 12 &&
+    exactQuote.length <= 240 &&
+    String(fields[path] || "").includes(exactQuote)
+  );
+};
 
 const evaluateFilmicMeaningCarrier = async (
   candidate,
@@ -16043,11 +16147,7 @@ if (useAutonomousNoIntentDirection) {
   }
 }
 
-logArchetypeProvenance(data?.cinematicIdentity?.creativeArchetype);
-console.log(
-  "FINAL CREATIVE ARCHETYPE:",
-  data.cinematicIdentity.creativeArchetype
-);
+logArchetypeProvenance();
 
 if (freeGenerationContext?.reserved) {
   const completion =
@@ -16066,9 +16166,34 @@ if (freeGenerationContext?.reserved) {
   freeGenerationContext.completed = true;
 }
 
+if (proGenerationContext?.reserved) {
+  if (!proGenerationContext.providerStarted) {
+    throw new Error("PROVIDER_START_NOT_CONFIRMED");
+  }
+
+  const committed = await commitProCredit(supabase, {
+    userId: proGenerationContext.userId,
+    requestId: proGenerationContext.generationRequestId,
+  });
+
+  if (committed?.status !== "committed") {
+    throw new Error("PRO_CREDIT_COMMIT_NOT_CONFIRMED");
+  }
+
+  proGenerationContext.committed = true;
+}
+
+costMeasurementOutcome = "success";
 return res.status(200).json(data);
   } catch (error) {
+    costMeasurementOutcome = "error";
     logArchetypeProvenance();
+    if (error?.safeCode === "ACCOUNT_DELETION_IN_PROGRESS") {
+      return res.status(410).json({ error: error.safeCode });
+    }
+    if (typeof error?.safeCode === "string" && error.safeCode.startsWith("ACCOUNT_DELETION_")) {
+      return res.status(503).json({ error: error.safeCode });
+    }
     let creditRollbackStatus = freeGenerationContext?.reserved
       ? "unverified"
       : "not_applicable";
@@ -16126,6 +16251,37 @@ return res.status(200).json(data);
           : "AI generation failed",
         details: error.message,
       });
+  } finally {
+    if (
+      proGenerationContext?.reserveAttempted &&
+      !proGenerationContext.providerStarted &&
+      !proGenerationContext.committed
+    ) {
+      try {
+        const released = await releaseProCredit(supabase, {
+          userId: proGenerationContext.userId,
+          requestId: proGenerationContext.generationRequestId,
+        });
+
+        if (!["released", "duplicate"].includes(released?.status)) {
+          console.error("PREMIVATE Pro credit release not confirmed");
+        }
+      } catch (releaseError) {
+        console.error(
+          "PREMIVATE Pro credit release failed:",
+          releaseError?.code || "UNKNOWN"
+        );
+      }
+    }
+
+    finalizeGenerationCostMeasurement(costMeasurement, costMeasurementOutcome);
+    if (accountOperationId) {
+      try {
+        await finishAccountRedisOperation(accountOperationRedis, accountOperationUserId, accountOperationId);
+      } catch (releaseError) {
+        console.error("PREMIVATE account operation release failed", releaseError?.safeCode || "UNKNOWN");
+      }
+    }
   }
 }
 

@@ -62,6 +62,7 @@ function createHarness({ userId = "clerk_owner", databaseError = null } = {}) {
     `${source}\n({ handler });`,
     {
       getAuth: () => ({ userId }),
+      assertAccountNotDeleting: async () => true,
       supabase: {
         from(table) {
           state.fromCalls += 1;
@@ -73,6 +74,7 @@ function createHarness({ userId = "clerk_owner", databaseError = null } = {}) {
         log: (...args) => state.logs.push(args),
         error: (...args) => state.logs.push(args),
       },
+      process: { env: {} },
     }
   );
 

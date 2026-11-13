@@ -36,6 +36,8 @@ function createHarness({ userId = "user_owner", databaseError = null } = {}) {
     `${endpointSource}\n({ handler });`,
     {
       getAuth: () => ({ userId }),
+      assertAccountNotDeleting: async () => true,
+      serviceSupabase: {},
       createClient: () => {
         state.clientCalls += 1;
         return {

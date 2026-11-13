@@ -1,8 +1,8 @@
 import Stripe from "stripe";
 import { getAuth } from "@clerk/nextjs/server";
-import { getStripeCustomerId } from "../../lib/pro";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+import { getStripeCustomerId, supabase } from "../../lib/pro";
+import { getStripeBaseUrl, stripeSecretMatchesEnvironment } from "../../lib/stripe-mode";
+import { assertAccountNotDeleting } from "../../lib/account-deletion";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -18,6 +18,17 @@ export default async function handler(req, res) {
       });
     }
 
+    await assertAccountNotDeleting(supabase, userId, process.env);
+
+    if (!stripeSecretMatchesEnvironment(process.env)) {
+      return res.status(503).json({ error: "STRIPE_MODE_MISMATCH" });
+    }
+    const returnUrl = getStripeBaseUrl(process.env);
+    if (!returnUrl) {
+      return res.status(503).json({ error: "STRIPE_BASE_URL_UNAVAILABLE" });
+    }
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
     const stripeCustomerId = await getStripeCustomerId(userId);
 
     if (!stripeCustomerId) {
@@ -28,14 +39,20 @@ export default async function handler(req, res) {
 
     const session = await stripe.billingPortal.sessions.create({
       customer: stripeCustomerId,
-      return_url: process.env.NEXT_PUBLIC_BASE_URL,
+      return_url: returnUrl,
     });
 
     return res.status(200).json({
       url: session.url,
     });
   } catch (error) {
-    console.error("create-portal-session error:", error);
+    if (error?.safeCode === "ACCOUNT_DELETION_IN_PROGRESS") {
+      return res.status(410).json({ error: error.safeCode });
+    }
+    if (typeof error?.safeCode === "string" && error.safeCode.startsWith("ACCOUNT_DELETION_")) {
+      return res.status(503).json({ error: error.safeCode });
+    }
+    console.error("create-portal-session failed");
 
     return res.status(500).json({
       error: "Failed to create billing portal session",

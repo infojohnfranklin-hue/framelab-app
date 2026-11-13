@@ -1,5 +1,7 @@
 import { getAuth } from "@clerk/nextjs/server";
 import { createClient } from "@supabase/supabase-js";
+import { assertAccountNotDeleting } from "../../lib/account-deletion";
+import { supabase as serviceSupabase } from "../../lib/pro";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -11,6 +13,8 @@ export default async function handler(req, res) {
     if (!userId) {
       return res.status(401).json({ error: "Unauthorized" });
     }
+
+    await assertAccountNotDeleting(serviceSupabase, userId, process.env);
 
     const rawId = req.body?.id;
     let generationId = null;
@@ -45,7 +49,13 @@ export default async function handler(req, res) {
     }
 
     return res.status(200).json({ success: true });
-  } catch {
+  } catch (error) {
+    if (error?.safeCode === "ACCOUNT_DELETION_IN_PROGRESS") {
+      return res.status(410).json({ error: error.safeCode });
+    }
+    if (typeof error?.safeCode === "string" && error.safeCode.startsWith("ACCOUNT_DELETION_")) {
+      return res.status(503).json({ error: error.safeCode });
+    }
     console.error("DELETE_GENERATION_REQUEST_ERROR");
     return res.status(500).json({ error: "Delete failed" });
   }

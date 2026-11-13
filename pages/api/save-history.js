@@ -1,5 +1,6 @@
 import { getAuth } from "@clerk/nextjs/server";
 import { supabase } from "../../lib/pro";
+import { assertAccountNotDeleting } from "../../lib/account-deletion";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -13,6 +14,8 @@ export default async function handler(req, res) {
     if (!authenticatedUserId) {
       return res.status(401).json({ error: "Unauthorized" });
     }
+
+    await assertAccountNotDeleting(supabase, authenticatedUserId, process.env);
 
     if (
       !req.body ||
@@ -113,7 +116,13 @@ export default async function handler(req, res) {
       success: true,
       generation: data,
     });
-  } catch {
+  } catch (error) {
+    if (error?.safeCode === "ACCOUNT_DELETION_IN_PROGRESS") {
+      return res.status(410).json({ error: error.safeCode });
+    }
+    if (typeof error?.safeCode === "string" && error.safeCode.startsWith("ACCOUNT_DELETION_")) {
+      return res.status(503).json({ error: error.safeCode });
+    }
     console.error("SAVE_HISTORY_REQUEST_ERROR");
 
     return res.status(500).json({

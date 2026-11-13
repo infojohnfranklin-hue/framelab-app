@@ -1,7 +1,9 @@
 import Stripe from "stripe";
 import { getAuth } from "@clerk/nextjs/server";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+import { getStripeCustomerIdStrict, saveStripeCustomerId, supabase } from "../../lib/pro";
+import { createProSubscriptionCheckout } from "../../lib/stripe-subscription";
+import { getStripeBaseUrl, stripeSecretMatchesEnvironment } from "../../lib/stripe-mode";
+import { assertAccountNotDeleting } from "../../lib/account-deletion";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -17,48 +19,30 @@ export default async function handler(req, res) {
       });
     }
 
-    const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
+    await assertAccountNotDeleting(supabase, userId, process.env);
 
-      branding_settings: {
-        display_name: "PREMIVATE",
-      },
+    if (!stripeSecretMatchesEnvironment(process.env)) {
+      return res.status(503).json({ error: "STRIPE_MODE_MISMATCH" });
+    }
 
-      payment_method_types: ["card"],
-
-      metadata: {
-        clerkUserId: userId,
-      },
-
-      subscription_data: {
-        metadata: {
-          clerkUserId: userId,
-        },
-      },
-
-      line_items: [
-        {
-          price_data: {
-            currency: "chf",
-            product_data: {
-              name: "Premivate Pro",
-            },
-            unit_amount: 2400,
-            recurring: {
-              interval: "month",
-            },
-          },
-          quantity: 1,
-        },
-      ],
-
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}`,
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const result = await createProSubscriptionCheckout({
+      env: process.env,
+      userId,
+      stripe,
+      supabase,
+      getCustomerId: getStripeCustomerIdStrict,
+      createCustomer: (id) => stripe.customers.create({
+        metadata: { clerkUserId: id },
+      }, { idempotencyKey: `premivate-customer-${id}` }),
+      saveCustomerId: saveStripeCustomerId,
+      baseUrl: getStripeBaseUrl(process.env),
     });
-
-    return res.status(200).json({ url: session.url });
+    return res.status(200).json(result);
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error: error.message });
+    const status = Number.isInteger(error?.status) ? error.status : 500;
+    const code = error?.safeCode;
+    console.error("Pro Checkout failed", { code: typeof code === "string" ? code : "CHECKOUT_FAILED" });
+    return res.status(status).json({ error: typeof code === "string" ? code : "CHECKOUT_FAILED" });
   }
 }
