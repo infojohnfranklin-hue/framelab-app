@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import { saveStripeCustomerId, supabase, updateStripeSubscription } from "../../lib/pro";
 import { grantPaidPeriod } from "../../lib/credit-ledger";
 import { processPaidCreditTopup } from "../../lib/credit-topup";
+import { persistCheckoutMarketData } from "../../lib/stripe-market-data";
 import { processStripeChargeRefund } from "../../lib/stripe-refunds";
 import { stripeEventMatchesEnvironment } from "../../lib/stripe-mode";
 import { isAccountDeletionMarked } from "../../lib/account-deletion";
@@ -270,6 +271,12 @@ async function recordSubscriptionCheckout(event, stripe) {
     }
     return { status: "suppressed_account_deletion" };
   }
+  await persistCheckoutMarketData({
+    session,
+    stripe,
+    subscriptionId,
+    invoiceId: stripeObjectId(session.invoice),
+  });
   const { error } = await supabase.rpc("premivate_subscription_checkout_complete", {
     p_clerk_user_id: userId,
     p_claim_token: claimToken,

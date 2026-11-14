@@ -5,6 +5,18 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 const sourcePath = path.join(__dirname, "../lib/stripe-subscription.js");
+function loadMarketDataModule() {
+  let source = fs.readFileSync(path.join(__dirname, "../lib/stripe-market-data.js"), "utf8")
+    .replace(/^export\s+/gm, "");
+  return vm.runInNewContext(
+    `${source}\n({ CHECKOUT_MARKET_DATA_PARAMETERS, getCheckoutMarketData });`,
+    {},
+    { timeout: 1000 },
+  );
+}
+const marketDataModule = loadMarketDataModule();
+const CHECKOUT_MARKET_DATA_PARAMETERS = marketDataModule.CHECKOUT_MARKET_DATA_PARAMETERS;
+
 function load(sourceOverrides = {}) {
   let source = fs.readFileSync(sourcePath, "utf8")
     .replace(/^import .*;\s*$/gm, "")
@@ -12,6 +24,7 @@ function load(sourceOverrides = {}) {
   return vm.runInNewContext(`${source}\n({ createProSubscriptionCheckout, isBlockingSubscriptionStatus });`, {
     randomUUID: () => "claim-test-1",
     URL,
+    CHECKOUT_MARKET_DATA_PARAMETERS,
     isPremivateOwner: (id) => id === "owner-id",
     stripeSecretMatchesEnvironment: (env) => env.STRIPE_SECRET_KEY === "sk_test_unit" && env.VERCEL_ENV === "preview",
     ...sourceOverrides,
@@ -45,6 +58,22 @@ const base = {
 };
 let saved;
 
+test("Stripe-safe buyer values map to the existing canonical categories", () => {
+  const marketData = marketDataModule.getCheckoutMarketData({
+    customer_details: { address: { country: "nz" }, tax_ids: [] },
+    custom_fields: [{ key: "buyertype", dropdown: { value: "businessregistered" } }],
+  });
+  assert.deepEqual({ ...marketData }, {
+    buyerType: "business_registered",
+    billingCountry: "NZ",
+    taxIdProvided: false,
+  });
+  assert.equal(marketDataModule.getCheckoutMarketData({
+    customer_details: { address: { country: "NZ" } },
+    custom_fields: [{ key: "buyertype", dropdown: { value: "business_registered" } }],
+  }), null);
+});
+
 test("subscription checkout uses the fixed CHF 24 monthly offer and guarded claim", async () => {
   const h = setup(); saved = [];
   const result = await h.api.createProSubscriptionCheckout({
@@ -62,6 +91,10 @@ test("subscription checkout uses the fixed CHF 24 monthly offer and guarded clai
   assert.equal(created.params.line_items[0].price_data.recurring.interval_count, 1);
   assert.equal(created.params.client_reference_id, "user_test_pro");
   assert.equal(created.params.metadata.premivateCheckoutClaim, "claim-test-1");
+  assert.deepEqual(
+    Array.from(created.params.custom_fields[0].dropdown.options, (option) => option.value),
+    ["consumer", "businessregistered", "businessunregistered", "businessunknown"],
+  );
   assert.equal(created.options.idempotencyKey, "premivate-pro-checkout-claim-test-1");
   assert.deepEqual(h.calls.rpc.map((item) => item.name), [
     "premivate_subscription_checkout_claim", "premivate_subscription_checkout_attach_session",

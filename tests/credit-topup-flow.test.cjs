@@ -5,12 +5,22 @@ const path = require("node:path");
 const vm = require("node:vm");
 const root = path.join(__dirname, "..");
 
+function loadMarketDataParameters() {
+  let source = fs.readFileSync(path.join(root, "lib/stripe-market-data.js"), "utf8")
+    .replace(/^export\s+/gm, "");
+  return vm.runInNewContext(`${source}\n({ CHECKOUT_MARKET_DATA_PARAMETERS });`, {}, { timeout: 1000 })
+    .CHECKOUT_MARKET_DATA_PARAMETERS;
+}
+const CHECKOUT_MARKET_DATA_PARAMETERS = loadMarketDataParameters();
+
 function loadModule(file, bindings = {}) {
   let source = fs.readFileSync(path.join(root, file), "utf8");
   source = source.replace(/^import\s+[\s\S]*?\s+from\s+["'][^"']+["'];\s*/gm, "");
   source = source.replace(/^export\s+(?=(?:async\s+)?function|const|class)/gm, "");
   source = source.replace(/(^|\n)export default async function handler/g, "$1async function handler");
   const defaults = {
+    CHECKOUT_MARKET_DATA_PARAMETERS,
+    persistCheckoutMarketData: async () => ({ status: "not_collected" }),
     handler: undefined, isCreditLedgerEnabled: undefined, parseCreditBalance: undefined,
     readCreditBalance: undefined, isTopupSalesEnabled: undefined,
     getCreditTopupPackage: undefined, validateTopupBalance: undefined,
@@ -217,6 +227,10 @@ test("server-owned package amount is used for the top-up Checkout session", asyn
   assert.equal(params.line_items[0].price_data.currency, "chf");
   assert.equal(params.metadata.credits, "50");
   assert.equal(params.customer, "cus_test");
+  assert.deepEqual(
+    Array.from(params.custom_fields[0].dropdown.options, (option) => option.value),
+    ["consumer", "businessregistered", "businessunregistered", "businessunknown"],
+  );
 });
 
 test("Owner cannot purchase top-ups because Owner access is unlimited", async () => {

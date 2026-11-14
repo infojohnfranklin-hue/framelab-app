@@ -78,6 +78,7 @@ function createHarness({
       return grantResults.shift() || { status: "granted_initial" };
     },
     saveStripeCustomerId: async (...args) => state.savedCustomers.push(args),
+    persistCheckoutMarketData: async () => ({ status: "not_collected" }),
     updateStripeSubscription: async (...args) => state.lifecycleUpdates.push(args),
     processPaidCreditTopup: async () => ({ status: "granted" }),
     processStripeChargeRefund: async () => ({ status: "refunded" }),
