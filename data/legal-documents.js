@@ -145,7 +145,7 @@ export const LEGAL_DOCUMENTS = {
           heading: "2. Data categories",
           paragraphs: [
             "Depending on how you use PREMIVATE, the service may process account and authentication information; creative briefs and other material you submit; generated concepts, prompts, blueprints and saved History; language and account preferences; subscription, credit and transaction references; and technical or security data needed to operate the service.",
-            "Some draft material and recent generated results are stored in this browser, separately from account-linked server data. The current Candidate stores the latest ten generated results in browser local storage and copies a reopened History item to browser storage. Signing out or deleting the server account does not automatically remove these browser copies; users may need to clear the browser’s site data. The complete inventory of technical logs, cookies and similar technologies must still be confirmed before publication.",
+            "PREMIVATE stores some content copies in this browser, separately from account-linked server data. In the current Release-D candidate these include a reopened History generation and a short label for the active project. Browser copies expire after 30 days and are removed on the next app visit. A successful in-app account-deletion flow clears the known PREMIVATE content copies from that browser; signing out alone does not clear them immediately. The complete inventory of technical logs, cookies and similar technologies must still be confirmed before publication.",
           ],
         },
         {
@@ -171,7 +171,7 @@ export const LEGAL_DOCUMENTS = {
           heading: "6. Account deletion and data that may remain",
           paragraphs: [
             "The Candidate contains a self-service deletion flow for an authenticated user’s own account, and a bounded isolated Preview acceptance was reported as passed. Production availability and complete deletion outcomes across every data store are not established by that evidence and must be confirmed before publication.",
-            "Server-side account deletion does not automatically remove browser-local drafts or copies of recent results; users may need to clear the relevant browser site data separately. The deletion design also retains a hashed fingerprint intended to prevent delayed recreation of a deleted account; its legal basis and retention period are not yet settled. Payment records, records required by law, provider-side records and backups may remain outside the application deletion transaction where applicable law, contract or provider processes require or permit this. The exact retention exceptions and periods must be established before publication.",
+            "After the in-app deletion endpoint confirms successful account deletion, the Release-D/Gate-E candidate clears known PREMIVATE content copies from that browser before redirecting. Browser copies also expire after 30 days and are removed on the next app visit. This is limited Preview evidence for one synthetic Free account; Production behavior, deletion with an active subscription, and the legal basis and period for the hashed deletion-prevention marker remain open. Payment records, records required by law, provider-side records and backups may remain outside the application deletion transaction where applicable law, contract or provider processes require or permit this; applicable categories and periods must be established before publication.",
           ],
         },
         {
@@ -202,7 +202,7 @@ export const LEGAL_DOCUMENTS = {
       openItems: [
         "Confirm against PREMIVATE’s current Production agreements and configuration: provider legal entities, roles, relevant subprocessors and transfer terms; selected Supabase region/plan; Upstash Redis mode/regions; Vercel plan/runtime region; Stripe contracting entity and role; and OpenAI project data-control/opt-in status and applicable endpoint/model retention controls.",
         "Set evidence-based retention criteria for Supabase profiles and saved History, Redis state beyond the documented 24-hour free-Generate result, technical/provider logs and backups, and the hashed deletion marker; confirm Production account-deletion outcomes and clear browser-data instructions.",
-        "Confirm the data-controller designation and related controller/processor roles in final legal review. Confirm Swiss and EU/EEA legal bases, the cookie/analytics inventory, any remaining feature-level AI payload details, Production deletion behavior including active-subscription handling, and obtain final legal review for the intended markets.",
+        "Confirm Swiss and EU/EEA legal bases, the cookie/analytics inventory, any remaining feature-level AI payload details, Production deletion behavior including active-subscription handling, and obtain final legal review for the intended markets.",
       ],
     },
     imprint: {
@@ -215,7 +215,7 @@ export const LEGAL_DOCUMENTS = {
           heading: "Provider",
           paragraphs: [
             "Franco Baumann, operator and seller of PREMIVATE",
-            "Intended business designation: Baumann Creative (sole proprietorship)",
+            "Baumann Creative is intended as an additional business designation.",
             "Rosenbüelstrasse 21",
             "9642 Ebnat-Kappel SG",
             "Switzerland",
@@ -387,7 +387,7 @@ export const LEGAL_DOCUMENTS = {
           heading: "2. Datenkategorien",
           paragraphs: [
             "Je nach Nutzung von PREMIVATE können Konto- und Authentifizierungsdaten, kreative Briefings und andere übermittelte Inhalte, generierte Konzepte/Prompts/Blueprints und gespeicherte History, Sprach- und Kontoeinstellungen, Abonnement-, Credit- und Transaktionsreferenzen sowie technische oder sicherheitsbezogene Betriebsdaten bearbeitet werden.",
-            "Entwürfe und aktuelle generierte Ergebnisse werden teilweise lokal in diesem Browser und getrennt von serverseitigen Kontodaten gespeichert. Der aktuelle Candidate speichert die zehn letzten generierten Ergebnisse im lokalen Browserspeicher und legt beim erneuten Öffnen eines History-Eintrags eine Kopie im Browserspeicher ab. Abmeldung oder serverseitige Kontolöschung entfernt diese Browserkopien nicht automatisch; gegebenenfalls müssen Nutzer die Website-Daten im Browser selbst löschen. Das vollständige Verzeichnis technischer Logs, Cookies und ähnlicher Technologien muss vor Veröffentlichung weiterhin bestätigt werden.",
+            "PREMIVATE speichert einige Inhaltskopien zusätzlich lokal in diesem Browser, getrennt von serverseitigen Kontodaten. Im aktuellen Release-D-Candidate betrifft dies eine erneut geöffnete History-Generierung und eine kurze Bezeichnung des aktiven Projekts. Browserkopien verfallen nach 30 Tagen und werden beim nächsten App-Aufruf entfernt. Nach erfolgreicher Kontolöschung entfernt der In-App-Löschablauf die bekannten PREMIVATE-Inhaltskopien aus diesem Browser; eine blosse Abmeldung löscht sie nicht sofort. Das vollständige Verzeichnis technischer Logs, Cookies und ähnlicher Technologien muss vor Veröffentlichung weiterhin bestätigt werden.",
           ],
         },
         {
@@ -413,7 +413,7 @@ export const LEGAL_DOCUMENTS = {
           heading: "6. Kontolöschung und möglicherweise verbleibende Daten",
           paragraphs: [
             "Der Candidate enthält einen Self-Service-Löschablauf für das authentifizierte eigene Konto; eine begrenzte Abnahme in einer isolierten Preview wurde als bestanden dokumentiert. Daraus sind die Verfügbarkeit in Production und die vollständige Löschung in jedem Datenspeicher nicht belegt und müssen vor Veröffentlichung bestätigt werden.",
-            "Browserlokale Entwürfe und Kopien aktueller Ergebnisse werden durch die serverseitige Kontolöschung nicht automatisch entfernt; Nutzer müssen gegebenenfalls die Website-Daten im Browser selbst löschen. Das Löschkonzept behält ausserdem einen gehashten Fingerprint zurück, der eine verspätete Neuerstellung eines gelöschten Kontos verhindern soll; Rechtsgrundlage und Aufbewahrungsdauer sind noch offen. Zahlungsdaten, gesetzlich aufzubewahrende Unterlagen, Anbieter-Daten und Backups können ausserhalb der App-Löschtransaktion verbleiben, soweit anwendbares Recht, Vertrag oder Anbieterprozesse dies erfordern oder erlauben. Die genauen Ausnahmen und Fristen müssen vor Veröffentlichung festgelegt werden.",
+            "Nachdem der In-App-Löschendpunkt die erfolgreiche Kontolöschung bestätigt hat, entfernt der Release-D/Gate-E-Candidate die bekannten PREMIVATE-Inhaltskopien aus diesem Browser, bevor er weiterleitet. Browserkopien verfallen ausserdem nach 30 Tagen und werden beim nächsten App-Aufruf entfernt. Dies ist begrenzte Preview-Evidence für ein synthetisches Free-Konto; das Verhalten in Production, eine Löschung bei aktivem Abo sowie Rechtsgrundlage und Frist des gehashten Löschschutz-Markers bleiben offen. Zahlungsdaten, gesetzlich aufzubewahrende Unterlagen, Anbieter-Daten und Backups können ausserhalb der App-Löschtransaktion verbleiben, soweit anwendbares Recht, Vertrag oder Anbieterprozesse dies erfordern oder erlauben; die konkreten Kategorien und Fristen sind vor Veröffentlichung festzulegen.",
           ],
         },
         {
@@ -444,7 +444,7 @@ export const LEGAL_DOCUMENTS = {
       openItems: [
         "Anhand der aktuellen PREMIVATE-Production-Verträge und -Konfiguration bestätigen: juristische Anbieter, Rollen, relevante Unterauftragsbearbeiter und Übermittlungsbedingungen; gewählte Supabase-Region/Tarif; Upstash-Redis-Modus/Regionen; Vercel-Tarif/Runtime-Region; Stripe-Vertragspartner und Rolle; sowie OpenAI-Projekt-Datenkontrollen/Opt-in und anwendbare Speicherregeln je Endpunkt/Modell.",
         "Belegte Aufbewahrungskriterien für Supabase-Profile und gespeicherte History, Redis-Zustände ausserhalb des dokumentierten 24-Stunden-Resultats für kostenlose Generate-Ausführungen, technische/Anbieter-Logs und Backups sowie den gehashten Löschmarker festlegen; Production-Löschung und Hinweise zum Löschen lokaler Browserdaten bestätigen.",
-        "Die Benennung des datenschutzrechtlich Verantwortlichen und die Rollen als Verantwortlicher/Auftragsbearbeiter in der abschliessenden Rechtsprüfung bestätigen. Schweizer und EU-/EWR-Rechtsgrundlagen, Cookies-/Analytics-Inventar, noch offene KI-Datenflüsse je Funktion und Production-Löschverhalten einschliesslich aktiver Abos bestätigen sowie eine abschliessende Rechtsprüfung für die Zielmärkte einholen.",
+        "Schweizer und EU-/EWR-Rechtsgrundlagen, Cookies-/Analytics-Inventar, noch offene KI-Datenflüsse je Funktion und Production-Löschverhalten einschliesslich aktiver Abos bestätigen sowie eine abschliessende Rechtsprüfung für die Zielmärkte einholen.",
       ],
     },
     imprint: {
@@ -457,7 +457,7 @@ export const LEGAL_DOCUMENTS = {
           heading: "Anbieter",
           paragraphs: [
             "Franco Baumann, Betreiber und Verkäufer von PREMIVATE",
-            "Vorgesehene Geschäftsbezeichnung: Baumann Creative (Einzelunternehmen)",
+            "Baumann Creative ist als zusätzliche Geschäftsbezeichnung vorgesehen.",
             "Rosenbüelstrasse 21",
             "9642 Ebnat-Kappel SG",
             "Schweiz",
