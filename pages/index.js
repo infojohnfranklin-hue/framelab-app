@@ -750,6 +750,7 @@ export default function Home({
 
   const [loading, setLoading] = useState(false);
   const [remainingCredits, setRemainingCredits] = useState(2);
+  const [purchasedCreditsAvailable, setPurchasedCreditsAvailable] = useState(0);
   const [mounted, setMounted] = useState(false);
   const generationRequestIdRef = useRef(null);
   const generationPlan =
@@ -1333,6 +1334,12 @@ export default function Home({
         if (typeof creditsData.remaining !== "undefined") {
           setRemainingCredits(creditsData.remaining);
         }
+        setPurchasedCreditsAvailable(
+          creditsData.ledgerEnabled === true &&
+            Number.isSafeInteger(creditsData.purchasedAvailable)
+            ? creditsData.purchasedAvailable
+            : 0
+        );
 
       } catch (error) {
         console.error(error);
@@ -1492,6 +1499,9 @@ export default function Home({
           String(remainingCredits)
         );
       }
+      if (purchasedCreditsAvailable > 0) {
+        return ui.generate.generateReel;
+      }
       return ui.generate.upgradeMonthly;
     }
 
@@ -1585,7 +1595,11 @@ export default function Home({
       return;
     }
 
-    if (generationPlan === "free" && remainingCredits <= 0) {
+    if (
+      generationPlan === "free" &&
+      remainingCredits <= 0 &&
+      purchasedCreditsAvailable <= 0
+    ) {
       window.location.href = "/pricing?reason=credits-used";
       return;
     }
@@ -1846,15 +1860,21 @@ Stage 3: ${data.narrativeArc.stage3 || ""}`
           const creditsData =
             await creditsRes.json();
 
-          if (
-            creditsRes.ok &&
-            typeof creditsData.remaining === "number"
-          ) {
-            setRemainingCredits(
-              creditsData.remaining
+          if (creditsRes.ok) {
+            if (typeof creditsData.remaining === "number") {
+              setRemainingCredits(creditsData.remaining);
+            }
+            setPurchasedCreditsAvailable(
+              creditsData.ledgerEnabled === true &&
+                Number.isSafeInteger(creditsData.purchasedAvailable)
+                ? creditsData.purchasedAvailable
+                : 0
             );
+          } else {
+            setPurchasedCreditsAvailable(0);
           }
         } catch (creditRefreshError) {
+          setPurchasedCreditsAvailable(0);
           console.error(
             "Credit refresh failed:",
             creditRefreshError
