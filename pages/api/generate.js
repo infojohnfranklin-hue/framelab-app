@@ -8,6 +8,7 @@ import {
 import { getEffectiveUserPlan, isPremivateOwner, supabase } from "../../lib/pro";
 import {
   reserve as reserveProCredit,
+  reservePurchased as reservePurchasedCredit,
   markProviderStarted as markProProviderStarted,
   commit as commitProCredit,
   release as releaseProCredit,
@@ -39,7 +40,7 @@ function escapeRegExp(string = "") {
 }
 
 export default async function handler(req, res) {
-  let proGenerationContext = null;
+  let ledgerGenerationContext = null;
   let accountOperationRedis = null;
   let accountOperationId = null;
   let accountOperationUserId = null;
@@ -47,15 +48,15 @@ export default async function handler(req, res) {
     await reserveGlobalProviderAttempt();
 
     if (
-      !proGenerationContext?.reserved ||
-      proGenerationContext.providerStarted
+      !ledgerGenerationContext?.reserved ||
+      ledgerGenerationContext.providerStarted
     ) {
       return;
     }
 
     const started = await markProProviderStarted(supabase, {
-      userId: proGenerationContext.userId,
-      requestId: proGenerationContext.generationRequestId,
+      userId: ledgerGenerationContext.userId,
+      requestId: ledgerGenerationContext.generationRequestId,
     });
 
     if (started?.status !== "started") {
@@ -64,7 +65,7 @@ export default async function handler(req, res) {
       throw error;
     }
 
-    proGenerationContext.providerStarted = true;
+    ledgerGenerationContext.providerStarted = true;
   };
 
   const costMeasurement =
@@ -238,24 +239,75 @@ export default async function handler(req, res) {
       }
 
       if (reservation.status === "LIMIT") {
-        return res.status(403).json({
-          error: "Free credits exhausted",
-          code: "FREE_CREDITS_EXHAUSTED",
-        });
-      }
+        if (process.env.PREMIVATE_PRO_CREDIT_LEDGER_ENABLED !== "true") {
+          return res.status(403).json({
+            error: "Free credits exhausted",
+            code: "FREE_CREDITS_EXHAUSTED",
+          });
+        }
 
-      if (reservation.status !== "RESERVED") {
+        ledgerGenerationContext = {
+          userId,
+          generationRequestId,
+          reserveAttempted: true,
+          reserved: false,
+          providerStarted: false,
+          committed: false,
+        };
+
+        let purchasedReservation;
+        try {
+          purchasedReservation = await reservePurchasedCredit(supabase, {
+            userId,
+            requestId: generationRequestId,
+            operation: "main",
+            credits: 1,
+          });
+        } catch (error) {
+          if (
+            typeof error?.message === "string" &&
+            error.message.includes("CREDIT_BALANCE_INSUFFICIENT")
+          ) {
+            ledgerGenerationContext = null;
+            return res.status(403).json({
+              error: "Free credits exhausted",
+              code: "FREE_CREDITS_EXHAUSTED",
+            });
+          }
+          throw error;
+        }
+
+        if (purchasedReservation?.status === "duplicate") {
+          ledgerGenerationContext = null;
+          return res.status(409).json({
+            error: "This generation request was already used",
+            code: "GENERATION_REQUEST_ALREADY_USED",
+            reservationStatus:
+              typeof purchasedReservation.reservationStatus === "string"
+                ? purchasedReservation.reservationStatus
+                : "unknown",
+          });
+        }
+
+        if (purchasedReservation?.status !== "reserved") {
+          throw new Error("PURCHASED_CREDIT_RESERVATION_FAILED");
+        }
+
+        ledgerGenerationContext.reserved = true;
+      } else if (reservation.status !== "RESERVED") {
         throw new Error(
           `Unexpected credit reservation state: ${reservation.status}`
         );
       }
 
-      freeGenerationContext = {
-        userId,
-        generationRequestId,
-        reserved: true,
-        completed: false,
-      };
+      if (reservation.status === "RESERVED") {
+        freeGenerationContext = {
+          userId,
+          generationRequestId,
+          reserved: true,
+          completed: false,
+        };
+      }
     }
 
     const {
@@ -414,7 +466,7 @@ if (
     });
   }
 
-  proGenerationContext = {
+  ledgerGenerationContext = {
     userId,
     generationRequestId,
     reserveAttempted: true,
@@ -436,7 +488,7 @@ if (
       typeof error?.message === "string" &&
       error.message.includes("CREDIT_BALANCE_INSUFFICIENT")
     ) {
-      proGenerationContext = null;
+      ledgerGenerationContext = null;
       return res.status(403).json({
         error: "Pro credits exhausted",
         code: "PRO_CREDITS_EXHAUSTED",
@@ -447,7 +499,7 @@ if (
   }
 
   if (reservation?.status === "duplicate") {
-    proGenerationContext = null;
+    ledgerGenerationContext = null;
     return res.status(409).json({
       error: "This generation request was already used",
       code: "GENERATION_REQUEST_ALREADY_USED",
@@ -462,7 +514,7 @@ if (
     throw new Error("PRO_CREDIT_RESERVATION_FAILED");
   }
 
-  proGenerationContext.reserved = true;
+  ledgerGenerationContext.reserved = true;
 }
 
 
@@ -16166,21 +16218,21 @@ if (freeGenerationContext?.reserved) {
   freeGenerationContext.completed = true;
 }
 
-if (proGenerationContext?.reserved) {
-  if (!proGenerationContext.providerStarted) {
+if (ledgerGenerationContext?.reserved) {
+  if (!ledgerGenerationContext.providerStarted) {
     throw new Error("PROVIDER_START_NOT_CONFIRMED");
   }
 
   const committed = await commitProCredit(supabase, {
-    userId: proGenerationContext.userId,
-    requestId: proGenerationContext.generationRequestId,
+    userId: ledgerGenerationContext.userId,
+    requestId: ledgerGenerationContext.generationRequestId,
   });
 
   if (committed?.status !== "committed") {
     throw new Error("PRO_CREDIT_COMMIT_NOT_CONFIRMED");
   }
 
-  proGenerationContext.committed = true;
+  ledgerGenerationContext.committed = true;
 }
 
 costMeasurementOutcome = "success";
@@ -16253,14 +16305,14 @@ return res.status(200).json(data);
       });
   } finally {
     if (
-      proGenerationContext?.reserveAttempted &&
-      !proGenerationContext.providerStarted &&
-      !proGenerationContext.committed
+      ledgerGenerationContext?.reserveAttempted &&
+      !ledgerGenerationContext.providerStarted &&
+      !ledgerGenerationContext.committed
     ) {
       try {
         const released = await releaseProCredit(supabase, {
-          userId: proGenerationContext.userId,
-          requestId: proGenerationContext.generationRequestId,
+          userId: ledgerGenerationContext.userId,
+          requestId: ledgerGenerationContext.generationRequestId,
         });
 
         if (!["released", "duplicate"].includes(released?.status)) {

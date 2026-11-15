@@ -37,19 +37,43 @@ export default async function handler(req, res) {
 
     if (isCreditLedgerEnabled(process.env)) {
       const plan = await getEffectiveUserPlan(userId);
-      if (plan === "pro") {
+      try {
+        let balance;
         try {
-          const balance = await readCreditBalance(supabase, userId);
+          balance = await readCreditBalance(supabase, userId);
+        } catch (error) {
+          const accountMissing =
+            error?.code === "P0002" ||
+            (typeof error?.message === "string" &&
+              error.message.includes("CREDIT_ACCOUNT_NOT_FOUND"));
+          if (plan === "pro" || !accountMissing) throw error;
+          balance = {
+            purchasedAvailable: 0,
+            purchasedHeld: 0,
+            creditAccessBlocked: false,
+          };
+        }
+        if (plan === "pro") {
           return res.status(200).json({
             ...balance,
             plan: "pro",
             ledgerEnabled: true,
             topupSalesEnabled: isTopupSalesEnabled(process.env),
           });
-        } catch (error) {
-          console.error("credit ledger balance error:", error);
-          return res.status(503).json({ error: "Credit balance unavailable" });
         }
+        const snapshot = await getCreditSnapshot(userId);
+        return res.status(200).json({
+          ...snapshot,
+          purchasedAvailable: balance.purchasedAvailable,
+          purchasedHeld: balance.purchasedHeld,
+          creditAccessBlocked: balance.creditAccessBlocked,
+          plan,
+          ledgerEnabled: true,
+          topupSalesEnabled: false,
+        });
+      } catch (error) {
+        console.error("credit ledger balance error:", error);
+        return res.status(503).json({ error: "Credit balance unavailable" });
       }
     }
 

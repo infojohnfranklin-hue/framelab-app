@@ -18,7 +18,7 @@ export default function SettingsPage({
   const [topupError, setTopupError] = useState("");
 
   useEffect(() => {
-    if (!planStatusLoaded || userPlan !== "pro") {
+    if (!planStatusLoaded || !["pro", "free"].includes(userPlan)) {
       setCreditState(null);
       return undefined;
     }
@@ -163,7 +163,10 @@ export default function SettingsPage({
           </section>
 
           <SignedIn>
-            {planStatusLoaded && userPlan === "pro" ? (
+            {planStatusLoaded && (
+              userPlan === "pro" ||
+              (userPlan === "free" && creditState?.ledgerEnabled && creditState.purchasedAvailable > 0)
+            ) ? (
               <section style={{ ...cardStyle, ...contextCardStyle }}>
                 <h2 style={cardTitle}>{ui.settings.creditsTitle}</h2>
                 {creditLoading ? <p style={cardText}>{ui.settings.creditsLoading}</p> : null}
@@ -177,17 +180,21 @@ export default function SettingsPage({
                 {!creditLoading && !creditError && creditState?.ledgerEnabled ? (
                   <>
                     <p style={cardText}>
-                      {ui.settings.subscriptionCredits}: {creditState.subscriptionAvailable}<br />
+                      {userPlan === "pro" ? <>{ui.settings.subscriptionCredits}: {creditState.subscriptionAvailable}<br /></> : null}
                       {ui.settings.purchasedCredits}: {creditState.purchasedAvailable}
                     </p>
-                    <h3 style={{ margin: "0 0 12px", fontSize: "16px" }}>{ui.settings.topupsTitle}</h3>
-                    {creditState.topupSalesEnabled && !creditState.creditAccessBlocked ? (
-                      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-                        <button type="button" disabled={Boolean(topupBusy)} onClick={() => startTopup("credits_25")} style={topupButtonStyle}>{topupBusy === "credits_25" ? ui.settings.creditsLoading : ui.settings.topup25}</button>
-                        <button type="button" disabled={Boolean(topupBusy)} onClick={() => startTopup("credits_50")} style={topupButtonStyle}>{topupBusy === "credits_50" ? ui.settings.creditsLoading : ui.settings.topup50}</button>
-                      </div>
-                    ) : <p style={cardText}>{ui.settings.topupsUnavailable}</p>}
-                    {topupError ? <p role="alert" style={{ ...cardText, color: "#fca5a5", marginTop: "12px" }}>{ui.settings.checkoutFailed}</p> : null}
+                    {userPlan === "pro" ? (
+                      <>
+                        <h3 style={{ margin: "0 0 12px", fontSize: "16px" }}>{ui.settings.topupsTitle}</h3>
+                        {creditState.topupSalesEnabled && !creditState.creditAccessBlocked ? (
+                          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                            <button type="button" disabled={Boolean(topupBusy)} onClick={() => startTopup("credits_25")} style={topupButtonStyle}>{topupBusy === "credits_25" ? ui.settings.creditsLoading : ui.settings.topup25}</button>
+                            <button type="button" disabled={Boolean(topupBusy)} onClick={() => startTopup("credits_50")} style={topupButtonStyle}>{topupBusy === "credits_50" ? ui.settings.creditsLoading : ui.settings.topup50}</button>
+                          </div>
+                        ) : <p style={cardText}>{ui.settings.topupsUnavailable}</p>}
+                        {topupError ? <p role="alert" style={{ ...cardText, color: "#fca5a5", marginTop: "12px" }}>{ui.settings.checkoutFailed}</p> : null}
+                      </>
+                    ) : null}
                   </>
                 ) : null}
               </section>
@@ -217,7 +224,7 @@ export default function SettingsPage({
           </section>
 
           <SignedIn>
-            <AccountDeletionCard language={language} />
+            <AccountDeletionCard language={language} userPlan={userPlan} />
           </SignedIn>
         </div>
       </div>
@@ -245,7 +252,7 @@ export default function SettingsPage({
   );
 }
 
-function AccountDeletionCard({ language }) {
+function AccountDeletionCard({ language, userPlan }) {
   const german = language === "Deutsch";
   const [preflight, setPreflight] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -308,7 +315,7 @@ function AccountDeletionCard({ language }) {
   const balance = preflight?.balance || {};
   const credits = (
     <>
-      {german ? "Abo-Credits" : "Subscription credits"}: {balance.subscriptionAvailable ?? "—"} {german ? "verfügbar" : "available"} ({balance.subscriptionHeld ?? 0} {german ? "reserviert" : "reserved"})<br />
+      {german ? "Abo-Credits" : "Subscription credits"}: {balance.subscriptionAvailable ?? "—"} {userPlan === "pro" ? (german ? "verfügbar" : "available") : userPlan === "free" ? (german ? "gespeichert, im Free-Tarif nicht nutzbar" : "stored, unavailable on Free plan") : (german ? "Tarifstatus nicht bestätigt" : "plan status unconfirmed")} ({balance.subscriptionHeld ?? 0} {german ? "reserviert" : "reserved"})<br />
       {german ? "Gekaufte Credits" : "Purchased credits"}: {balance.purchasedAvailable ?? "—"} {german ? "verfügbar" : "available"} ({balance.purchasedHeld ?? 0} {german ? "reserviert" : "reserved"})<br />
       {german ? "Free-Credits" : "Free credits"}: {balance.freeRemaining ?? "—"} {german ? "verfügbar" : "available"} ({balance.freeReserved ?? 0} {german ? "reserviert" : "reserved"})
     </>
