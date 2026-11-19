@@ -25,8 +25,8 @@ test("account deletion UI requires signed-in user, re-verification and explicit 
   assert.match(source, /freeRemaining/);
   assert.match(source, /mandatory legal rights remain unaffected/);
   assert.match(source, /Local drafts in this browser are not linked/);
-  assert.match(source, /minimal hashed security marker may be retained/);
-  assert.match(source, /gehashter Sicherheitsmarker kann aufbewahrt werden/);
+  assert.match(source, /one-way hashed security marker is kept for 30 days after successful deletion/);
+  assert.match(source, /Sicherheitsmarker bleibt 30 Tage nach erfolgreicher Löschung/);
 });
 
 test("deletion endpoint scopes target to authenticated identity and deletes Clerk last", () => {
@@ -55,6 +55,42 @@ test("migration has staged, tombstoned deletion and fail-closed concurrent write
   assert.match(source, /premivate_reject_deleted_account_write/);
   assert.match(source, /grant execute on function public\.premivate_self_service_deletion_commit\(text\) to service_role/);
   assert.match(source, /status = 'pending' and expires_at > now\(\)/);
+});
+
+test("deletion markers have bounded expiry and a scheduled database purge", () => {
+  const migration = read("supabase/migrations/202611190001_bounded_account_deletion_markers.sql");
+  assert.match(migration, /premivate_account_deletion_tombstones[\s\S]*?expires_at timestamptz/);
+  assert.match(migration, /created_at \+ interval '30 days'/);
+  assert.match(migration, /set expires_at = updated_at \+ interval '30 days'[\s\S]*?where stage = 'data_deleted'/);
+  assert.match(migration, /stage = 'data_deleted' and expires_at is not null/);
+  assert.match(migration, /expires_at <= statement_timestamp\(\)/);
+  assert.match(migration, /cron\.schedule\([\s\S]*?'0 \* \* \* \*'/);
+  assert.match(migration, /delete from cron\.job_run_details as run[\s\S]*?interval '7 days'[\s\S]*?from cron\.job as job[\s\S]*?job\.jobid = run\.jobid[\s\S]*?job\.jobname = 'premivate-expired-account-deletion-marker-purge'/);
+  assert.match(migration, /set stage = 'data_deleted',[\s\S]*?expires_at = now\(\) \+ interval '30 days'/);
+  assert.match(migration, /grant execute on function public\.premivate_self_service_deletion_commit\(text\)[\s\S]*?to service_role/);
+});
+
+test("Swiss Privacy pages are publication-ready and match the bounded retention design", () => {
+  const englishAndGerman = read("data/legal-documents.js");
+  const french = read("data/legal-documents-fr.js");
+  const englishGermanPrivacyBlocks = [...englishAndGerman.matchAll(/privacy:\s*\{([\s\S]*?)\n\s*imprint:/g)].map((match) => match[1]);
+  const englishPrivacy = englishGermanPrivacyBlocks[0] ?? "";
+  const germanPrivacy = englishGermanPrivacyBlocks[1] ?? "";
+  const frenchPrivacy = french.match(/privacy:\s*\{([\s\S]*?)\n\s*imprint:/)?.[1] ?? "";
+
+  assert.match(englishPrivacy, /publicationStatus: "ready"/);
+  assert.match(germanPrivacy, /publicationStatus: "ready"/);
+  assert.match(frenchPrivacy, /publicationStatus: "ready"/);
+  assert.match(englishPrivacy, /Vercel Runtime Logs for this project are retained for one day/);
+  assert.match(englishPrivacy, /expire 30 days after successful deletion[\s\S]*?next hourly database cleanup/);
+  assert.match(germanPrivacy, /Vercel-Runtime-Logs dieses Projekts werden.*einen Tag gespeichert/);
+  assert.match(germanPrivacy, /laufen 30 Tage nach erfolgreicher Löschung ab[\s\S]*?stündlichen Datenbank-Bereinigungslauf/);
+  assert.match(frenchPrivacy, /Runtime Logs Vercel de ce projet sont conservés pendant un jour/);
+  assert.match(frenchPrivacy, /expirent 30 jours après la suppression réussie[\s\S]*?nettoyage horaire/);
+  assert.doesNotMatch(englishPrivacy, /Release-D|Candidate|must be reconciled|before publication/i);
+  assert.doesNotMatch(frenchPrivacy, /Release-D|Candidate|avant publication|doit être rapproché/i);
+  assert.deepEqual(parseSource("data/legal-documents.js").type, "File");
+  assert.deepEqual(parseSource("data/legal-documents-fr.js").type, "File");
 });
 
 test("generate and blueprint generation are blocked and release operation locks", () => {
@@ -112,6 +148,8 @@ test("all modified JavaScript and JSX parses", () => {
     "lib/account-deletion.js",
     "lib/credit-topup.js",
     "lib/stripe-refunds.js",
+    "data/legal-documents.js",
+    "data/legal-documents-fr.js",
   ];
   for (const file of files) assert.doesNotThrow(() => parseSource(file), file);
 });

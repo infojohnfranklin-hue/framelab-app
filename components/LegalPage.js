@@ -57,12 +57,13 @@ export default function LegalPage({ documentKey, language }) {
       };
 
   if (!document) return null;
+  const isPublicationReady = document.publicationStatus === "ready";
 
   return (
     <>
       <Head>
         <title>{`${document.title} · PREMIVATE`}</title>
-        <meta name="robots" content="noindex, nofollow" />
+        {!isPublicationReady && <meta name="robots" content="noindex, nofollow" />}
       </Head>
       <div className="legal-page">
         <div className="legal-shell">
@@ -95,10 +96,12 @@ export default function LegalPage({ documentKey, language }) {
             <p className="legal-version">{document.version}</p>
           </header>
 
-          <div className="legal-draft-note" role="status">
-            <span className="legal-draft-label">{copy.draft}</span>
-            <span>{copy.note}</span>
-          </div>
+          {!isPublicationReady && (
+            <div className="legal-draft-note" role="status">
+              <span className="legal-draft-label">{copy.draft}</span>
+              <span>{copy.note}</span>
+            </div>
+          )}
 
           <nav className="legal-document-nav" aria-label={activeLanguage === "de" ? "Rechtliche Dokumente" : activeLanguage === "fr" ? "Documents juridiques" : "Legal documents"}>
             {DOCUMENT_LINKS[activeLanguage].map((item) => (
@@ -119,14 +122,16 @@ export default function LegalPage({ documentKey, language }) {
             <Link href="/">{copy.back}</Link>
           </nav>
 
-          <aside className="legal-open-items">
-            <h2>{copy.openTitle}</h2>
-            <ul>
-              {document.openItems.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </aside>
+          {document.openItems.length > 0 && (
+            <aside className="legal-open-items">
+              <h2>{copy.openTitle}</h2>
+              <ul>
+                {document.openItems.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </aside>
+          )}
 
           <article className="legal-article">
             {document.sections.map((section) => (

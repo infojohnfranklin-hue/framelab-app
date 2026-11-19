@@ -424,8 +424,8 @@ function AccountDeletionCard({ language, userPlan }) {
       </p>
       <p style={{ ...cardText, marginBottom: "12px" }}>
         {german
-          ? "Ein minimaler gehashter Sicherheitsmarker kann aufbewahrt werden, damit verspätete Systemereignisse gelöschte Kontodaten nicht wiederherstellen."
-          : "A minimal hashed security marker may be retained to prevent delayed system events from restoring deleted account data."}
+          ? "Ein minimaler, nicht umkehrbar gehashter Sicherheitsmarker bleibt 30 Tage nach erfolgreicher Löschung als Schutz vor verspäteten Zahlungsereignissen bestehen und wird beim nächsten stündlichen Bereinigungslauf entfernt."
+          : "A minimal one-way hashed security marker is kept for 30 days after successful deletion to prevent delayed payment events from restoring deleted account data, then removed by the next hourly cleanup."}
       </p>
       {loading ? <p style={cardText}>{german ? "Löschstatus wird geladen …" : "Loading deletion status…"}</p> : null}
       {!loading && loadError ? (
