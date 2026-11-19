@@ -1,35 +1,42 @@
 import Stripe from "stripe";
 import { getAuth } from "@clerk/nextjs/server";
-import { getEffectiveUserPlan, getStripeCustomerIdStrict, isProPlan, supabase } from "../../lib/pro";
+import { getEffectiveUserPlan, getStripeCustomerIdStrict, isProPlan, saveStripeCustomerId, supabase } from "../../lib/pro";
 import { readCreditBalance } from "../../lib/credit-balance";
-import { createCreditTopupCheckout } from "../../lib/credit-topup";
-import { getStripeBaseUrl } from "../../lib/stripe-mode";
+import { getStripePublishableKey, stripeSecretMatchesEnvironment } from "../../lib/stripe-mode";
 import { assertAccountNotDeleting } from "../../lib/account-deletion";
+import { createServerFinalizedPrepaymentDraft } from "../../lib/server-finalized-prepayment";
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).json({ error: "Only POST allowed" });
+  if (req.method !== "POST") return res.status(405).json({ error: "METHOD_NOT_ALLOWED" });
   try {
     const { userId } = getAuth(req);
-    if (userId) await assertAccountNotDeleting(supabase, userId, process.env);
-    const result = await createCreditTopupCheckout({
-      env: process.env,
+    if (!userId) return res.status(401).json({ error: "AUTH_REQUIRED" });
+    await assertAccountNotDeleting(supabase, userId, process.env);
+    if (!stripeSecretMatchesEnvironment(process.env)) return res.status(503).json({ error: "STRIPE_MODE_MISMATCH" });
+    const publishableKey = getStripePublishableKey(process.env);
+    if (!publishableKey) return res.status(503).json({ error: "STRIPE_PUBLISHABLE_KEY_UNAVAILABLE" });
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const draft = await createServerFinalizedPrepaymentDraft({
+      serviceType: "credit_topup",
       userId,
-      packageId: req.body?.packageId,
+      requestBody: req.body || {},
+      env: process.env,
+      supabase,
+      stripe,
       getPlan: getEffectiveUserPlan,
       isProPlan,
       getBalance: (id) => readCreditBalance(supabase, id),
       getCustomerId: getStripeCustomerIdStrict,
-      supabase,
-      baseUrl: getStripeBaseUrl(process.env),
-      createSession: (params) => {
-        // Stripe is initialized only after the flag, Pro status and balance pass.
-        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-        return stripe.checkout.sessions.create(params);
-      },
+      createCustomer: (id) => stripe.customers.create({ metadata: { clerkUserId: id } }, {
+        idempotencyKey: `premivate-customer-${id}`,
+      }),
+      saveCustomerId: saveStripeCustomerId,
     });
-    return res.status(200).json(result);
+    return res.status(200).json({ ...draft, publishableKey });
   } catch (error) {
     const status = Number.isInteger(error?.status) ? error.status : 500;
-    return res.status(status).json({ error: error?.safeCode || "TOPUP_CHECKOUT_FAILED" });
+    const code = typeof error?.safeCode === "string" ? error.safeCode : "TOPUP_DRAFT_FAILED";
+    if (status >= 500) console.error("Top-up prepayment draft failed", { code });
+    return res.status(status).json({ error: code });
   }
 }

@@ -14,18 +14,18 @@ const DOCUMENT_LINKS = {
     { href: "/privacy?lang=de", label: "Datenschutz" },
     { href: "/imprint?lang=de", label: "Impressum" },
   ],
+  fr: [
+    { href: "/terms?lang=fr", label: "Conditions" },
+    { href: "/privacy?lang=fr", label: "Confidentialité" },
+    { href: "/imprint?lang=fr", label: "Mentions légales" },
+  ],
 };
 
 export default function LegalPage({ documentKey, language }) {
   const router = useRouter();
-  const activeLanguage =
-    router.query.lang === "de"
-      ? "de"
-      : router.query.lang === "en"
-        ? "en"
-        : language === "Deutsch"
-          ? "de"
-          : "en";
+  const activeLanguage = ["en", "de", "fr"].includes(router.query.lang)
+    ? router.query.lang
+    : language === "Deutsch" ? "de" : language === "Français" ? "fr" : "en";
   const document = LEGAL_DOCUMENTS[activeLanguage]?.[documentKey];
   const copy = activeLanguage === "de"
     ? {
@@ -36,12 +36,23 @@ export default function LegalPage({ documentKey, language }) {
         german: "Deutsch",
         back: "Zurück zur App",
       }
+    : activeLanguage === "fr"
+      ? {
+          draft: "PROJET DE TRAVAIL · NON DESTINÉ À LA PUBLICATION",
+          note: "Ce texte n’est pas encore approuvé pour le lancement public.",
+          openTitle: "À confirmer avant publication",
+          english: "English",
+          german: "Deutsch",
+          french: "Français",
+          back: "Retour à l’application",
+        }
     : {
         draft: "WORKING DRAFT · NOT FOR PUBLICATION",
         note: "This text is not yet approved for public launch.",
         openTitle: "To confirm before publication",
         english: "English",
         german: "Deutsch",
+        french: "Français",
         back: "Back to the app",
       };
 
@@ -71,6 +82,12 @@ export default function LegalPage({ documentKey, language }) {
                 >
                   {copy.german}
                 </Link>
+                <Link
+                  aria-current={activeLanguage === "fr" ? "page" : undefined}
+                  href={{ pathname: router.pathname, query: { lang: "fr" } }}
+                >
+                  {copy.french}
+                </Link>
               </div>
             </div>
             <h1>{document.title}</h1>
@@ -83,7 +100,7 @@ export default function LegalPage({ documentKey, language }) {
             <span>{copy.note}</span>
           </div>
 
-          <nav className="legal-document-nav" aria-label={activeLanguage === "de" ? "Rechtliche Dokumente" : "Legal documents"}>
+          <nav className="legal-document-nav" aria-label={activeLanguage === "de" ? "Rechtliche Dokumente" : activeLanguage === "fr" ? "Documents juridiques" : "Legal documents"}>
             {DOCUMENT_LINKS[activeLanguage].map((item) => (
               <Link
                 href={item.href}

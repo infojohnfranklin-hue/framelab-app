@@ -1513,25 +1513,9 @@ export default function Home({
       setShowAlreadyProDialog(true);
       return;
     }
-
-    try {
-      const response = await fetch("/api/create-checkout-session", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ plan: "pro" }),
-      });
-
-      const data = await response.json();
-
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch (error) {
-      console.error(error);
-      alert(ui.common.checkoutFailed);
-    }
+    // Route every Pro purchase through the reviewed terms and shared
+    // prepayment eligibility flow on the pricing page.
+    window.location.href = "/pricing";
   }
 
   async function handleManageSubscription() {
@@ -1651,10 +1635,6 @@ export default function Home({
         response.headers.get("content-type") || "";
 
       const responseText = await response.text();
-      const responseBodyPreview = responseText
-        .replace(/\s+/g, " ")
-        .trim()
-        .slice(0, 300);
 
       let data = null;
       let responseParseError = null;
@@ -1727,8 +1707,9 @@ export default function Home({
         console.error("Generate API request failed:", {
           status: response.status,
           contentType: responseContentType,
-          bodyPreview: responseBodyPreview,
-          parseError: responseParseError?.message || null,
+          parseErrorCode: responseParseError
+            ? "INVALID_RESPONSE_JSON"
+            : null,
         });
 
         alert(
@@ -1746,8 +1727,9 @@ export default function Home({
         console.error("Generate API returned invalid JSON:", {
           status: response.status,
           contentType: responseContentType,
-          bodyPreview: responseBodyPreview,
-          parseError: responseParseError?.message || null,
+          parseErrorCode: responseParseError
+            ? "INVALID_RESPONSE_JSON"
+            : null,
         });
 
         alert(

@@ -23,6 +23,7 @@ import {
 } from "../../lib/account-deletion";
 import { directorModes } from "../../data/directorModes";
 import measurement from "../../lib/generation-cost-measurement";
+import { finalizeDueTopupConfirmationsForUser } from "../../lib/contract-confirmation";
 
 const {
   createGenerationCostMeasurementContext,
@@ -176,6 +177,10 @@ export default async function handler(req, res) {
       accountOperationRedis = createAccountDeletionRedis(process.env);
       accountOperationId = await beginAccountRedisOperation(accountOperationRedis, userId);
       accountOperationUserId = userId;
+    }
+
+    if (!devMode && userId && process.env.PREMIVATE_CREDIT_LEDGER_BALANCE_ENABLED === "true") {
+      await finalizeDueTopupConfirmationsForUser(supabase, userId);
     }
 
     const isOwner = !devMode && isPremivateOwner(userId);
@@ -2037,9 +2042,6 @@ const createAutonomousPremise = async () => {
     if (!validateAutonomousPremise(premise)) throw new Error(failureReason);
     console.log("[FRAME-LAB AUTONOMOUS PREMISE]", {
       model: "gpt-6.1-sol", finishReason: choice.finish_reason,
-      promptTokens: premiseCompletion.usage?.prompt_tokens ?? null,
-      completionTokens: premiseCompletion.usage?.completion_tokens ?? null,
-      maxCompletionTokens: 8192,
     });
     return premise;
   } catch (_) {
@@ -5474,7 +5476,14 @@ let data;
 try {
   data = JSON.parse(text);
 } catch (parseError) {
-  console.error("JSON PARSE FAILED:", parseError);
+  console.error(
+    "JSON PARSE FAILED",
+    {
+      errorClass: "SYNTAX_ERROR",
+      code: "INVALID_AI_JSON",
+      httpStatus: null,
+    }
+  );
 
   return res.status(500).json({
     error: "Invalid JSON from AI",
@@ -11073,8 +11082,6 @@ let selectedFamily = resolveCreativeState(creativeState);
   const lightTrace = (layer, input, output) => {
     console.info("[FRAME-LAB LIGHT TRACE]", {
       layer,
-      inputLength: String(input).length,
-      outputLength: String(output).length,
     });
   };
 
@@ -14114,9 +14121,19 @@ ${JSON.stringify(candidateInput, null, 2)}`,
     }
     return validatedPreservation;
   } catch (preservationError) {
+    const preservationHttpStatus = Number.isInteger(preservationError?.status) &&
+      preservationError.status >= 100 && preservationError.status <= 599
+      ? preservationError.status
+      : null;
     console.error(
       "[FRAME-LAB PREMIUM PRESERVATION ERROR]",
-      preservationError
+      {
+        errorClass: preservationHttpStatus !== null
+          ? "HTTP_ERROR"
+          : "APPLICATION_ERROR",
+        code: "PRESERVATION_EVALUATION_FAILED",
+        httpStatus: preservationHttpStatus,
+      }
     );
 
     return {
@@ -14607,7 +14624,17 @@ const evaluateFilmicMeaningCarrier = async (
   } catch (error) {
     console.error(
       "[FRAME-LAB FILMIC QUALITY EVALUATION FAILED]",
-      error?.name || "unknown"
+      {
+        errorClass: Number.isInteger(error?.status) &&
+          error.status >= 100 && error.status <= 599
+          ? "HTTP_ERROR"
+          : "APPLICATION_ERROR",
+        code: "FILMIC_QUALITY_EVALUATION_FAILED",
+        httpStatus: Number.isInteger(error?.status) &&
+          error.status >= 100 && error.status <= 599
+          ? error.status
+          : null,
+      }
     );
     return uncertain(requestCompleted, "EVALUATOR_EXCEPTION");
   }
@@ -15066,12 +15093,6 @@ ${JSON.stringify(repairContext, null, 2)}`,
         retryConfiguration: "maxRetries_zero",
         configuredMaxRetries: 0,
       }, () => client.chat.completions.create(repairCompletionRequest));
-    const repairPromptApproxChars = repairCompletionRequest.messages.reduce(
-      (total, message) =>
-        total +
-        (typeof message.content === "string" ? message.content.length : 0),
-      0
-    );
 
     let repairPayload;
     let repairCompletion;
@@ -15092,18 +15113,6 @@ ${JSON.stringify(repairContext, null, 2)}`,
         finishReason:
           repairCompletion?.choices?.[0]?.finish_reason || null,
         refusalPresent: Boolean(repairMessage?.refusal),
-        contentLength: repairText.length,
-        completionTokens:
-          repairCompletion?.usage?.completion_tokens ??
-          repairCompletion?.usage?.output_tokens ??
-          null,
-        promptTokens:
-          repairCompletion?.usage?.prompt_tokens ??
-          repairCompletion?.usage?.input_tokens ??
-          null,
-        maxCompletionTokens: repairMaxCompletionTokens,
-        allowedFieldsCount: allowedFields.size,
-        promptApproxChars: repairPromptApproxChars,
       };
 
       try {
@@ -15524,7 +15533,17 @@ ${JSON.stringify(repairContext, null, 2)}`,
     );
     console.error(
       "[FRAME-LAB SEMANTIC QUALITY REPAIR ERROR]",
-      repairError
+      {
+        errorClass: Number.isInteger(repairError?.status) &&
+          repairError.status >= 100 && repairError.status <= 599
+          ? "HTTP_ERROR"
+          : "APPLICATION_ERROR",
+        code: "SEMANTIC_REPAIR_FAILED",
+        httpStatus: Number.isInteger(repairError?.status) &&
+          repairError.status >= 100 && repairError.status <= 599
+          ? repairError.status
+          : null,
+      }
     );
     if (mustRejectUnrepairedMeaning) {
       console.error("[FRAME-LAB FINAL 503 DECISION]", {
@@ -16263,14 +16282,37 @@ return res.status(200).json(data);
             ? "confirmed"
             : "unverified";
       } catch (creditError) {
+        const rollbackHttpStatus = Number.isInteger(creditError?.status) &&
+          creditError.status >= 100 && creditError.status <= 599
+          ? creditError.status
+          : null;
         console.error(
           "FrameLab credit rollback error:",
-          creditError
+          {
+            errorClass: rollbackHttpStatus !== null
+              ? "HTTP_ERROR"
+              : "APPLICATION_ERROR",
+            code: "CREDIT_ROLLBACK_FAILED",
+            httpStatus: rollbackHttpStatus,
+          }
         );
       }
     }
 
-    console.error("FrameLab API Error:", error);
+    const generationHttpStatus = Number.isInteger(error?.status) &&
+      error.status >= 100 && error.status <= 599
+      ? error.status
+      : null;
+    console.error(
+      "FrameLab API Error",
+      {
+        errorClass: generationHttpStatus !== null
+          ? "HTTP_ERROR"
+          : "APPLICATION_ERROR",
+        code: "GENERATION_FAILED",
+        httpStatus: generationHttpStatus,
+      }
+    );
 
     if (
       [

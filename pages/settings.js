@@ -2,6 +2,9 @@ import { LANGUAGES } from "../data/languages";
 import { useEffect, useState } from "react";
 import { SignedIn, useReverification } from "@clerk/nextjs";
 import { clearLocalContentCopies } from "../lib/browser-content-retention";
+import CheckoutTermsDialog from "../components/CheckoutTermsDialog";
+import StripePrepaymentDialog from "../components/StripePrepaymentDialog";
+import PendingContractConfirmations from "../components/PendingContractConfirmations";
 
 export default function SettingsPage({
   language,
@@ -16,6 +19,10 @@ export default function SettingsPage({
   const [creditError, setCreditError] = useState("");
   const [topupBusy, setTopupBusy] = useState("");
   const [topupError, setTopupError] = useState("");
+  const [pendingTopupPackage, setPendingTopupPackage] = useState("");
+  const [checkoutSession, setCheckoutSession] = useState(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [earlyStartRequested, setEarlyStartRequested] = useState(false);
 
   useEffect(() => {
     if (!planStatusLoaded || !["pro", "free"].includes(userPlan)) {
@@ -37,19 +44,63 @@ export default function SettingsPage({
     return () => { active = false; };
   }, [planStatusLoaded, userPlan]);
 
-  async function startTopup(packageId) {
+  function requestTopup(packageId) {
     if (topupBusy || creditState?.topupSalesEnabled !== true) return;
+    setTermsAccepted(false);
+    setEarlyStartRequested(false);
+    setTopupError("");
+    setPendingTopupPackage(packageId);
+  }
+
+  function cancelTopup() {
+    setPendingTopupPackage("");
+    setTermsAccepted(false);
+    setEarlyStartRequested(false);
+  }
+
+  function cancelTopupPayment() {
+    const confirmationId = checkoutSession?.confirmationId;
+    setCheckoutSession(null);
+    setTopupBusy("");
+    if (confirmationId) {
+      fetch("/api/cancel-prepayment-draft", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirmationId }),
+      }).catch(() => {});
+    }
+  }
+
+  async function startTopup(disclosure = {}) {
+    const packageId = pendingTopupPackage;
+    if (!packageId || !termsAccepted || topupBusy || creditState?.topupSalesEnabled !== true) return;
+    const requestEarlyStart = earlyStartRequested === true;
+    setPendingTopupPackage("");
+    setTermsAccepted(false);
+    setEarlyStartRequested(false);
     setTopupBusy(packageId);
     setTopupError("");
     try {
       const response = await fetch("/api/create-credit-topup-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ packageId }),
+        body: JSON.stringify({
+          packageId,
+          termsAccepted: true,
+          termsLocale: disclosure.termsLocale || (language === "Deutsch" ? "de" : language === "Français" ? "fr" : "en"),
+          earlyStartRequested: requestEarlyStart,
+          marketCountryScope: disclosure.marketCountryScope,
+          marketRegion: disclosure.marketRegion,
+          buyerType: disclosure.buyerType,
+          frenchVersionPresented: disclosure.frenchVersionPresented,
+          alternativeLanguageChoice: disclosure.alternativeLanguageChoice,
+        }),
       });
       const data = await response.json();
-      if (!response.ok || typeof data.url !== "string") throw new Error(data.error || "TOPUP_CHECKOUT_FAILED");
-      window.location.href = data.url;
+      if (!response.ok || !data.confirmationId || !data.amount || !data.currency || !data.publishableKey) {
+        throw new Error(data.error || "TOPUP_CHECKOUT_FAILED");
+      }
+      setCheckoutSession(data);
     } catch (error) {
       setTopupError(error.message || "TOPUP_CHECKOUT_FAILED");
       setTopupBusy("");
@@ -188,8 +239,8 @@ export default function SettingsPage({
                         <h3 style={{ margin: "0 0 12px", fontSize: "16px" }}>{ui.settings.topupsTitle}</h3>
                         {creditState.topupSalesEnabled && !creditState.creditAccessBlocked ? (
                           <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-                            <button type="button" disabled={Boolean(topupBusy)} onClick={() => startTopup("credits_25")} style={topupButtonStyle}>{topupBusy === "credits_25" ? ui.settings.creditsLoading : ui.settings.topup25}</button>
-                            <button type="button" disabled={Boolean(topupBusy)} onClick={() => startTopup("credits_50")} style={topupButtonStyle}>{topupBusy === "credits_50" ? ui.settings.creditsLoading : ui.settings.topup50}</button>
+                            <button type="button" disabled={Boolean(topupBusy)} onClick={() => requestTopup("credits_25")} style={topupButtonStyle}>{topupBusy === "credits_25" ? ui.settings.creditsLoading : ui.settings.topup25}</button>
+                            <button type="button" disabled={Boolean(topupBusy)} onClick={() => requestTopup("credits_50")} style={topupButtonStyle}>{topupBusy === "credits_50" ? ui.settings.creditsLoading : ui.settings.topup50}</button>
                           </div>
                         ) : <p style={cardText}>{ui.settings.topupsUnavailable}</p>}
                         {topupError ? <p role="alert" style={{ ...cardText, color: "#fca5a5", marginTop: "12px" }}>{ui.settings.checkoutFailed}</p> : null}
@@ -228,6 +279,39 @@ export default function SettingsPage({
           </SignedIn>
         </div>
       </div>
+
+      <CheckoutTermsDialog
+        open={Boolean(pendingTopupPackage)}
+        language={language || "English"}
+        locale={language === "Deutsch" ? "de" : language === "Français" ? "fr" : "en"}
+        summary={
+          pendingTopupPackage === "credits_25"
+            ? ui.settings.topup25
+            : pendingTopupPackage === "credits_50"
+              ? ui.settings.topup50
+              : ""
+        }
+        checked={termsAccepted}
+        onCheckedChange={setTermsAccepted}
+        serviceType="credit_topup"
+        earlyStartRequested={earlyStartRequested}
+        onEarlyStartRequestedChange={setEarlyStartRequested}
+        onCancel={cancelTopup}
+        onConfirm={startTopup}
+        busy={Boolean(topupBusy)}
+      />
+      <StripePrepaymentDialog
+        open={Boolean(checkoutSession)}
+        session={checkoutSession}
+        locale={language === "Deutsch" ? "de" : language === "Français" ? "fr" : "en"}
+        onCancel={cancelTopupPayment}
+      />
+
+      <SignedIn>
+        <div style={{ maxWidth: "980px" }}>
+          <PendingContractConfirmations language={language} />
+        </div>
+      </SignedIn>
 
       <style jsx global>{`
         @media (max-width: 760px) {

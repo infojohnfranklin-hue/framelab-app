@@ -262,17 +262,17 @@ export default function App({ Component, pageProps }) {
           />
           <footer
             className="premivate-legal-footer"
-            aria-label={language === "Deutsch" ? "Rechtliche Informationen" : "Legal information"}
+            aria-label={language === "Deutsch" ? "Rechtliche Informationen" : language === "Français" ? "Informations juridiques" : "Legal information"}
           >
-            <span>{language === "Deutsch" ? "Rechtliches" : "Legal"}</span>
-            <Link href={language === "Deutsch" ? "/terms?lang=de" : "/terms"}>
-              {language === "Deutsch" ? "AGB" : "Terms"}
+            <span>{language === "Deutsch" ? "Rechtliches" : language === "Français" ? "Juridique" : "Legal"}</span>
+            <Link href={language === "Deutsch" ? "/terms?lang=de" : language === "Français" ? "/terms?lang=fr" : "/terms"}>
+              {language === "Deutsch" ? "AGB" : language === "Français" ? "Conditions" : "Terms"}
             </Link>
-            <Link href={language === "Deutsch" ? "/privacy?lang=de" : "/privacy"}>
-              {language === "Deutsch" ? "Datenschutz" : "Privacy"}
+            <Link href={language === "Deutsch" ? "/privacy?lang=de" : language === "Français" ? "/privacy?lang=fr" : "/privacy"}>
+              {language === "Deutsch" ? "Datenschutz" : language === "Français" ? "Confidentialité" : "Privacy"}
             </Link>
-            <Link href={language === "Deutsch" ? "/imprint?lang=de" : "/imprint"}>
-              {language === "Deutsch" ? "Impressum" : "Imprint"}
+            <Link href={language === "Deutsch" ? "/imprint?lang=de" : language === "Français" ? "/imprint?lang=fr" : "/imprint"}>
+              {language === "Deutsch" ? "Impressum" : language === "Français" ? "Mentions légales" : "Imprint"}
             </Link>
           </footer>
         </main>

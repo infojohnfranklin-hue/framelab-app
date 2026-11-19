@@ -20,6 +20,48 @@ function loadModule(file, bindings = {}) {
   source = source.replace(/(^|\n)export default async function handler/g, "$1async function handler");
   const defaults = {
     CHECKOUT_MARKET_DATA_PARAMETERS,
+    validateServerFinalizedEligibilityMetadata: undefined,
+    SERVER_FINALIZED_CHECKOUT_FLOW: undefined,
+    createCheckoutTermsConsent: ({ locale = "en", accepted = true, ...input }) => {
+      if (input.marketCountryScope === "CA") {
+        const error = new Error("CANADA_SALES_UNAVAILABLE");
+        error.status = 403;
+        error.safeCode = "CANADA_SALES_UNAVAILABLE";
+        throw error;
+      }
+      return {
+        accepted, locale, version: "terms-v1", acceptedAt: "2026-11-17T10:00:00.000Z",
+        precontractDisclosure: {
+          marketCountryScope: input.marketCountryScope || "OTHER",
+          marketRegion: input.marketRegion || "",
+          buyerType: input.buyerType || "consumer",
+          frenchVersionPresented: input.frenchVersionPresented === true,
+          alternativeLanguageChoice: input.alternativeLanguageChoice === true,
+        },
+      };
+    },
+    checkoutTermsMetadata: (consent) => ({
+      premivateTermsVersion: consent.version,
+      premivateTermsLocale: consent.locale,
+      premivateTermsAcceptedAt: consent.acceptedAt,
+      premivatePrecontractMarketScope: consent.precontractDisclosure.marketCountryScope,
+      premivatePrecontractRegion: consent.precontractDisclosure.marketRegion,
+      premivateBuyerType: consent.precontractDisclosure.buyerType,
+      premivateFrenchTermsPresented: String(consent.precontractDisclosure.frenchVersionPresented),
+      premivateAlternativeLanguageChoice: String(consent.precontractDisclosure.alternativeLanguageChoice),
+    }),
+    earlyStartRequestMetadata: ({ confirmationId, requested }) => ({
+      premivateContractConfirmationId: confirmationId,
+      premivateEarlyStartRequested: String(requested),
+      premivateEarlyStartVersion: "test-v1",
+    }),
+    createContractConfirmationDraft: async (_db, input) => ({
+      id: "confirmation-test-1",
+      earlyStartRequested: input.earlyStartRequested,
+      earlyStartRequestedAt: null,
+    }),
+    attachContractConfirmationSession: async () => true,
+    markContractConfirmationCheckoutFailed: async () => {},
     persistCheckoutMarketData: async () => ({ status: "not_collected" }),
     handler: undefined, isCreditLedgerEnabled: undefined, parseCreditBalance: undefined,
     readCreditBalance: undefined, isTopupSalesEnabled: undefined,
@@ -28,6 +70,7 @@ function loadModule(file, bindings = {}) {
     assertAccountNotDeleting: async () => true,
     isAccountDeletionMarked: async () => false,
     getStripeBaseUrl: () => null,
+    getStripePublishableKey: () => null,
     getEffectiveUserPlan: undefined, isProPlan: undefined,
     isPremivateOwner: (id) => id === "user_3DrEzh71zs0gCqttVokYBfwF6Jk",
     stripeSecretMatchesEnvironment: (env) => typeof env?.STRIPE_SECRET_KEY === "string" &&
@@ -36,7 +79,7 @@ function loadModule(file, bindings = {}) {
       event.livemode === (env.VERCEL_ENV === "production") &&
       (env.VERCEL_ENV === "production" ? env.STRIPE_SECRET_KEY?.startsWith("sk_live_") : env.STRIPE_SECRET_KEY?.startsWith("sk_test_")),
   };
-  const wrapped = `${source}\n({ handler, getEffectiveUserPlan, isCreditLedgerEnabled, isProPlan, parseCreditBalance, readCreditBalance, isTopupSalesEnabled, getCreditTopupPackage, validateTopupBalance, createCreditTopupCheckout, processPaidCreditTopup });`;
+  const wrapped = `${source}\n({ handler, getEffectiveUserPlan, isCreditLedgerEnabled, isProPlan, parseCreditBalance, readCreditBalance, isTopupSalesEnabled, getCreditTopupPackage, validateTopupBalance, createCreditTopupCheckout, processPaidCreditTopup, validateServerFinalizedEligibilityMetadata, SERVER_FINALIZED_CHECKOUT_FLOW });`;
   return vm.runInNewContext(wrapped, { ...defaults, ...bindings, console, URL, process: bindings.process || { env: {} }, Buffer }, { timeout: 1000 });
 }
 
@@ -159,8 +202,9 @@ test("Free balances keep the existing Redis values and do not read the ledger", 
   assert.equal(response.code, 200);
   assert.equal(response.body.used, 1);
   assert.equal(response.body.remaining, 1);
-  assert.equal(response.body.ledgerEnabled, false);
-  assert.equal(ledgerReads, 0);
+  assert.equal(response.body.ledgerEnabled, true);
+  assert.equal(response.body.purchasedAvailable, validBalance.purchasedAvailable);
+  assert.equal(ledgerReads, 1);
 });
 
 test("enabled Pro ledger read errors keep HTTP 503", async () => {
@@ -217,20 +261,49 @@ test("server-owned package amount is used for the top-up Checkout session", asyn
   let params;
   const result = await api.createCreditTopupCheckout({
     env: enabledEnv, userId: "user_pro", packageId: "credits_50",
+    termsAccepted: true, termsLocale: "en", earlyStartRequested: false,
+    marketCountryScope: "CH", marketRegion: "", buyerType: "consumer",
+    frenchVersionPresented: false, alternativeLanguageChoice: false,
     getPlan: async () => "pro", getBalance: async () => validBalance,
     getCustomerId: async () => "cus_test",
-    createSession: async (value) => { params = value; return { url: "https://checkout.test/session" }; },
+    createSession: async (value) => { params = value; return { id: "cs_test_session", ui_mode: "elements", client_secret: "cs_test_secret", expires_at: 1_900_000_000 }; },
     baseUrl: "https://premivate.com",
   });
-  assert.equal(result.url, "https://checkout.test/session");
+  assert.equal(result.sessionId, "cs_test_session");
+  assert.equal(result.clientSecret, "cs_test_secret");
+  assert.equal(params.ui_mode, "elements");
+  assert.match(params.return_url, /\/success\?session_id=\{CHECKOUT_SESSION_ID\}$/);
   assert.equal(params.line_items[0].price_data.unit_amount, 1290);
   assert.equal(params.line_items[0].price_data.currency, "chf");
   assert.equal(params.metadata.credits, "50");
   assert.equal(params.customer, "cus_test");
-  assert.deepEqual(
-    Array.from(params.custom_fields[0].dropdown.options, (option) => option.value),
-    ["consumer", "businessregistered", "businessunregistered", "businessunknown"],
-  );
+  assert.equal(params.locale, "en");
+  assert.equal(params.metadata.premivatePrecontractRegion, "");
+  assert.equal(params.metadata.premivateBuyerType, "consumer");
+  assert.equal(params.custom_fields, undefined);
+});
+
+test("Canadian top-up checkout is denied before plan, customer or Stripe lookups", async () => {
+  const api = loadModule("lib/credit-topup.js");
+  const calls = { plan: 0, balance: 0, customer: 0, session: 0 };
+  await assert.rejects(api.createCreditTopupCheckout({
+    env: enabledEnv,
+    userId: "user_pro",
+    packageId: "credits_25",
+    termsAccepted: true,
+    termsLocale: "en",
+    earlyStartRequested: false,
+    marketCountryScope: "CA",
+    marketRegion: "ON",
+    frenchVersionPresented: false,
+    alternativeLanguageChoice: false,
+    getPlan: async () => { calls.plan++; return "pro"; },
+    getBalance: async () => { calls.balance++; return validBalance; },
+    getCustomerId: async () => { calls.customer++; return "cus_test"; },
+    createSession: async () => { calls.session++; return { url: "https://checkout.test/session" }; },
+    baseUrl: "https://premivate.com",
+  }), (error) => error.status === 403 && error.safeCode === "CANADA_SALES_UNAVAILABLE");
+  assert.deepEqual(calls, { plan: 0, balance: 0, customer: 0, session: 0 });
 });
 
 test("Owner cannot purchase top-ups because Owner access is unlimited", async () => {
@@ -244,6 +317,103 @@ test("Owner cannot purchase top-ups because Owner access is unlimited", async ()
     baseUrl: "https://premivate.com",
   }), (error) => error.status === 403);
   assert.equal(sessions, 0);
+});
+
+test("server-finalized top-up payment is recorded from the verified PaymentIntent", async () => {
+  const now = Date.now();
+  const checkedAt = new Date(now - 60_000).toISOString();
+  const expiresAt = new Date(now + 9 * 60_000).toISOString();
+  const metadata = {
+    premivateCheckoutFlow: "r2-server-finalized-v1",
+    premivateCheckoutType: "credit_topup",
+    premivateEligibilityVersion: "r2-server-finalized-v1",
+    premivateEligibilityStatus: "approved",
+    premivateEligibilityBillingCountry: "CH",
+    premivateEligibilityIpCountry: "CH",
+    premivateEligibilityEvidence: "confirmation_token_billing_country+server_ip_country",
+    premivateEligibilityCheckedAt: checkedAt,
+    premivateEligibilityExpiresAt: expiresAt,
+    premivatePrecontractMarketScope: "CH",
+    premivateBuyerType: "consumer",
+    premivateContractConfirmationId: "confirmation-test-1",
+    premivateEarlyStartRequested: "false",
+    premivateEarlyStartVersion: "eu-service-confirmation-v2",
+    premivateTermsVersion: "terms-v1",
+    premivateTermsLocale: "en",
+    premivateTermsAcceptedAt: checkedAt,
+    clerkUserId: "user_pro",
+    creditPackage: "credits_25",
+    credits: "25",
+  };
+  const event = {
+    id: "evt_server_topup_1",
+    type: "payment_intent.succeeded",
+    created: Math.floor(now / 1000),
+    livemode: false,
+    data: { object: { id: "pi_server_topup_1", metadata } },
+  };
+  const paymentIntent = {
+    id: "pi_server_topup_1",
+    status: "succeeded",
+    amount: 690,
+    amount_received: 690,
+    currency: "chf",
+    livemode: false,
+    customer: { id: "cus_server_topup_1" },
+    payment_method: {
+      id: "pm_server_topup_1",
+      type: "card",
+      billing_details: { address: { country: "CH" } },
+    },
+    metadata,
+  };
+  const confirmation = {
+    id: "confirmation-test-1",
+    clerk_user_id: "user_pro",
+    service_type: "credit_topup",
+    state: "checkout_pending",
+    purchase_snapshot: { packageId: "credits_25", credits: 25, amount: 690 },
+    stripe_confirmation_token_id: "ctoken_test_1",
+    stripe_payment_intent_id: null,
+    stripe_customer_id: "cus_server_topup_1",
+  };
+  let recorded;
+  const supabase = {
+    from(table) {
+      assert.equal(table, "premivate_contract_confirmations");
+      const query = {
+        select() { return this; },
+        eq() { return this; },
+        async maybeSingle() { return { data: confirmation, error: null }; },
+      };
+      return query;
+    },
+  };
+  const eligibility = loadModule("lib/server-finalized-eligibility.js", {
+    normalizeBuyerType: (value) => value,
+    isPrepaymentMarketActivated: () => false,
+  });
+  const api = loadModule("lib/credit-topup.js", {
+    validateServerFinalizedEligibilityMetadata: eligibility.validateServerFinalizedEligibilityMetadata,
+    SERVER_FINALIZED_CHECKOUT_FLOW: eligibility.SERVER_FINALIZED_CHECKOUT_FLOW,
+    grantPurchasedCredits: async () => { throw new Error("server-finalized top-ups must remain transfer-gated"); },
+    recordPaidServerFinalizedContractConfirmation: async (_db, input) => { recorded = input; },
+  });
+  assert.equal(metadata.premivateCheckoutFlow, eligibility.SERVER_FINALIZED_CHECKOUT_FLOW);
+  assert.equal(event.data.object.metadata.premivateCheckoutType, "credit_topup");
+  const result = await api.processPaidCreditTopup({
+    event,
+    stripe: {
+      paymentIntents: { retrieve: async (id) => { assert.equal(id, paymentIntent.id); return paymentIntent; } },
+      customers: { retrieve: async (id) => ({ id, address: { country: "CH" }, email: "buyer@example.test" }) },
+    },
+    supabase,
+    env: { VERCEL_ENV: "preview" },
+  });
+  assert.equal(result.status, "paid_pending_transfer");
+  assert.equal(recorded.paymentIntent.id, paymentIntent.id);
+  assert.equal(recorded.expectedServiceType, "credit_topup");
+  assert.equal(recorded.marketData.billingCountry, "CH");
 });
 
 test("refund-restricted Pro accounts cannot start a new top-up checkout", async () => {

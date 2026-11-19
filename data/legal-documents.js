@@ -1,3 +1,6 @@
+import { EU_EARLY_START_COPY } from "./contract-confirmation-copy";
+import { LEGAL_DOCUMENTS_FR } from "./legal-documents-fr";
+
 export const LEGAL_DOCUMENTS = {
   en: {
     terms: {
@@ -5,7 +8,7 @@ export const LEGAL_DOCUMENTS = {
       title: "Terms of Service",
       summary:
         "Terms for using PREMIVATE’s AI-assisted creative direction platform.",
-      version: "Working draft · 8 November 2026",
+      version: "Working draft · 17 November 2026 · Terms v5",
       sections: [
         {
           heading: "1. Provider and contact",
@@ -26,7 +29,7 @@ export const LEGAL_DOCUMENTS = {
           heading: "3. Accounts and material you provide",
           paragraphs: [
             "You must provide accurate information required for your account and protect your sign-in credentials. You remain responsible for the material and instructions you submit and must have the rights and permissions needed to use them.",
-            "You authorize PREMIVATE to process submitted material only as needed to provide and operate the service, subject to applicable law and the Privacy Policy. The exact provider data flows and contract wording must be confirmed before publication.",
+            "PREMIVATE handles personal data as described in the PREMIVATE Privacy Policy.",
           ],
         },
         {
@@ -43,7 +46,7 @@ export const LEGAL_DOCUMENTS = {
         {
           heading: "5. Pro subscription and price",
           paragraphs: [
-            "PREMIVATE Pro is offered for CHF 24.00 per month. The amount presented by PREMIVATE is the amount PREMIVATE charges; separate fees imposed by a bank or payment provider, such as currency-conversion fees, may still apply.",
+            "PREMIVATE Pro is offered for CHF 24.00 per month. Before you purchase, PREMIVATE will show the total amount due to PREMIVATE for the selected billing period, including any tax PREMIVATE is required to collect. Separate fees imposed by your bank or payment provider, such as currency-conversion fees, may still apply.",
             "A subscription renews for successive monthly billing periods until it is effectively cancelled. The checkout must display the price, renewal and cancellation terms before you confirm the purchase.",
           ],
         },
@@ -58,15 +61,16 @@ export const LEGAL_DOCUMENTS = {
         {
           heading: "7. Purchased top-up credits",
           paragraphs: [
-            "The current top-up offers are 25 credits for CHF 6.90 and 50 credits for CHF 12.90. The applicable package and price are shown before purchase.",
+            "The current top-up offers are 25 credits for CHF 6.90 and 50 credits for CHF 12.90. Before purchase, PREMIVATE will show the selected package and the total amount due, including any tax PREMIVATE is required to collect.",
             "Purchased top-up credits remain available when a Pro subscription is cancelled and can be used for eligible features without active Pro. When both types of credits are available, subscription credits are used first. The 200-credit cap applies to subscription credits and does not include separately purchased top-up credits.",
+            "A top-up package is supplied when all credits in that purchase have been successfully credited to your account and made available for eligible use. Using those credits for later generations is not required for delivery of the package. Mandatory statutory rights remain unaffected.",
           ],
         },
         {
           heading: "8. Cancellation and renewal",
           paragraphs: [
-            "You may cancel a Pro subscription using the account’s subscription-management function when available. An effective cancellation stops future renewals; Pro access continues until the end of the already-paid period, subject to applicable law.",
-            "Ordinary cancellation does not automatically remove purchased top-up credits. The customer-facing cancellation steps and timing must match the live checkout and billing configuration before publication.",
+            "You can manage or cancel Pro by signing in to your PREMIVATE account and opening subscription management. This opens Stripe’s customer billing portal. The portal shows the cancellation options and effective date. Where a cancellation is scheduled for the end of a paid period, Pro access continues until that period ends and future renewals stop.",
+            "Ordinary cancellation does not automatically remove purchased top-up credits. Mandatory cancellation and refund rights under applicable law remain unaffected.",
           ],
         },
         {
@@ -80,9 +84,8 @@ export const LEGAL_DOCUMENTS = {
         {
           heading: "10. Permanent account deletion",
           paragraphs: [
-            "PREMIVATE’s product rule is that customers can request permanent deletion of their own account directly in the application. Before confirmation, the flow must show the account’s remaining credit categories, explain the consequences and obtain explicit confirmation.",
-            "Deletion can leave limited records where required by law or needed to prevent delayed account recreation. Browser-local drafts are not linked to the account and must be cleared separately. Records held by payment, hosting or other providers and provider backups are not necessarily removed by the application’s deletion operation.",
-            "Production availability, the treatment of an active subscription and the retention basis and period for any deletion-prevention marker must be verified before this text is published as a live description of the service.",
+            "You can request permanent deletion of your account in the application. Before you confirm, the app will show your remaining credit categories and explain the effects of deletion.",
+            "Limited records may remain where required or permitted by law for legal or security reasons. Deleting your PREMIVATE account does not necessarily delete separate records held by payment, hosting or other providers, or their backups. See the Privacy Policy for more information.",
           ],
         },
         {
@@ -112,7 +115,7 @@ export const LEGAL_DOCUMENTS = {
         {
           heading: "15. Governing law and mandatory protections",
           paragraphs: [
-            "These Terms are intended to be governed by Swiss law. This does not remove mandatory consumer protections that apply to you under the law of your place of residence or other applicable law. Any jurisdiction provision requires final legal review before publication.",
+            "These Terms are intended to be governed by Swiss law. This does not limit mandatory consumer protections or court-jurisdiction rules that apply under the law of your place of residence or other applicable law.",
           ],
         },
         {
@@ -121,11 +124,13 @@ export const LEGAL_DOCUMENTS = {
             "PREMIVATE · operated by Franco Baumann · Rosenbüelstrasse 21, 9642 Ebnat-Kappel SG, Switzerland · support@premivate.com.",
           ],
         },
+        {
+          heading: "17. EU consumer withdrawal and early service start",
+          paragraphs: EU_EARLY_START_COPY.en.termsParagraphs,
+        },
       ],
       openItems: [
-        "Confirm that the live checkout and cancellation steps match the renewal, price and withdrawal wording.",
-        "Confirm the production account-deletion behavior for active subscriptions and retained deletion-prevention data.",
-        "Have the consumer, liability, output-rights and governing-law clauses reviewed for the actual target markets.",
+        "The existing international market matrix still has unresolved local tax and consumer-contract requirements for US states, Canadian provinces, and the 'Other provider-listed markets' group. The general mandatory-rights clause does not resolve market-specific pre-contract disclosures, tax treatment, or any required local terms.",
       ],
     },
     privacy: {
@@ -133,12 +138,12 @@ export const LEGAL_DOCUMENTS = {
       title: "Privacy Policy",
       summary:
         "How PREMIVATE’s current product design uses account, creative, billing and operational data.",
-      version: "Working draft · 8 November 2026",
+      version: "Working draft · 17 November 2026",
       sections: [
         {
-          heading: "1. Controller and contact",
+          heading: "1. Controller and privacy contacts",
           paragraphs: [
-            "The controller is Franco Baumann, PREMIVATE’s operator and seller, whose tax domicile is Switzerland. Baumann Creative is intended as an additional business designation. Contact: support@premivate.com. Postal address: Rosenbüelstrasse 21, 9642 Ebnat-Kappel SG, Switzerland.",
+            "For personal-data processing whose purposes and means PREMIVATE determines, the controller is Franco Baumann, PREMIVATE’s operator and seller, whose tax domicile is Switzerland. Baumann Creative is intended as an additional business designation; PREMIVATE is a product brand and is not a separate legal entity. Provider roles may be separate or joint depending on the activity. Privacy contact: support@premivate.com. Postal address: Rosenbüelstrasse 21, 9642 Ebnat-Kappel SG, Switzerland.",
             "Privacy contacts: Franco Baumann acts as PREMIVATE’s internal Data Protection Officer (DPO) for Singapore. The contact is support@premivate.com and will be reachable during Singapore business hours. Franco Baumann also acts as PREMIVATE’s internal Privacy Officer for New Zealand; contact: support@premivate.com.",
           ],
         },
@@ -146,42 +151,42 @@ export const LEGAL_DOCUMENTS = {
           heading: "2. Data categories",
           paragraphs: [
             "Depending on how you use PREMIVATE, the service may process account and authentication information; creative briefs and other material you submit; generated concepts, prompts, blueprints and saved History; language and account preferences; subscription, credit and transaction references; and technical or security data needed to operate the service.",
-            "For Pro and credit top-up Checkout, Stripe collects the customer’s required billing address, including country, and a required self-declared purchase category (private or business, including the customer’s stated tax-registration status). Checkout also offers an optional business name and optional tax-ID collection. PREMIVATE uses the billing country and declared category for transaction records and market turnover monitoring; the application records only whether a tax ID was supplied, while Stripe collects and stores any business name and tax-ID value. These fields do not by themselves determine tax treatment or establish residence.",
-            "PREMIVATE stores some content copies in this browser, separately from account-linked server data. In the current Release-D candidate these include a reopened History generation and a short label for the active project. Browser copies expire after 30 days and are removed on the next app visit. A successful in-app account-deletion flow clears the known PREMIVATE content copies from that browser; signing out alone does not clear them immediately. The complete inventory of technical logs, cookies and similar technologies must still be confirmed before publication.",
+            "For Pro and credit top-up Checkout, Stripe collects the customer’s required billing address, including country, and a required self-declared purchase category (private or business, including the customer’s stated tax-registration status). Checkout also offers an optional business name and optional tax-ID collection. Before payment, PREMIVATE compares the declared market country and Stripe billing-address country with the country signal supplied by Vercel for the incoming request. PREMIVATE stores the country codes, eligibility result and check time in Checkout metadata and, after payment, in the contract-confirmation record. It does not write the raw request IP into PREMIVATE billing or contract records; Vercel processes request IPs and may include them in provider logs under the configured retention. These country signals support market eligibility checks; they do not prove residence or determine tax treatment. The application records only whether a tax ID was supplied, while Stripe collects and stores any business name and tax-ID value.",
+            "PREMIVATE stores some content copies in this browser, separately from account-linked server data. The intended Release-D candidate stores a reopened History generation and a short active-project label. Browser content copies are limited to the documented product cap, expire after 30 days and are removed on the next app access. The in-app Clear/Reset and account-deletion cleanup apply where provided; signing out alone does not immediately clear these copies. The final cookie, browser-storage and similar-technology inventory, including any provider-set authentication cookies, must be reconciled against the release before publication.",
           ],
         },
         {
           heading: "3. Purposes",
           paragraphs: [
             "The application uses data to authenticate accounts, provide creative generation and saved History, manage subscriptions and credit balances, secure and maintain the service, and respond to support or privacy requests. The exact purposes and legal bases for each category, especially for users in the EU/EEA, must be documented before publication.",
-            "Billing country and the customer’s declared private/business and tax-registration category are also used to review market-level sales and turnover thresholds and to support billing or tax-compliance follow-up where applicable. The declaration is a monitoring input, not a legal tax determination.",
+            "Billing country, the declared market country, the Vercel-supplied request-country signal, and the customer’s declared private/business and tax-registration category are used to check whether a prepayment market flow is enabled, review market-level sales and turnover, and support billing or tax-compliance follow-up where applicable. Missing or conflicting location signals stop payment or require review. These signals and declarations are monitoring inputs, not proof of residence or a legal tax determination.",
           ],
         },
         {
           heading: "4. AI processing and recipients",
           paragraphs: [
             "PREMIVATE’s Generate server calls OpenAI Chat Completions to produce requested creative outputs. The Blueprint flow sends the user’s vision, selected director mode and output language; it may also send derived audio-reference analysis and, when provided, visual-reference image pixels. The source does not establish that raw audio files are sent to OpenAI. OpenAI states that API inputs and outputs are not used to train or improve its models unless the customer opts in; its published default abuse-monitoring logs may be retained for up to 30 days. PREMIVATE-specific opt-in status, applicable endpoint/model storage settings, regional processing and any Zero Data Retention or Modified Abuse Monitoring approval have not been verified. No PREMIVATE-specific no-training or zero-retention guarantee is made.",
-            "The Candidate also identifies Clerk for authentication, Supabase for application data, Upstash Redis for certain operational and credit/request state, Stripe for billing, and Vercel for hosting and deployment. Clerk publicly states that its service uses US infrastructure and does not offer regional data-residency selection. Supabase states that the selected project region covers Postgres, Auth, Storage and backups, while some account, support, usage or log data may be processed elsewhere; PREMIVATE’s selected Production region and plan have not been confirmed. Upstash documents optional global Redis databases with customer-selected primary/read regions, but PREMIVATE’s deployed Redis mode and regions have not been verified. Stripe and Vercel describe provider-specific roles, transfer terms and retention in their public legal materials. According to current Owner information, no individually negotiated agreements with Stripe or Supabase are known. PREMIVATE therefore currently expects the providers’ standard terms to govern those relationships. The exact contracting entities, data-protection roles, Production plans and settings, transfer locations and retention controls remain to be confirmed. Vercel’s applicable agreement and plan also remain unconfirmed. Public vendor documentation does not prove PREMIVATE’s deployed settings.",
+            "The intended Release-D provider setup uses Clerk for authentication, Supabase for application data, Upstash Redis for operational and credit/request state, Stripe for billing, Vercel for hosting and deployment, and OpenAI for generation. The mapped Supabase application project is in Ireland (eu-west-1); the configured Upstash Production resource is in Frankfurt (eu-central-1). The Vercel project Function Region setting is iad1 (Washington, DC, United States), and the team has Pro with Observability Plus, whose runtime-log retention is 30 days. These are configuration facts for the intended release; Release D is not yet the active Production deployment, and the configured Vercel region does not prove where each invocation ran. Clerk describes US infrastructure and no regional-residency selection. The OpenAI Default project has Global residency and API data controls enabled per call; OpenAI’s default abuse-monitoring logs may contain prompts and responses and may be retained for up to 30 days. PREMIVATE-specific request storage, endpoint/model retention, and any Zero Data Retention or Modified Abuse Monitoring approval are not established. No PREMIVATE-specific no-training or zero-retention guarantee is made. Supabase, Upstash, Stripe, Vercel and OpenAI publish provider-specific contract, role, transfer and retention terms. The Owner knows of no individually negotiated Stripe or Supabase agreement and expects standard terms. Provider roles can differ by activity. The exact account contracting entities, applicable terms, subprocessors, transfer mechanisms and effective Production runtime remain to be confirmed. Data may be processed in the United States, Ireland, Germany and other countries; the intended region settings do not guarantee that every provider operation or support process stays in those regions.",
             "For paid Checkout Sessions, Stripe receives and stores the billing address, the customer’s required purchase-category selection, any optional business name, and any tax ID the customer optionally supplies. PREMIVATE’s webhook uses the country and selection in billing records and stores only a tax-ID-present flag in market metadata; it does not copy the business-name or tax-ID value into PREMIVATE’s application database. Automatic tax calculation is not enabled by these Checkout settings.",
           ],
         },
         {
           heading: "5. Storage and retention",
           paragraphs: [
-            "Candidate source shows profiles, saved generations/History and credit information in Supabase, plus certain user-scoped operational, credit and request state in Upstash Redis. In one specific free-Generate completion flow, the full result is serialized into Redis request state with a 24-hour TTL. That code-level TTL is not a general retention period for other Redis values, saved History, provider logs, backups or account data. Evidence-based retention criteria for those other categories remain to be confirmed; no general duration is stated here.",
+            "PREMIVATE’s policy is to retain Supabase profiles and saved generations/History until the user deletes the relevant entry or deletes the account. The per-user Free-Credit counter has no expiry while the account exists and is deleted as part of account deletion. Browser content copies are limited to the documented product cap, expire after 30 days and are removed on the next app access; Clear/Reset and account-deletion cleanup apply where provided. Some operational Redis request states have shorter, path-specific expiry periods, including a 24-hour TTL for a completed Free-Generate result; this is not a general expiry for all Redis keys. Vercel runtime logs are configured for 30-day retention. OpenAI’s default abuse-monitoring logs may be retained for up to 30 days. The observed Supabase Free/Nano plan lists one-day API/database logs and 24-hour Auth audit logs, with no automatic project backups included. Stripe billing records, records legally required to be retained, provider-side records and backups may remain under applicable provider terms or law. The retention basis and period for the hashed account-deletion marker and billing records remains under legal review; no single retention period applies to every category.",
           ],
         },
         {
           heading: "6. Account deletion and data that may remain",
           paragraphs: [
-            "The Candidate contains a self-service deletion flow for an authenticated user’s own account, and a bounded isolated Preview acceptance was reported as passed. Production availability and complete deletion outcomes across every data store are not established by that evidence and must be confirmed before publication.",
-            "After the in-app deletion endpoint confirms successful account deletion, the Release-D/Gate-E candidate clears known PREMIVATE content copies from that browser before redirecting. Browser copies also expire after 30 days and are removed on the next app visit. This is limited Preview evidence for one synthetic Free account; Production behavior, deletion with an active subscription, and the legal basis and period for the hashed deletion-prevention marker remain open. Payment records, records required by law, provider-side records and backups may remain outside the application deletion transaction where applicable law, contract or provider processes require or permit this; applicable categories and periods must be established before publication.",
+            "The intended Release-D application includes a self-service deletion flow for an authenticated user’s own account. After the application confirms successful deletion, it clears the known PREMIVATE content copies from that browser before redirecting. Release-D account deletion has been accepted in an isolated Preview for a synthetic account; Production availability and complete outcomes across every data store, including an active subscription, remain to be verified separately.",
+            "Payment and tax records, the minimal hashed deletion-prevention marker, provider-side data and backups may remain outside the application deletion transaction where applicable law, contract or provider processes require or permit this. The categories and legal retention periods for billing records and the deletion marker remain to be determined.",
           ],
         },
         {
           heading: "7. International processing",
           paragraphs: [
-            "Public provider materials reviewed for this draft indicate that some services may process data in the United States or in other locations, and that some providers let customers select a project or database region. These materials do not establish the regions configured for PREMIVATE. The applicable processing and hosting locations, provider legal entities, contract terms, onward transfers and safeguards must be confirmed from PREMIVATE’s current Production configuration and agreements before publication. No specific PREMIVATE region or transfer safeguard is asserted here.",
+            "For the intended Release-D configuration, the Supabase application project is mapped to Ireland, the Upstash Production database to Frankfurt, and the Vercel Function Region setting to Washington, DC. Clerk describes US infrastructure, and the OpenAI project is Global. These settings do not mean that all provider support, security, billing, logging or other processing remains in those locations. Providers may process or support data from the United States and other countries. The applicable transfer mechanism depends on the provider, activity and account terms; PREMIVATE does not claim that data stays only in Switzerland or the EEA. Before publication, the final Production configuration and the applicable provider terms must match these disclosures, and the safeguards applicable to each transfer must be identified.",
           ],
         },
         {
@@ -193,7 +198,7 @@ export const LEGAL_DOCUMENTS = {
         {
           heading: "9. Security",
           paragraphs: [
-            "PREMIVATE uses technical and organizational safeguards intended to protect personal data. The measures, incident process and provider responsibilities must be confirmed for the production service before this statement is finalized. No system can be represented as risk-free.",
+            "PREMIVATE and its service providers use technical and organizational safeguards intended to protect personal data. No system can be represented as risk-free. The final Production release must use the security controls described for the service.",
           ],
         },
         {
@@ -204,17 +209,17 @@ export const LEGAL_DOCUMENTS = {
         },
       ],
       openItems: [
-        "Confirm against PREMIVATE’s current Production agreements and configuration: provider legal entities, roles, relevant subprocessors and transfer terms; selected Supabase region/plan; Upstash Redis mode/regions; Vercel plan/runtime region; Stripe contracting entity and role; and OpenAI project data-control/opt-in status and applicable endpoint/model retention controls.",
-        "In Gate C, verify that both Pro and top-up Checkout require a full billing address and purchase-category selection, that optional business names and tax IDs are handled as stated, and that the country/category are visible on the corresponding Stripe customer, invoice, subscription and payment records. Confirm whether those records and their retention are sufficient for the owner’s manual monthly market-turnover review; billing country alone is not proof of tax residence and does not close the New Zealand two-signal check.",
-        "Set evidence-based retention criteria for Supabase profiles and saved History, Redis state beyond the documented 24-hour free-Generate result, technical/provider logs and backups, and the hashed deletion marker; confirm Production account-deletion outcomes and clear browser-data instructions.",
-        "Confirm Swiss and EU/EEA legal bases, the cookie/analytics inventory, any remaining feature-level AI payload details, Production deletion behavior including active-subscription handling, and obtain final legal review for the intended markets.",
+        "Before publication, determine the legal bases by purpose, any required representatives or local contacts, and transfer safeguards for each in-scope market. Franco Baumann is the controller for PREMIVATE processing whose purposes and means he determines; provider roles, including any joint-controller roles, must be assessed by activity. Where GDPR applies, Article 13 requires information including controller/representative, purposes and legal bases, recipients, third-country transfers and storage periods; Article 27 requires an EU representative where Article 3(2) applies unless an exception applies. This legal application is not closed by the intended provider setup.",
+        "Gate B must compare the later Production deployment, provider account terms, subprocessors, actual runtime/processing locations and retention with the intended Release-D facts above. This is a later runtime reconciliation, not a prerequisite to drafting the policy.",
+        "Gate C must verify Production Checkout, tax display, Stripe records and receipts against the described billing data flow. The Candidate does not explicitly enable automatic tax calculation; no international tax-collection or compliance conclusion is made here.",
+        "Complete the release-specific cookie/storage inventory and resolve the legal retention basis and period for billing records and the hashed deletion-prevention marker. Gate E separately accepts Production account deletion, including active subscriptions.",
       ],
     },
     imprint: {
       eyebrow: "PREMIVATE · PROVIDER DETAILS",
       title: "Imprint",
       summary: "Provider and contact information for PREMIVATE.",
-      version: "Working draft · 8 November 2026",
+      version: "Working draft · 17 November 2026",
       sections: [
         {
           heading: "Provider",
@@ -252,7 +257,7 @@ export const LEGAL_DOCUMENTS = {
       title: "Allgemeine Geschäftsbedingungen",
       summary:
         "Bedingungen für die Nutzung der KI-gestützten Creative-Direction-Plattform PREMIVATE.",
-      version: "Arbeitsentwurf · 8. November 2026",
+      version: "Arbeitsentwurf · 17. November 2026 · AGB v5",
       sections: [
         {
           heading: "1. Anbieter und Kontakt",
@@ -273,7 +278,7 @@ export const LEGAL_DOCUMENTS = {
           heading: "3. Konto und bereitgestellte Inhalte",
           paragraphs: [
             "Du musst die für dein Konto erforderlichen Angaben korrekt machen und deine Zugangsdaten schützen. Für die von dir übermittelten Inhalte und Anweisungen bist du verantwortlich und musst über die notwendigen Rechte und Einwilligungen verfügen.",
-            "Du erlaubst PREMIVATE, übermittelte Inhalte nur insoweit zu verarbeiten, wie dies zur Bereitstellung und zum Betrieb des Dienstes erforderlich ist; es gelten das anwendbare Recht und die Datenschutzerklärung. Die genauen Anbieter-Datenflüsse und Vertragsformulierungen sind vor Veröffentlichung zu bestätigen.",
+            "PREMIVATE bearbeitet Personendaten gemäss der PREMIVATE-Datenschutzerklärung.",
           ],
         },
         {
@@ -290,7 +295,7 @@ export const LEGAL_DOCUMENTS = {
         {
           heading: "5. Pro-Abonnement und Preis",
           paragraphs: [
-            "PREMIVATE Pro kostet CHF 24.00 pro Monat. Der von PREMIVATE angezeigte Betrag ist der von PREMIVATE berechnete Preis. Separate Gebühren einer Bank oder eines Zahlungsanbieters, beispielsweise für eine Währungsumrechnung, können zusätzlich anfallen.",
+            "PREMIVATE Pro kostet CHF 24.00 pro Monat. Vor dem Kauf zeigt PREMIVATE den Gesamtbetrag, den du PREMIVATE für den ausgewählten Abrechnungszeitraum schuldest, einschliesslich allfälliger Steuern, die PREMIVATE erheben muss. Separate Gebühren deiner Bank oder deines Zahlungsanbieters, beispielsweise für eine Währungsumrechnung, können zusätzlich anfallen.",
             "Ein Abonnement verlängert sich jeweils um einen weiteren monatlichen Abrechnungszeitraum, bis es wirksam gekündigt wird. Preis, Verlängerung und Kündigungsbedingungen müssen vor dem Kaufabschluss im Checkout angezeigt werden.",
           ],
         },
@@ -305,15 +310,16 @@ export const LEGAL_DOCUMENTS = {
         {
           heading: "7. Gekaufte Top-up-Credits",
           paragraphs: [
-            "Die derzeitigen Top-up-Angebote sind 25 Credits für CHF 6.90 und 50 Credits für CHF 12.90. Das jeweilige Paket und der Preis werden vor dem Kauf angezeigt.",
+            "Die derzeitigen Top-up-Angebote sind 25 Credits für CHF 6.90 und 50 Credits für CHF 12.90. Vor dem Kauf zeigt PREMIVATE das ausgewählte Paket und den Gesamtbetrag einschliesslich allfälliger Steuern, die PREMIVATE erheben muss.",
             "Gekaufte Top-up-Credits bleiben bei einer Kündigung des Pro-Abonnements erhalten und können für geeignete Funktionen auch ohne aktives Pro verwendet werden. Wenn beide Credit-Arten vorhanden sind, werden zuerst Abo-Credits verbraucht. Die Grenze von 200 Credits gilt für Abo-Credits, nicht für separat gekaufte Top-up-Credits.",
+            "Ein Top-up-Paket ist bereitgestellt, wenn alle Credits dieses Kaufs deinem Konto erfolgreich gutgeschrieben und für berechtigte Nutzung verfügbar gemacht wurden. Eine spätere Nutzung dieser Credits für Generierungen ist für die Bereitstellung des Pakets nicht erforderlich. Zwingende gesetzliche Rechte bleiben unberührt.",
           ],
         },
         {
           heading: "8. Kündigung und Verlängerung",
           paragraphs: [
-            "Du kannst ein Pro-Abonnement über die Abonnementverwaltung des Kontos kündigen, sofern diese Funktion verfügbar ist. Eine wirksame Kündigung verhindert künftige Verlängerungen; der Pro-Zugang bleibt vorbehaltlich des anwendbaren Rechts bis zum Ende des bereits bezahlten Zeitraums bestehen.",
-            "Eine normale Kündigung entfernt gekaufte Top-up-Credits nicht automatisch. Die Kundenschritte und der Kündigungszeitpunkt müssen vor Veröffentlichung mit dem tatsächlichen Checkout und der Billing-Konfiguration übereinstimmen.",
+            "Du kannst Pro verwalten oder kündigen, indem du dich in deinem PREMIVATE-Konto anmeldest und die Abonnementverwaltung öffnest. Dadurch öffnet sich das Stripe-Kundenportal. Dort werden Kündigungsoptionen und Wirksamkeitsdatum angezeigt. Wird die Kündigung auf das Ende eines bezahlten Zeitraums gesetzt, bleibt Pro bis zu dessen Ende verfügbar; künftige Verlängerungen werden beendet.",
+            "Eine normale Kündigung entfernt gekaufte Top-up-Credits nicht automatisch. Zwingende gesetzliche Kündigungs- und Rückerstattungsrechte bleiben unberührt.",
           ],
         },
         {
@@ -327,9 +333,8 @@ export const LEGAL_DOCUMENTS = {
         {
           heading: "10. Endgültige Kontolöschung",
           paragraphs: [
-            "Die Produktvorgabe von PREMIVATE ist, dass Kunden die endgültige Löschung ihres eigenen Kontos direkt in der App beantragen können. Vor der Bestätigung muss der Ablauf die verbleibenden Credit-Kategorien des Kontos anzeigen, die Folgen erklären und eine ausdrückliche Bestätigung einholen.",
-            "Daten können in begrenztem Umfang verbleiben, wenn dies gesetzlich erforderlich ist oder verspätete Konto-Neuanlagen verhindert. Browserlokale Entwürfe sind nicht mit dem Konto verknüpft und müssen gesondert gelöscht werden. Daten bei Zahlungs-, Hosting- oder anderen Anbietern sowie deren Backups werden durch die Löschung in der App nicht zwingend entfernt.",
-            "Die Verfügbarkeit in Production, die Behandlung eines aktiven Abonnements sowie Rechtsgrundlage und Aufbewahrungsdauer eines allfälligen Löschschutz-Markers müssen bestätigt werden, bevor dieser Abschnitt als aktuelle Live-Beschreibung veröffentlicht wird.",
+            "Du kannst die endgültige Löschung deines Kontos direkt in der App beantragen. Vor deiner Bestätigung zeigt dir die App deine verbleibenden Credit-Kategorien und erklärt die Folgen der Löschung.",
+            "Begrenzte Daten können aus rechtlichen oder Sicherheitsgründen verbleiben, wenn dies gesetzlich vorgeschrieben oder zulässig ist. Die Löschung deines PREMIVATE-Kontos löscht nicht zwingend separate Daten bei Zahlungs-, Hosting- oder anderen Anbietern oder deren Backups. Weitere Informationen findest du in der Datenschutzerklärung.",
           ],
         },
         {
@@ -359,7 +364,7 @@ export const LEGAL_DOCUMENTS = {
         {
           heading: "15. Anwendbares Recht und zwingender Schutz",
           paragraphs: [
-            "Diese Bedingungen sollen dem Schweizer Recht unterstehen. Dies entzieht dir keine zwingenden Verbraucherrechte nach dem Recht deines Wohnsitzes oder anderem anwendbarem Recht. Eine Gerichtsstandsklausel muss vor Veröffentlichung rechtlich geprüft werden.",
+            "Diese Bedingungen sollen dem Schweizer Recht unterstehen. Dies beschränkt keine zwingenden Verbraucherrechte oder Gerichtsstandsregeln nach dem Recht deines Wohnsitzes oder anderem anwendbarem Recht.",
           ],
         },
         {
@@ -368,11 +373,13 @@ export const LEGAL_DOCUMENTS = {
             "PREMIVATE · betrieben von Franco Baumann · Rosenbüelstrasse 21, 9642 Ebnat-Kappel SG, Schweiz · support@premivate.com.",
           ],
         },
+        {
+          heading: "17. Widerruf und vorzeitiger Leistungsbeginn für EU-Verbraucher",
+          paragraphs: EU_EARLY_START_COPY.de.termsParagraphs,
+        },
       ],
       openItems: [
-        "Prüfen, dass der Live-Checkout und die Kündigungsschritte mit Preis, Verlängerung und Widerrufstext übereinstimmen.",
-        "Verhalten der Kontolöschung in Production bei aktiven Abos und verbleibenden Löschschutz-Daten bestätigen.",
-        "Verbraucher-, Haftungs-, Output-Rechte- und Rechtswahlklauseln für die tatsächlichen Zielmärkte juristisch prüfen lassen.",
+        "Die bestehende internationale Markt-Matrix enthält weiterhin ungeklärte lokale Steuer- und Verbraucher-Vertragsanforderungen für US-Bundesstaaten, kanadische Provinzen und die Gruppe 'Other provider-listed markets'. Der allgemeine Vorbehalt zwingender Rechte klärt keine marktbezogenen Vorabinformationen, Steuerbehandlung oder erforderlichen lokalen Vertragsklauseln.",
       ],
     },
     privacy: {
@@ -380,12 +387,12 @@ export const LEGAL_DOCUMENTS = {
       title: "Datenschutzerklärung",
       summary:
         "Wie PREMIVATE nach heutigem Produktstand Konto-, Kreativ-, Zahlungs- und Betriebsdaten verwendet.",
-      version: "Arbeitsentwurf · 8. November 2026",
+      version: "Arbeitsentwurf · 17. November 2026",
       sections: [
         {
-          heading: "1. Verantwortlicher und Kontakt",
+          heading: "1. Verantwortlicher und Datenschutzkontakte",
           paragraphs: [
-            "Verantwortlicher ist Franco Baumann, Betreiber und Verkäufer von PREMIVATE mit Steuerdomizil in der Schweiz. Baumann Creative ist als zusätzliche Geschäftsbezeichnung vorgesehen. Kontakt: support@premivate.com. Postanschrift: Rosenbüelstrasse 21, 9642 Ebnat-Kappel SG, Schweiz.",
+            "Verantwortlicher für Personendatenbearbeitungen, deren Zwecke und Mittel PREMIVATE bestimmt, ist Franco Baumann, Betreiber und Verkäufer von PREMIVATE mit Steuerdomizil in der Schweiz. Baumann Creative ist als zusätzliche Geschäftsbezeichnung vorgesehen; PREMIVATE ist eine Produktmarke und keine eigenständige juristische Person. Anbieterrollen können je nach Tätigkeit eigenständig oder gemeinsam sein. Datenschutzkontakt: support@premivate.com. Postanschrift: Rosenbüelstrasse 21, 9642 Ebnat-Kappel SG, Schweiz.",
             "Datenschutzkontakte: Franco Baumann übernimmt intern die DPO-Rolle (Data Protection Officer) für Singapur. Kontakt ist support@premivate.com; die Erreichbarkeit während der Geschäftszeiten in Singapur wird gewährleistet. Franco Baumann übernimmt ausserdem intern die Rolle des Privacy Officer für Neuseeland; Kontakt: support@premivate.com.",
           ],
         },
@@ -393,42 +400,42 @@ export const LEGAL_DOCUMENTS = {
           heading: "2. Datenkategorien",
           paragraphs: [
             "Je nach Nutzung von PREMIVATE können Konto- und Authentifizierungsdaten, kreative Briefings und andere übermittelte Inhalte, generierte Konzepte/Prompts/Blueprints und gespeicherte History, Sprach- und Kontoeinstellungen, Abonnement-, Credit- und Transaktionsreferenzen sowie technische oder sicherheitsbezogene Betriebsdaten bearbeitet werden.",
-            "Beim Pro- und Credit-Top-up-Checkout erhebt Stripe die erforderliche Rechnungsadresse einschliesslich Land sowie eine erforderliche Selbstauskunft zur Kaufart (privat oder geschäftlich, einschliesslich des angegebenen Steuerregistrierungsstatus). Zusätzlich kann der Kunde optional einen Unternehmensnamen und eine Steuer-ID angeben. PREMIVATE verwendet Rechnungsland und deklarierte Kaufart für Transaktionsaufzeichnungen und die Umsatzüberwachung nach Märkten; die App speichert nur, ob eine Steuer-ID angegeben wurde, während Stripe allfällige Unternehmensnamen und den Steuer-ID-Wert erhebt und speichert. Diese Angaben bestimmen für sich allein weder die steuerliche Behandlung noch den Wohnsitz.",
-            "PREMIVATE speichert einige Inhaltskopien zusätzlich lokal in diesem Browser, getrennt von serverseitigen Kontodaten. Im aktuellen Release-D-Candidate betrifft dies eine erneut geöffnete History-Generierung und eine kurze Bezeichnung des aktiven Projekts. Browserkopien verfallen nach 30 Tagen und werden beim nächsten App-Aufruf entfernt. Nach erfolgreicher Kontolöschung entfernt der In-App-Löschablauf die bekannten PREMIVATE-Inhaltskopien aus diesem Browser; eine blosse Abmeldung löscht sie nicht sofort. Das vollständige Verzeichnis technischer Logs, Cookies und ähnlicher Technologien muss vor Veröffentlichung weiterhin bestätigt werden.",
+            "Beim Pro- und Credit-Top-up-Checkout erhebt Stripe die erforderliche Rechnungsadresse einschliesslich Land sowie eine erforderliche Selbstauskunft zur Kaufart (privat oder geschäftlich, einschliesslich des angegebenen Steuerregistrierungsstatus). Zusätzlich kann der Kunde optional einen Unternehmensnamen und eine Steuer-ID angeben. Vor der Zahlung vergleicht PREMIVATE das deklarierte Marktland und das Land der Stripe-Rechnungsadresse mit dem von Vercel für die eingehende Anfrage bereitgestellten Länder-Signal. PREMIVATE speichert die Ländercodes, das Prüfergebnis und den Prüfzeitpunkt in Checkout-Metadaten und nach der Zahlung im Vertragsbestätigungsdatensatz. Die rohe Anfrage-IP wird nicht in PREMIVATE-Billing- oder Vertragsdatensätze geschrieben; Vercel verarbeitet Anfrage-IPs und kann sie gemäss der konfigurierten Aufbewahrung in Provider-Logs aufnehmen. Diese Ländersignale unterstützen die Marktberechtigungsprüfung; sie beweisen keinen Wohnsitz und bestimmen keine Steuerbehandlung. Die App speichert nur, ob eine Steuer-ID angegeben wurde, während Stripe allfällige Unternehmensnamen und den Steuer-ID-Wert erhebt und speichert.",
+            "PREMIVATE speichert einige Inhaltskopien zusätzlich lokal in diesem Browser, getrennt von serverseitigen Kontodaten. Der vorgesehene Release-D-Candidate speichert eine erneut geöffnete History-Generierung und eine kurze Bezeichnung des aktiven Projekts. Browser-Inhaltskopien sind auf die dokumentierte Produktobergrenze beschränkt, verfallen nach 30 Tagen und werden beim nächsten App-Aufruf entfernt. Vorhandene Clear-/Reset- und Kontolöschfunktionen bereinigen sie, soweit vorgesehen; eine blosse Abmeldung löscht sie nicht sofort. Die App verwendet ausserdem Browser-Speicher für Spracheinstellungen und Authentifizierungs-/Sitzungsfunktionen. Das abschliessende Verzeichnis von Cookies, Browser-Speicher und ähnlichen Technologien, einschliesslich möglicher Authentifizierungs-Cookies des Anbieters, muss vor Veröffentlichung mit dem Release abgeglichen werden.",
           ],
         },
         {
           heading: "3. Zwecke",
           paragraphs: [
             "Die App verwendet Daten zur Authentifizierung von Konten, zur Bereitstellung kreativer Generierungen und gespeicherter History, zur Verwaltung von Abonnements und Credit-Ständen, zum Schutz und Betrieb des Dienstes sowie zur Beantwortung von Support- und Datenschutzanfragen. Die genauen Zwecke und Rechtsgrundlagen je Datenkategorie, insbesondere für Nutzer in der EU/im EWR, sind vor Veröffentlichung zu dokumentieren.",
-            "Rechnungsland und die erklärte private/geschäftliche Kaufart samt angegebenem Steuerregistrierungsstatus dienen auch zur Prüfung von Verkäufen und Umsatzschwellen nach Märkten sowie – soweit anwendbar – zur Unterstützung weiterer Billing- oder Steuer-Compliance-Schritte. Die Erklärung ist ein Monitoring-Eingangswert und keine rechtliche Steuerentscheidung.",
+            "Rechnungsland, das deklarierte Marktland, das von Vercel bereitgestellte Anfrageland und die erklärte private/geschäftliche Kaufart samt angegebenem Steuerregistrierungsstatus dienen dazu, einen vor der Zahlung aktivierten Markt-Flow zu prüfen, Verkäufe und Umsatzschwellen nach Märkten zu überwachen sowie – soweit anwendbar – weitere Billing- oder Steuer-Compliance-Schritte zu unterstützen. Fehlende oder widersprüchliche Standortsignale stoppen die Zahlung oder erfordern eine Prüfung. Diese Signale und Erklärungen beweisen keinen Wohnsitz und sind keine rechtliche Steuerentscheidung.",
           ],
         },
         {
           heading: "4. KI-Bearbeitung und Empfänger",
           paragraphs: [
             "Der Generate-Server von PREMIVATE ruft OpenAI Chat Completions auf, um angeforderte kreative Ergebnisse zu erstellen. Der Blueprint-Ablauf übermittelt die Vision, den ausgewählten Director Mode und die Ausgabesprache; zusätzlich können eine abgeleitete Audio-Referenzanalyse und, falls bereitgestellt, Bildpixel einer visuellen Referenz übermittelt werden. Der Source belegt nicht, dass rohe Audiodateien an OpenAI gesendet werden. OpenAI erklärt, dass API-Eingaben und -Ausgaben ohne Zustimmung des Kunden nicht zum Training oder zur Verbesserung der Modelle verwendet werden; die standardmässigen Abuse-Monitoring-Logs können laut OpenAI bis zu 30 Tage aufbewahrt werden. PREMIVATE-spezifischer Opt-in-Status, anwendbare Speicherregeln je Endpunkt/Modell, regionale Bearbeitung sowie eine allfällige Genehmigung für Zero Data Retention oder Modified Abuse Monitoring wurden nicht verifiziert. Es wird keine PREMIVATE-spezifische Garantie für Nicht-Training oder Null-Aufbewahrung gegeben.",
-            "Der Candidate nennt ausserdem Clerk für Authentifizierung, Supabase für App-Daten, Upstash Redis für bestimmte Betriebs- und Credit-/Request-Zustände, Stripe für Billing sowie Vercel für Hosting und Deployment. Clerk erklärt öffentlich, dass der Dienst US-Infrastruktur verwendet und keine regionale Datenresidenz-Auswahl anbietet. Supabase erklärt, dass die gewählte Projektregion Postgres, Auth, Storage und Backups umfasst; bestimmte Konto-, Support-, Nutzungs- oder Logdaten können dennoch anderswo bearbeitet werden. Die bei PREMIVATE für Production gewählte Supabase-Region und der Tarif wurden nicht bestätigt. Upstash dokumentiert optionale globale Redis-Datenbanken mit vom Kunden gewählten Primär- und Leseregionen; der bei PREMIVATE eingesetzte Modus und die Regionen wurden nicht verifiziert. Stripe und Vercel beschreiben in ihren öffentlichen Rechtsunterlagen anbieterbezogene Rollen, Übermittlungsbedingungen und Aufbewahrung. Nach aktuellem Owner-Wissen sind keine individuell ausgehandelten Verträge mit Stripe oder Supabase bekannt. PREMIVATE geht daher derzeit davon aus, dass für diese Vertragsbeziehungen die jeweiligen Standardbedingungen gelten. Die konkreten Vertragspartner, Datenschutzrollen, Production-Tarife und -Einstellungen, Übermittlungsorte sowie Aufbewahrungsregeln bleiben zu bestätigen. Ebenso bleiben der anwendbare Vercel-Vertrag und Tarif unbestätigt. Öffentliche Anbieterunterlagen belegen nicht die tatsächlich für PREMIVATE konfigurierten Einstellungen.",
+            "Das vorgesehene Release D nutzt Clerk für Authentifizierung, Supabase für App-Daten, Upstash Redis für Betriebs- und Credit-/Request-Zustände, Stripe für Billing, Vercel für Hosting/Deployment und OpenAI für Generierungen. Das zugeordnete Supabase-App-Projekt liegt in Irland (eu-west-1); die konfigurierte Upstash-Production-Ressource liegt in Frankfurt (eu-central-1). Die Vercel Function-Region-Einstellung lautet iad1 (Washington, DC, USA); für `framelab-app` sind Pro und Observability Plus mit 30 Tagen Runtime-Log-Aufbewahrung belegt. Diese Einstellungen beschreiben das vorgesehene Release; Release D ist noch nicht die aktive Production-Version, und die Vercel-Einstellung belegt nicht den tatsächlichen Ausführungsort jeder Funktion. Clerk beschreibt US-Infrastruktur ohne regionale Datenresidenz-Auswahl. Das OpenAI-Default-Projekt ist auf Global gesetzt und die API-Datenkontrollen stehen auf „Enabled per call“; standardmässige Abuse-Monitoring-Logs können Eingaben und Ausgaben enthalten und bis zu 30 Tage aufbewahrt werden. PREMIVATE-spezifische Request-Speicherung, Endpunkt-/Modell-Retention und eine ZDR-/MAM-Genehmigung sind nicht belegt. Es wird keine PREMIVATE-spezifische Nicht-Trainings- oder Null-Retention-Garantie behauptet. Supabase, Upstash, Stripe, Vercel und OpenAI veröffentlichen anbieterbezogene Vertrags-, Rollen-, Übermittlungs- und Aufbewahrungsbedingungen. Nach aktuellem Owner-Wissen bestehen keine individuell ausgehandelten Stripe- oder Supabase-Verträge; erwartet werden die Standardbedingungen. Die Anbieterrollen können je nach Tätigkeit abweichen. Die konkreten Vertragspartner, anwendbaren Bedingungen, Unterauftragsbearbeiter, Transfermechanismen und die effektive Production-Laufzeit sind noch abzugleichen. Daten können in den USA, Irland, Deutschland und weiteren Ländern bearbeitet werden; die Zielregionen garantieren nicht, dass alle Anbieter-, Support- oder Betriebsprozesse dort verbleiben.",
             "Für bezahlte Checkout-Sessions erhält und speichert Stripe die Rechnungsadresse, die erforderliche Auswahl der Kaufart sowie einen optionalen Unternehmensnamen und eine Steuer-ID, falls der Kunde sie freiwillig angibt. Der PREMIVATE-Webhook verwendet Land und Auswahl in den Billing-Datensätzen und speichert in den Marktmetadaten nur ein Kennzeichen, ob eine Steuer-ID angegeben wurde; Unternehmensname und Steuer-ID-Wert werden nicht in die PREMIVATE-App-Datenbank kopiert. Diese Checkout-Einstellungen aktivieren keine automatische Steuerberechnung.",
           ],
         },
         {
           heading: "5. Speicherung und Aufbewahrung",
           paragraphs: [
-            "Der Candidate-Source zufolge liegen Profile, gespeicherte Generierungen/History und Credit-Informationen in Supabase sowie bestimmte nutzerbezogene Betriebs-, Credit- und Request-Zustände in Upstash Redis. In einem bestimmten Ablauf für eine abgeschlossene kostenlose Generate-Ausführung wird das vollständige Ergebnis im Redis-Request-Zustand serialisiert und mit einer TTL von 24 Stunden gespeichert. Diese Source-TTL ist keine allgemeine Aufbewahrungsfrist für andere Redis-Werte, gespeicherte History, Anbieter-Logs, Backups oder Kontodaten. Belegte Aufbewahrungskriterien für diese weiteren Kategorien müssen noch bestätigt werden; hier wird keine allgemeine Frist genannt.",
+            "PREMIVATE bewahrt Supabase-Profile und gespeicherte Generierungen/History gemäss Owner-Vorgabe auf, bis der Nutzer den betreffenden Eintrag oder sein Konto löscht. Der nutzerbezogene Free-Credit-Zähler hat keine Ablaufzeit, solange das Konto besteht, und wird mit der Kontolöschung entfernt. Browser-Inhaltskopien sind auf die dokumentierte Produktobergrenze beschränkt, verfallen nach 30 Tagen und werden beim nächsten App-Aufruf entfernt; vorhandene Clear-/Reset- und Kontolöschfunktionen bereinigen sie, soweit vorgesehen. Bestimmte Redis-Request-Zustände haben kürzere, pfadabhängige Fristen; ein abgeschlossenes kostenloses Generate-Ergebnis hat beispielsweise eine TTL von 24 Stunden. Das ist keine allgemeine Frist für alle Redis-Schlüssel. Vercel Runtime-Logs sind auf 30 Tage eingestellt. OpenAI-Standardlogs zur Missbrauchsüberwachung können bis zu 30 Tage gespeichert werden. Beim beobachteten Supabase Free/Nano-Tarif sind API-/Datenbanklogs mit einem Tag und Auth-Audit-Logs mit 24 Stunden angegeben; automatische Projekt-Backups sind nicht enthalten. Stripe-Billingdaten, gesetzlich aufzubewahrende Unterlagen, Anbieterdaten und Backups können nach Anbieterbedingungen oder Gesetz weiterbestehen. Rechtsgrundlage und Dauer der Aufbewahrung von Billingdaten und gehashtem Kontolöschmarker bleiben LEGAL_REVIEW; eine einheitliche Frist gilt nicht für alle Kategorien.",
           ],
         },
         {
           heading: "6. Kontolöschung und möglicherweise verbleibende Daten",
           paragraphs: [
-            "Der Candidate enthält einen Self-Service-Löschablauf für das authentifizierte eigene Konto; eine begrenzte Abnahme in einer isolierten Preview wurde als bestanden dokumentiert. Daraus sind die Verfügbarkeit in Production und die vollständige Löschung in jedem Datenspeicher nicht belegt und müssen vor Veröffentlichung bestätigt werden.",
-            "Nachdem der In-App-Löschendpunkt die erfolgreiche Kontolöschung bestätigt hat, entfernt der Release-D/Gate-E-Candidate die bekannten PREMIVATE-Inhaltskopien aus diesem Browser, bevor er weiterleitet. Browserkopien verfallen ausserdem nach 30 Tagen und werden beim nächsten App-Aufruf entfernt. Dies ist begrenzte Preview-Evidence für ein synthetisches Free-Konto; das Verhalten in Production, eine Löschung bei aktivem Abo sowie Rechtsgrundlage und Frist des gehashten Löschschutz-Markers bleiben offen. Zahlungsdaten, gesetzlich aufzubewahrende Unterlagen, Anbieter-Daten und Backups können ausserhalb der App-Löschtransaktion verbleiben, soweit anwendbares Recht, Vertrag oder Anbieterprozesse dies erfordern oder erlauben; die konkreten Kategorien und Fristen sind vor Veröffentlichung festzulegen.",
+            "Das vorgesehene Release D enthält einen Self-Service-Löschablauf für das authentifizierte eigene Konto. Nach erfolgreicher Bestätigung durch die App bereinigt dieser die bekannten PREMIVATE-Inhaltskopien in diesem Browser vor der Weiterleitung. Die Kontolöschung wurde in einer isolierten Preview für ein synthetisches Konto abgenommen; Production-Verfügbarkeit und vollständige Ergebnisse über alle Datenspeicher, einschliesslich bei aktivem Abo, werden separat geprüft.",
+            "Zahlungs- und Steuerunterlagen, ein minimaler gehashter Löschschutz-Marker, Anbieterdaten und Backups können ausserhalb der App-Löschung verbleiben, soweit anwendbares Recht, Vertrag oder Anbieterprozesse dies erfordern oder erlauben. Die Kategorien und Rechtsfristen für Billingdaten und Löschmarker bleiben zu klären.",
           ],
         },
         {
           heading: "7. Internationale Bearbeitung",
           paragraphs: [
-            "Die für diesen Entwurf geprüften öffentlichen Anbieterinformationen zeigen, dass einzelne Dienste Daten in den USA oder an anderen Orten bearbeiten können und manche Anbieter eine Projekt- oder Datenbankregion wählen lassen. Daraus ergibt sich nicht, welche Regionen PREMIVATE tatsächlich konfiguriert hat. Die für PREMIVATE geltenden Bearbeitungs- und Hostingländer, juristischen Anbieter, Vertragsbedingungen, Weiterübermittlungen und Schutzmassnahmen müssen vor Veröffentlichung anhand der aktuellen Production-Konfiguration und Verträge bestätigt werden. Eine konkrete PREMIVATE-Region oder Übermittlungsgarantie wird hier nicht behauptet.",
+            "Für die vorgesehene Release-D-Konfiguration ist das Supabase-App-Projekt Irland, die Upstash-Production-Datenbank Frankfurt und die Vercel Function-Region Washington, DC zugeordnet. Clerk beschreibt US-Infrastruktur; das OpenAI-Projekt ist Global. Diese Einstellungen bedeuten nicht, dass sämtliche Anbieter-, Support-, Sicherheits-, Abrechnungs- oder Logprozesse an diesen Orten bleiben. Anbieter können Daten aus den USA und weiteren Ländern bearbeiten oder unterstützen. Der anwendbare Transfermechanismus hängt vom Anbieter, der Tätigkeit und den Kontobedingungen ab; PREMIVATE behauptet nicht, dass Daten ausschliesslich in der Schweiz oder im EWR verbleiben. Vor Veröffentlichung müssen die endgültige Production-Konfiguration und die einschlägigen Anbieterbedingungen mit diesen Angaben übereinstimmen und die je Transfer geltenden Schutzmechanismen bestimmt sein.",
           ],
         },
         {
@@ -440,7 +447,7 @@ export const LEGAL_DOCUMENTS = {
         {
           heading: "9. Sicherheit",
           paragraphs: [
-            "PREMIVATE setzt technische und organisatorische Massnahmen ein, die Personendaten schützen sollen. Die Massnahmen, der Vorfallprozess und die Verantwortlichkeiten der Anbieter müssen für den Production-Dienst vor Abschluss dieser Erklärung bestätigt werden. Kein System kann als risikofrei dargestellt werden.",
+            "PREMIVATE und seine Dienstanbieter setzen technische und organisatorische Massnahmen ein, die Personendaten schützen sollen. Kein System kann als risikofrei dargestellt werden. Das finale Production-Release muss die für den Dienst beschriebenen Sicherheitskontrollen verwenden.",
           ],
         },
         {
@@ -451,17 +458,17 @@ export const LEGAL_DOCUMENTS = {
         },
       ],
       openItems: [
-        "Anhand der aktuellen PREMIVATE-Production-Verträge und -Konfiguration bestätigen: juristische Anbieter, Rollen, relevante Unterauftragsbearbeiter und Übermittlungsbedingungen; gewählte Supabase-Region/Tarif; Upstash-Redis-Modus/Regionen; Vercel-Tarif/Runtime-Region; Stripe-Vertragspartner und Rolle; sowie OpenAI-Projekt-Datenkontrollen/Opt-in und anwendbare Speicherregeln je Endpunkt/Modell.",
-        "In Gate C prüfen, ob Pro- und Top-up-Checkout eine vollständige Rechnungsadresse und die Kaufart erfordern, optionale Unternehmensnamen und Steuer-IDs wie beschrieben behandeln und Land/Kaufart auf den zugehörigen Stripe-Kunden-, Rechnungs-, Abo- und Zahlungsdatensätzen verfügbar sind. Bestätigen, ob diese Datensätze samt Aufbewahrung für die manuelle monatliche Markt-Umsatzprüfung ausreichen; das Rechnungsland allein beweist keinen steuerlichen Wohnsitz und schliesst den neuseeländischen Zwei-Signal-Nachweis nicht.",
-        "Belegte Aufbewahrungskriterien für Supabase-Profile und gespeicherte History, Redis-Zustände ausserhalb des dokumentierten 24-Stunden-Resultats für kostenlose Generate-Ausführungen, technische/Anbieter-Logs und Backups sowie den gehashten Löschmarker festlegen; Production-Löschung und Hinweise zum Löschen lokaler Browserdaten bestätigen.",
-        "Schweizer und EU-/EWR-Rechtsgrundlagen, Cookies-/Analytics-Inventar, noch offene KI-Datenflüsse je Funktion und Production-Löschverhalten einschliesslich aktiver Abos bestätigen sowie eine abschliessende Rechtsprüfung für die Zielmärkte einholen.",
+        "Vor Veröffentlichung sind die Rechtsgrundlagen je Zweck, erforderliche Vertreter oder lokale Kontakte sowie die Transfer-Schutzmechanismen je in-scope-Markt zu bestimmen. Franco Baumann ist für die von PREMIVATE bestimmten Bearbeitungszwecke und -mittel Verantwortlicher; Anbieterrollen, einschliesslich einer möglichen gemeinsamen Verantwortlichkeit, sind je Tätigkeit zu bestimmen. Soweit anwendbar, verlangt Art. 13 DSGVO insbesondere Angaben zu Verantwortlichem/Vertreter, Zwecken und Rechtsgrundlagen, Empfängern, Drittlandtransfers und Speicherfristen; Art. 27 verlangt bei Anwendbarkeit von Art. 3 Abs. 2 grundsätzlich eine EU-Vertretung, sofern keine Ausnahme greift. Diese Rechtsanwendung wird durch das vorgesehene Provider-Setup nicht geschlossen.",
+        "Gate B vergleicht nach dem späteren Release die tatsächliche Production-Deployment-, Provider-, Subprozessor-, Laufzeit-/Verarbeitungsort- und Retention-Evidence mit den obigen Release-D-Angaben. Das ist ein nachgelagerter Runtime-Abgleich, keine Voraussetzung für die Entwurfsarbeit.",
+        "Gate C muss Production-Checkout, Steuerdarstellung, Stripe-Datensätze und Belege gegen den beschriebenen Billing-Datenfluss abnehmen. Der Candidate aktiviert automatische Steuerberechnung nicht ausdrücklich; eine internationale Steuererhebung oder Compliance-Freigabe wird hier nicht behauptet.",
+        "Das release-spezifische Cookie-/Storage-Inventar vervollständigen und Rechtsgrundlage sowie Dauer der Aufbewahrung von Billingdaten und gehashtem Kontolöschmarker klären. Gate E nimmt die Production-Kontolöschung, einschliesslich aktiver Abos, separat ab.",
       ],
     },
     imprint: {
       eyebrow: "PREMIVATE · ANBIETERANGABEN",
       title: "Impressum",
       summary: "Anbieter- und Kontaktangaben für PREMIVATE.",
-      version: "Arbeitsentwurf · 8. November 2026",
+      version: "Arbeitsentwurf · 17. November 2026",
       sections: [
         {
           heading: "Anbieter",
@@ -493,4 +500,5 @@ export const LEGAL_DOCUMENTS = {
       ],
     },
   },
+  fr: LEGAL_DOCUMENTS_FR,
 };

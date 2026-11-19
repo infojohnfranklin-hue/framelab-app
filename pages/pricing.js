@@ -1,66 +1,25 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import CheckoutTermsDialog from "../components/CheckoutTermsDialog";
+import StripePrepaymentDialog from "../components/StripePrepaymentDialog";
 
-export default function PricingPage({ ui, t }) {
-  const _t = typeof t === "function" ? t : (value) => value;
+export default function PricingPage({ ui, language }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [checkoutDialogOpen, setCheckoutDialogOpen] = useState(false);
+  const [checkoutSession, setCheckoutSession] = useState(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [earlyStartRequested, setEarlyStartRequested] = useState(false);
   const checkoutTriggerRef = useRef(null);
-  const cancelButtonRef = useRef(null);
-  const confirmButtonRef = useRef(null);
   const checkoutStatusRef = useRef(null);
   const checkoutStartedRef = useRef(false);
   const restoreTriggerFocusRef = useRef(false);
   const focusCheckoutStatusRef = useRef(false);
 
   useEffect(() => {
-    if (!checkoutDialogOpen) return undefined;
-
-    cancelButtonRef.current?.focus();
-
-    function handleKeyDown(event) {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        restoreTriggerFocusRef.current = true;
-        setCheckoutDialogOpen(false);
-        return;
-      }
-
-      if (event.key !== "Tab") return;
-
-      const focusableButtons = [
-        cancelButtonRef.current,
-        confirmButtonRef.current,
-      ].filter(Boolean);
-
-      if (focusableButtons.length < 2) return;
-
-      const first = focusableButtons[0];
-      const last = focusableButtons[focusableButtons.length - 1];
-
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    }
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-
-      if (restoreTriggerFocusRef.current) {
-        restoreTriggerFocusRef.current = false;
-
-        requestAnimationFrame(() => {
-          checkoutTriggerRef.current?.focus();
-        });
-      }
-    };
+    if (checkoutDialogOpen || !restoreTriggerFocusRef.current) return;
+    restoreTriggerFocusRef.current = false;
+    requestAnimationFrame(() => checkoutTriggerRef.current?.focus());
   }, [checkoutDialogOpen]);
 
   useEffect(() => {
@@ -78,24 +37,42 @@ export default function PricingPage({ ui, t }) {
 
     restoreTriggerFocusRef.current = false;
     focusCheckoutStatusRef.current = false;
+    setTermsAccepted(false);
+    setEarlyStartRequested(false);
     setCheckoutDialogOpen(true);
   }
 
   function cancelCheckout() {
     restoreTriggerFocusRef.current = true;
+    setTermsAccepted(false);
+    setEarlyStartRequested(false);
     setCheckoutDialogOpen(false);
   }
 
-  function confirmCheckout() {
-    if (loading || checkoutStartedRef.current) return;
+  function cancelPayment() {
+    const confirmationId = checkoutSession?.confirmationId;
+    setCheckoutSession(null);
+    setLoading(false);
+    checkoutStartedRef.current = false;
+    if (confirmationId) {
+      fetch("/api/cancel-prepayment-draft", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirmationId }),
+      }).catch(() => {});
+    }
+  }
+
+  function confirmCheckout(disclosure = {}) {
+    if (loading || checkoutStartedRef.current || !termsAccepted) return;
 
     restoreTriggerFocusRef.current = false;
     focusCheckoutStatusRef.current = true;
     setCheckoutDialogOpen(false);
-    startCheckout();
+    startCheckout(earlyStartRequested, disclosure);
   }
 
-  async function startCheckout() {
+  async function startCheckout(requestEarlyStart, disclosure) {
     if (checkoutStartedRef.current) return;
 
     checkoutStartedRef.current = true;
@@ -108,16 +85,26 @@ export default function PricingPage({ ui, t }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ plan: "pro" }),
+        body: JSON.stringify({
+          plan: "pro",
+          termsAccepted: true,
+          termsLocale: disclosure.termsLocale || (language === "Deutsch" ? "de" : language === "Français" ? "fr" : "en"),
+          earlyStartRequested: requestEarlyStart === true,
+          marketCountryScope: disclosure.marketCountryScope,
+          marketRegion: disclosure.marketRegion,
+          buyerType: disclosure.buyerType,
+          frenchVersionPresented: disclosure.frenchVersionPresented,
+          alternativeLanguageChoice: disclosure.alternativeLanguageChoice,
+        }),
       });
 
       const data = await res.json();
 
-      if (!res.ok || !data.url) {
+      if (!res.ok || !data.confirmationId || !data.amount || !data.currency || !data.publishableKey) {
         throw new Error(data.error || ui.pricing.checkoutCouldNotStart);
       }
-
-      window.location.href = data.url;
+      setCheckoutSession(data);
+      setLoading(false);
     } catch (err) {
       checkoutStartedRef.current = false;
       setError(err.message || ui.pricing.checkoutCouldNotStart);
@@ -280,54 +267,26 @@ export default function PricingPage({ ui, t }) {
           </section>
         </div>
 
-        {checkoutDialogOpen && (
-          <div
-            style={modalOverlayStyle}
-            onMouseDown={(event) => {
-              if (event.target === event.currentTarget) {
-                cancelCheckout();
-              }
-            }}
-          >
-            <div
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="checkout-dialog-title"
-              aria-describedby="checkout-dialog-description"
-              style={modalStyle}
-            >
-              <div style={modalEyebrowStyle}>Checkout confirmation</div>
-
-              <h2 id="checkout-dialog-title" style={modalTitleStyle}>
-                Stripe Checkout öffnen?
-              </h2>
-
-              <p id="checkout-dialog-description" style={modalTextStyle}>
-                Nur fortfahren, wenn du den Checkout bewusst testen möchtest.
-              </p>
-
-              <div style={modalActionsStyle}>
-                <button
-                  ref={cancelButtonRef}
-                  type="button"
-                  onClick={cancelCheckout}
-                  style={modalCancelButtonStyle}
-                >
-                  Abbrechen
-                </button>
-
-                <button
-                  ref={confirmButtonRef}
-                  type="button"
-                  onClick={confirmCheckout}
-                  style={modalConfirmButtonStyle}
-                >
-                  Checkout öffnen
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <CheckoutTermsDialog
+          open={checkoutDialogOpen}
+          language={language || "English"}
+          locale={language === "Deutsch" ? "de" : language === "Français" ? "fr" : "en"}
+          summary="PREMIVATE Pro · CHF 24.00 / month"
+          checked={termsAccepted}
+          onCheckedChange={setTermsAccepted}
+          serviceType="pro"
+          earlyStartRequested={earlyStartRequested}
+          onEarlyStartRequestedChange={setEarlyStartRequested}
+          onCancel={cancelCheckout}
+          onConfirm={confirmCheckout}
+          busy={loading}
+        />
+        <StripePrepaymentDialog
+          open={Boolean(checkoutSession)}
+          session={checkoutSession}
+          locale={language === "Deutsch" ? "de" : language === "Français" ? "fr" : "en"}
+          onCancel={cancelPayment}
+        />
       </div>
     </div>
   );
@@ -383,77 +342,4 @@ const secondaryButtonStyle = {
   textDecoration: "none",
   fontWeight: 900,
   fontSize: "13px",
-};
-
-const modalOverlayStyle = {
-  position: "fixed",
-  inset: 0,
-  display: "grid",
-  placeItems: "center",
-  padding: "20px",
-  background: "rgba(0,0,0,0.72)",
-  zIndex: 1000,
-};
-
-const modalStyle = {
-  width: "min(100%, 520px)",
-  padding: "clamp(24px, 5vw, 34px)",
-  borderRadius: "24px",
-  background: "#050505",
-  border: "1px solid rgba(var(--premivate-gold-rgb),0.28)",
-  boxShadow: "0 28px 100px rgba(0,0,0,0.36)",
-  boxSizing: "border-box",
-};
-
-const modalEyebrowStyle = {
-  marginBottom: "14px",
-  color: "rgb(var(--premivate-gold-rgb))",
-  fontSize: "12px",
-  fontWeight: 900,
-  letterSpacing: "0.18em",
-  textTransform: "uppercase",
-};
-
-const modalTitleStyle = {
-  margin: "0 0 14px",
-  fontSize: "28px",
-  lineHeight: 1.1,
-  fontWeight: 900,
-  letterSpacing: "-0.03em",
-};
-
-const modalTextStyle = {
-  margin: "0 0 26px",
-  color: "rgba(255,255,255,0.68)",
-  lineHeight: 1.6,
-};
-
-const modalActionsStyle = {
-  display: "flex",
-  justifyContent: "flex-end",
-  gap: "12px",
-  flexWrap: "wrap",
-};
-
-const modalCancelButtonStyle = {
-  minWidth: "132px",
-  padding: "13px 18px",
-  borderRadius: "999px",
-  background: "rgba(255,255,255,0.07)",
-  border: "1px solid rgba(255,255,255,0.1)",
-  color: "white",
-  fontWeight: 900,
-  cursor: "pointer",
-};
-
-const modalConfirmButtonStyle = {
-  minWidth: "160px",
-  padding: "13px 18px",
-  borderRadius: "999px",
-  background: "rgb(var(--premivate-gold-rgb))",
-  border: "1px solid rgba(var(--premivate-gold-rgb),0.28)",
-  color: "#17130C",
-  fontWeight: 900,
-  cursor: "pointer",
-  boxShadow: "0 10px 30px rgba(var(--premivate-gold-rgb),0.20)",
 };

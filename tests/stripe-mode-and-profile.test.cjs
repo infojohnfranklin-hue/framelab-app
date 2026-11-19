@@ -7,7 +7,7 @@ const vm = require("node:vm");
 const root = path.join(__dirname, "..");
 function load(file, bindings, exports) {
   let source = fs.readFileSync(path.join(root, file), "utf8")
-    .replace(/^import .*;\s*$/gm, "")
+    .replace(/^import\s+[\s\S]*?\s+from\s+["'][^"']+["'];\s*/gm, "")
     .replace(/^export default async function handler/m, "async function handler")
     .replace(/^export\s+/gm, "");
   return vm.runInNewContext(`${source}\n({ ${exports.join(", ")} });`, bindings, { timeout: 1000 });

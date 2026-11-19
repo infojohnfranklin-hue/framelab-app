@@ -6,6 +6,14 @@ import { persistCheckoutMarketData } from "../../lib/stripe-market-data";
 import { processStripeChargeRefund } from "../../lib/stripe-refunds";
 import { stripeEventMatchesEnvironment } from "../../lib/stripe-mode";
 import { isAccountDeletionMarked } from "../../lib/account-deletion";
+import { validateCompletedCheckoutEligibility } from "../../lib/prepayment-eligibility";
+import { SERVER_FINALIZED_CHECKOUT_FLOW, validateServerFinalizedEligibilityMetadata } from "../../lib/server-finalized-eligibility";
+import {
+  markContractConfirmationExpired,
+  markContractConfirmationRefundReview,
+  recordPaidContractConfirmation,
+  recordPaidServerFinalizedContractConfirmation,
+} from "../../lib/contract-confirmation";
 
 export const config = {
   api: {
@@ -67,7 +75,9 @@ async function processPaidProInvoice(event, stripe) {
   }
 
   // Retrieve the canonical invoice using this release's pinned SDK API version.
-  const invoice = await stripe.invoices.retrieve(eventInvoice.id);
+  const invoice = await stripe.invoices.retrieve(eventInvoice.id, {
+    expand: ["payments.data.payment.payment_intent"],
+  });
   if (!invoice || invoice.id !== eventInvoice.id) {
     throw creditGrantFailure("CREDIT_INVOICE_LOOKUP_MISMATCH");
   }
@@ -106,6 +116,48 @@ async function processPaidProInvoice(event, stripe) {
   const userId = subscription.metadata?.clerkUserId;
   if (typeof userId !== "string" || !userId.trim()) {
     return { status: "ignored" };
+  }
+
+  const checkoutFlow = subscription.metadata?.premivateCheckoutFlow;
+  if (checkoutFlow === SERVER_FINALIZED_CHECKOUT_FLOW) {
+    if (periodKind === "initial" && !Number.isSafeInteger(event.created)) {
+      await placeServerFinalizedProInRefundReview({ eventId: event.id, subscription, stripe });
+      return { status: "refund_review" };
+    }
+    const eligibility = validateServerFinalizedEligibilityMetadata(subscription.metadata, {
+      eventCreated: event.created,
+      enforceExpiry: periodKind === "initial",
+      requireActivated: false,
+    });
+    if (eligibility.status !== "eligible") {
+      await placeServerFinalizedProInRefundReview({ eventId: event.id, subscription, stripe });
+      return { status: "refund_review" };
+    }
+  } else if (checkoutFlow === "r1-location-v1") {
+    const sessions = await stripe.checkout.sessions.list({ subscription: subscriptionId, limit: 10 });
+    const matches = Array.isArray(sessions?.data)
+      ? sessions.data.filter((item) => item?.metadata?.premivateCheckoutFlow === "r1-location-v1")
+      : [];
+    const checkoutSession = matches.length === 1 && sessions?.has_more !== true
+      ? await stripe.checkout.sessions.retrieve(matches[0].id)
+      : null;
+    const eligibility = checkoutSession
+      ? validateCompletedCheckoutEligibility(checkoutSession, {
+        eventCreated: event.created,
+        enforceExpiry: periodKind === "initial",
+      })
+      : { status: "refund_review" };
+    if (eligibility.status !== "eligible") {
+      await placeProCheckoutInRefundReview({
+        eventId: event.id,
+        eventCreated: event.created,
+        invoiceId: invoice.id,
+        session: checkoutSession,
+        subscription,
+        stripe,
+      });
+      return { status: "refund_review" };
+    }
   }
 
   if (await isAccountDeletionMarked(supabase, userId, process.env)) {
@@ -178,6 +230,64 @@ async function processPaidProInvoice(event, stripe) {
     throw creditGrantFailure("CREDIT_PRO_INVOICE_PERIOD_INVALID");
   }
 
+  if (checkoutFlow === SERVER_FINALIZED_CHECKOUT_FLOW && periodKind === "initial") {
+    const confirmationId = subscription.metadata?.premivateContractConfirmationId;
+    const invoicePaymentIntentId = stripeObjectId(invoice.payments?.data?.[0]?.payment?.payment_intent) ||
+      stripeObjectId(invoice.payment_intent);
+    if (!confirmationId || !invoicePaymentIntentId || !Number.isSafeInteger(event.created)) {
+      await placeServerFinalizedProInRefundReview({ eventId: event.id, subscription, stripe });
+      return { status: "refund_review" };
+    }
+    const paymentIntent = await stripe.paymentIntents.retrieve(invoicePaymentIntentId, { expand: ["payment_method"] });
+    const customer = await stripe.customers.retrieve(stripeObjectId(subscription.customer));
+    const paymentMethod = typeof paymentIntent?.payment_method === "object"
+      ? paymentIntent.payment_method
+      : null;
+    const expectedMetadata = subscription.metadata || {};
+    const actualMetadata = paymentIntent?.metadata || {};
+    const paymentCountry = String(paymentMethod?.billing_details?.address?.country || "").toUpperCase();
+    const customerCountry = String(customer?.address?.country || "").toUpperCase();
+    if (paymentIntent?.status !== "succeeded" || paymentIntent.amount_received !== invoice.amount_paid ||
+        paymentIntent.amount !== 2400 || paymentIntent.currency !== "chf" ||
+        stripeObjectId(paymentIntent.customer) !== stripeObjectId(subscription.customer) ||
+        paymentIntent.livemode !== subscription.livemode || paymentMethod?.type !== "card" ||
+        paymentCountry !== expectedMetadata.premivateEligibilityBillingCountry ||
+        customerCountry !== expectedMetadata.premivateEligibilityBillingCountry ||
+        actualMetadata.premivateCheckoutFlow !== SERVER_FINALIZED_CHECKOUT_FLOW ||
+        actualMetadata.premivateContractConfirmationId !== confirmationId ||
+        actualMetadata.clerkUserId !== userId) {
+      await placeServerFinalizedProInRefundReview({ eventId: event.id, subscription, stripe });
+      return { status: "refund_review" };
+    }
+    const { data: confirmation, error: confirmationError } = await supabase.from("premivate_contract_confirmations")
+      .select("id,clerk_user_id,service_type,state,purchase_snapshot,stripe_confirmation_token_id,stripe_payment_intent_id,stripe_subscription_id,stripe_customer_id")
+      .eq("id", confirmationId)
+      .eq("clerk_user_id", userId)
+      .maybeSingle();
+    if (confirmationError || !confirmation || confirmation.service_type !== "pro" ||
+        !confirmation.stripe_confirmation_token_id || confirmation.purchase_snapshot?.amount !== 2400 ||
+        confirmation.stripe_customer_id !== stripeObjectId(subscription.customer) ||
+        confirmation.stripe_subscription_id && confirmation.stripe_subscription_id !== subscriptionId ||
+        confirmation.stripe_payment_intent_id && confirmation.stripe_payment_intent_id !== paymentIntent.id) {
+      await placeServerFinalizedProInRefundReview({ eventId: event.id, subscription, stripe });
+      return { status: "refund_review" };
+    }
+    await recordPaidServerFinalizedContractConfirmation(supabase, {
+      paymentIntent,
+      customer,
+      marketData: {
+        billingCountry: expectedMetadata.premivateEligibilityBillingCountry,
+        buyerType: expectedMetadata.premivateBuyerType,
+        taxIdProvided: false,
+      },
+      userId,
+      expectedServiceType: "pro",
+      paidAt: new Date(event.created * 1000).toISOString(),
+      subscriptionId,
+      invoiceId: invoice.id,
+    });
+  }
+
   const grant = await grantPaidPeriod(supabase, {
     userId,
     subscriptionId,
@@ -187,6 +297,16 @@ async function processPaidProInvoice(event, stripe) {
     periodStart: new Date(line.period.start * 1000).toISOString(),
     periodEnd: new Date(line.period.end * 1000).toISOString(),
   });
+
+  if (checkoutFlow === SERVER_FINALIZED_CHECKOUT_FLOW && periodKind === "initial") {
+    const claimToken = subscription.metadata?.premivateCheckoutClaim;
+    const { error } = await supabase.rpc("premivate_subscription_checkout_complete_subscription", {
+      p_clerk_user_id: userId,
+      p_claim_token: claimToken,
+      p_stripe_subscription_id: subscriptionId,
+    });
+    if (error) throw creditGrantFailure("SUBSCRIPTION_CHECKOUT_LOCK_UPDATE_FAILED");
+  }
 
   const acceptedStatuses = new Set([
     "granted_initial",
@@ -205,6 +325,7 @@ async function processPaidProInvoice(event, stripe) {
     cancelAtPeriodEnd: subscription.cancel_at_period_end === true,
     livemode: subscription.livemode,
     paidThrough: new Date(line.period.end * 1000).toISOString(),
+    contractConfirmationId: subscription.metadata?.premivateContractConfirmationId || null,
   });
 
   return { status: grant.status };
@@ -233,8 +354,77 @@ async function syncSubscriptionStatus(subscriptionId, stripe) {
     cancelAtPeriodEnd: subscription.cancel_at_period_end === true,
     livemode: subscription.livemode,
     immediateEnd: subscription.status === "canceled" && subscription.cancel_at_period_end !== true,
+    contractConfirmationId: subscription.metadata?.premivateContractConfirmationId || null,
   });
   return { status: "updated" };
+}
+
+async function placeProCheckoutInRefundReview({ eventId, eventCreated, invoiceId = null, session, subscription, stripe }) {
+  const confirmationId = session?.metadata?.premivateContractConfirmationId ||
+    subscription?.metadata?.premivateContractConfirmationId;
+  const userId = session?.metadata?.clerkUserId || subscription?.metadata?.clerkUserId;
+  if (typeof confirmationId === "string" && confirmationId &&
+      typeof userId === "string" && userId &&
+      typeof eventId === "string" && eventId) {
+    try {
+      if (session && Number.isSafeInteger(eventCreated)) {
+        await recordPaidContractConfirmation(supabase, {
+          session,
+          userId,
+          expectedServiceType: "pro",
+          paidAt: new Date(eventCreated * 1000).toISOString(),
+          subscriptionId: stripeObjectId(subscription),
+          invoiceId: invoiceId || stripeObjectId(session.invoice),
+          refundReview: true,
+        });
+      } else {
+        throw new Error("PRO_REFUND_REVIEW_SNAPSHOT_UNAVAILABLE");
+      }
+    } catch {
+      await markContractConfirmationRefundReview(supabase, {
+        confirmationId,
+        userId,
+        eventId,
+      });
+    }
+  }
+  const subscriptionId = stripeObjectId(subscription);
+  if (subscriptionId && subscription?.status !== "canceled") {
+    const canceled = await stripe.subscriptions.cancel(subscriptionId, {
+      invoice_now: false,
+      prorate: false,
+    });
+    if (canceled?.id !== subscriptionId || canceled.status !== "canceled") {
+      throw creditGrantFailure("INELIGIBLE_SUBSCRIPTION_CANCELLATION_UNCONFIRMED");
+    }
+    await syncSubscriptionStatus(subscriptionId, stripe);
+  }
+}
+
+async function placeServerFinalizedProInRefundReview({ eventId, subscription, stripe }) {
+  const confirmationId = subscription?.metadata?.premivateContractConfirmationId;
+  const userId = subscription?.metadata?.clerkUserId;
+  if (typeof confirmationId === "string" && confirmationId &&
+      typeof userId === "string" && userId && typeof eventId === "string" && eventId) {
+    await markContractConfirmationRefundReview(supabase, { confirmationId, userId, eventId });
+  }
+  const subscriptionId = stripeObjectId(subscription);
+  if (subscriptionId && subscription?.status !== "canceled") {
+    const canceled = await stripe.subscriptions.cancel(subscriptionId, { invoice_now: false, prorate: false });
+    if (canceled?.id !== subscriptionId || canceled.status !== "canceled") {
+      throw creditGrantFailure("INELIGIBLE_SUBSCRIPTION_CANCELLATION_UNCONFIRMED");
+    }
+    await syncSubscriptionStatus(subscriptionId, stripe);
+  }
+  const claimToken = subscription?.metadata?.premivateCheckoutClaim;
+  if (typeof userId === "string" && userId && typeof claimToken === "string" && claimToken && subscriptionId) {
+    const { error } = await supabase.rpc("premivate_subscription_checkout_release_subscription", {
+      p_clerk_user_id: userId,
+      p_claim_token: claimToken,
+      p_stripe_subscription_id: subscriptionId,
+    });
+    if (error) throw creditGrantFailure("SUBSCRIPTION_CHECKOUT_LOCK_UPDATE_FAILED");
+  }
 }
 
 async function recordSubscriptionCheckout(event, stripe) {
@@ -262,6 +452,28 @@ async function recordSubscriptionCheckout(event, stripe) {
       subscription.livemode !== session.livemode) {
     throw creditGrantFailure("SUBSCRIPTION_CHECKOUT_SUBSCRIPTION_MISMATCH");
   }
+  if (session.metadata?.premivateCheckoutFlow === "r1-location-v1") {
+    const eligibility = validateCompletedCheckoutEligibility(session, {
+      eventCreated: event.created,
+    });
+    if (eligibility.status !== "eligible") {
+      await placeProCheckoutInRefundReview({
+        eventId: event.id,
+        eventCreated: event.created,
+        invoiceId: stripeObjectId(session.invoice),
+        session,
+        subscription,
+        stripe,
+      });
+      const { error } = await supabase.rpc("premivate_subscription_checkout_complete", {
+        p_clerk_user_id: userId,
+        p_claim_token: claimToken,
+        p_stripe_session_id: session.id,
+      });
+      if (error) throw creditGrantFailure("SUBSCRIPTION_CHECKOUT_LOCK_UPDATE_FAILED");
+      return { status: "refund_review" };
+    }
+  }
   if (await isAccountDeletionMarked(supabase, userId, process.env)) {
     const cancelled = subscription.status === "canceled"
       ? subscription
@@ -277,6 +489,21 @@ async function recordSubscriptionCheckout(event, stripe) {
     subscriptionId,
     invoiceId: stripeObjectId(session.invoice),
   });
+  const confirmationId = session.metadata?.premivateContractConfirmationId;
+  if (confirmationId) {
+    if (subscription.metadata?.premivateContractConfirmationId !== confirmationId ||
+        typeof event.created !== "number") {
+      throw creditGrantFailure("SUBSCRIPTION_CONTRACT_CONFIRMATION_MISMATCH");
+    }
+    await recordPaidContractConfirmation(supabase, {
+      session,
+      userId,
+      expectedServiceType: "pro",
+      paidAt: new Date(event.created * 1000).toISOString(),
+      subscriptionId,
+      invoiceId: stripeObjectId(session.invoice),
+    });
+  }
   const { error } = await supabase.rpc("premivate_subscription_checkout_complete", {
     p_clerk_user_id: userId,
     p_claim_token: claimToken,
@@ -307,6 +534,15 @@ async function releaseExpiredCheckout(event) {
   const claimToken = session?.metadata?.premivateCheckoutClaim;
   if (session?.mode === "payment" &&
       session?.metadata?.premivateCheckoutType === "credit_topup") {
+    if (typeof session.metadata?.premivateContractConfirmationId === "string" &&
+        typeof userId === "string" && typeof session.id === "string") {
+      await markContractConfirmationExpired(
+        supabase,
+        session.metadata.premivateContractConfirmationId,
+        userId,
+        session.id
+      );
+    }
     const deletionClaimToken = session?.metadata?.premivateDeletionClaimToken;
     if (typeof userId !== "string" || !userId || typeof deletionClaimToken !== "string" ||
         !deletionClaimToken || typeof session.id !== "string") {
@@ -332,6 +568,14 @@ async function releaseExpiredCheckout(event) {
   if (session?.mode !== "subscription" || typeof userId !== "string" ||
       typeof claimToken !== "string" || !claimToken || typeof session.id !== "string") {
     return { status: "ignored" };
+  }
+  if (typeof session.metadata?.premivateContractConfirmationId === "string") {
+    await markContractConfirmationExpired(
+      supabase,
+      session.metadata.premivateContractConfirmationId,
+      userId,
+      session.id
+    );
   }
   if (await isAccountDeletionMarked(supabase, userId, process.env)) {
     return { status: "suppressed_account_deletion" };
@@ -371,8 +615,13 @@ export default async function handler(req, res) {
     return res.status(400).json({ received: false });
   }
 
-  if (event.type === "checkout.session.completed" &&
-      event.data?.object?.metadata?.premivateCheckoutType === "credit_topup") {
+  const eventObjectMetadata = event.data?.object?.metadata || {};
+  const isLegacyTopupSession = event.type === "checkout.session.completed" &&
+    eventObjectMetadata.premivateCheckoutType === "credit_topup";
+  const isServerFinalizedTopupPayment = event.type === "payment_intent.succeeded" &&
+    eventObjectMetadata.premivateCheckoutType === "credit_topup" &&
+    eventObjectMetadata.premivateCheckoutFlow === SERVER_FINALIZED_CHECKOUT_FLOW;
+  if (isLegacyTopupSession || isServerFinalizedTopupPayment) {
     try {
       const result = await processPaidCreditTopup({
         event,
@@ -454,6 +703,13 @@ export default async function handler(req, res) {
         env: process.env,
         isDeletionInProgress: (userId) => isAccountDeletionMarked(supabase, userId, process.env),
       });
+      if (result.contractConfirmationId && result.userId) {
+        await markContractConfirmationRefundReview(supabase, {
+          confirmationId: result.contractConfirmationId,
+          userId: result.userId,
+          eventId: event.id,
+        });
+      }
       return res.status(200).json({ received: true, refundStatus: result.status });
     } catch (error) {
       console.error("Stripe refund processing failed", {

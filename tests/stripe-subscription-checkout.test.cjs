@@ -19,12 +19,52 @@ const CHECKOUT_MARKET_DATA_PARAMETERS = marketDataModule.CHECKOUT_MARKET_DATA_PA
 
 function load(sourceOverrides = {}) {
   let source = fs.readFileSync(sourcePath, "utf8")
-    .replace(/^import .*;\s*$/gm, "")
+    .replace(/^import\s+[\s\S]*?\s+from\s+["'][^"']+["'];\s*/gm, "")
     .replace(/^export\s+/gm, "");
   return vm.runInNewContext(`${source}\n({ createProSubscriptionCheckout, isBlockingSubscriptionStatus });`, {
     randomUUID: () => "claim-test-1",
     URL,
     CHECKOUT_MARKET_DATA_PARAMETERS,
+    createCheckoutTermsConsent: ({ locale = "en", accepted = true, ...input }) => {
+      if (input.marketCountryScope === "CA") {
+        const error = new Error("CANADA_SALES_UNAVAILABLE");
+        error.status = 403;
+        error.safeCode = "CANADA_SALES_UNAVAILABLE";
+        throw error;
+      }
+      return {
+        accepted, locale, version: "terms-v1", acceptedAt: "2026-11-17T10:00:00.000Z",
+        precontractDisclosure: {
+          marketCountryScope: input.marketCountryScope || "OTHER",
+          marketRegion: input.marketRegion || "",
+          buyerType: input.buyerType || "consumer",
+          frenchVersionPresented: input.frenchVersionPresented === true,
+          alternativeLanguageChoice: input.alternativeLanguageChoice === true,
+        },
+      };
+    },
+    checkoutTermsMetadata: (consent) => ({
+      premivateTermsVersion: consent.version,
+      premivateTermsLocale: consent.locale,
+      premivateTermsAcceptedAt: consent.acceptedAt,
+      premivatePrecontractMarketScope: consent.precontractDisclosure.marketCountryScope,
+      premivatePrecontractRegion: consent.precontractDisclosure.marketRegion,
+      premivateBuyerType: consent.precontractDisclosure.buyerType,
+      premivateFrenchTermsPresented: String(consent.precontractDisclosure.frenchVersionPresented),
+      premivateAlternativeLanguageChoice: String(consent.precontractDisclosure.alternativeLanguageChoice),
+    }),
+    earlyStartRequestMetadata: ({ confirmationId, requested }) => ({
+      premivateContractConfirmationId: confirmationId,
+      premivateEarlyStartRequested: String(requested),
+      premivateEarlyStartVersion: "test-v1",
+    }),
+    createContractConfirmationDraft: async (_db, input) => ({
+      id: "confirmation-test-1",
+      earlyStartRequested: input.earlyStartRequested,
+      earlyStartRequestedAt: null,
+    }),
+    attachContractConfirmationSession: async () => true,
+    markContractConfirmationCheckoutFailed: async () => {},
     isPremivateOwner: (id) => id === "owner-id",
     stripeSecretMatchesEnvironment: (env) => env.STRIPE_SECRET_KEY === "sk_test_unit" && env.VERCEL_ENV === "preview",
     ...sourceOverrides,
@@ -41,7 +81,7 @@ function setup({ subscriptions = [], sessions = [], rpcData = { status: "claimed
     subscriptions: { async list(input) { calls.subscriptionQuery = input; return { data: subscriptions, has_more: false }; } },
     checkout: { sessions: {
       async list(input) { calls.openSessionQuery = input; return { data: sessions, has_more: false }; },
-      async create(params, options) { calls.stripeSessions.push({ params, options }); return { id: "cs_test_1", url: "https://checkout.stripe.test/cs_test_1", expires_at: 1_900_000_000 }; },
+      async create(params, options) { calls.stripeSessions.push({ params, options }); return { id: "cs_test_1", ui_mode: "elements", client_secret: "cs_test_secret_1", expires_at: 1_900_000_000 }; },
     } },
   };
   const supabase = { async rpc(name, args) { calls.rpc.push({ name, args }); return { data: rpcData, error: null }; } };
@@ -51,6 +91,14 @@ function setup({ subscriptions = [], sessions = [], rpcData = { status: "claimed
 
 const base = {
   env: { VERCEL_ENV: "preview", STRIPE_SECRET_KEY: "sk_test_unit" },
+  termsAccepted: true,
+  termsLocale: "en",
+  earlyStartRequested: false,
+  marketCountryScope: "CH",
+  marketRegion: "",
+  buyerType: "consumer",
+  frenchVersionPresented: false,
+  alternativeLanguageChoice: false,
   userId: "user_test_pro", getCustomerId: async () => null,
   createCustomer: async () => ({ id: "cus_test_1" }),
   saveCustomerId: async (...args) => { saved.push(args); },
@@ -82,23 +130,45 @@ test("subscription checkout uses the fixed CHF 24 monthly offer and guarded clai
     supabase: h.supabase,
     saveCustomerId: async (...args) => saved.push(args),
   });
-  assert.equal(result.url, "https://checkout.stripe.test/cs_test_1");
+  assert.equal(result.sessionId, "cs_test_1");
+  assert.equal(result.clientSecret, "cs_test_secret_1");
   const created = h.calls.stripeSessions[0];
   assert.equal(created.params.mode, "subscription");
+  assert.equal(created.params.ui_mode, "elements");
+  assert.match(created.params.return_url, /\/success\?session_id=\{CHECKOUT_SESSION_ID\}$/);
   assert.equal(created.params.line_items[0].price_data.currency, "chf");
   assert.equal(created.params.line_items[0].price_data.unit_amount, 2400);
   assert.equal(created.params.line_items[0].price_data.recurring.interval, "month");
   assert.equal(created.params.line_items[0].price_data.recurring.interval_count, 1);
   assert.equal(created.params.client_reference_id, "user_test_pro");
   assert.equal(created.params.metadata.premivateCheckoutClaim, "claim-test-1");
-  assert.deepEqual(
-    Array.from(created.params.custom_fields[0].dropdown.options, (option) => option.value),
-    ["consumer", "businessregistered", "businessunregistered", "businessunknown"],
-  );
+  assert.equal(created.params.custom_fields, undefined);
+  assert.equal(created.params.metadata.premivateBuyerType, "consumer");
   assert.equal(created.options.idempotencyKey, "premivate-pro-checkout-claim-test-1");
   assert.deepEqual(h.calls.rpc.map((item) => item.name), [
     "premivate_subscription_checkout_claim", "premivate_subscription_checkout_attach_session",
   ]);
+});
+
+test("Canadian subscription checkout is denied before claims or Stripe side effects", async () => {
+  const h = setup(); saved = [];
+  let customerLookups = 0;
+  await assert.rejects(h.api.createProSubscriptionCheckout({
+    ...base,
+    termsLocale: "fr",
+    marketCountryScope: "CA",
+    marketRegion: "QC",
+    frenchVersionPresented: true,
+    stripe: h.stripe,
+    supabase: h.supabase,
+    getCustomerId: async () => { customerLookups++; return null; },
+    saveCustomerId: async (...args) => saved.push(args),
+  }), (error) => error.status === 403 && error.safeCode === "CANADA_SALES_UNAVAILABLE");
+  assert.equal(customerLookups, 0);
+  assert.equal(h.calls.rpc.length, 0);
+  assert.equal(h.calls.customers.length, 0);
+  assert.equal(h.calls.stripeSessions.length, 0);
+  assert.equal(saved.length, 0);
 });
 
 test("active, past_due, unpaid, incomplete or trialing subscription blocks another checkout", async () => {

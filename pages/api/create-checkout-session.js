@@ -1,48 +1,39 @@
 import Stripe from "stripe";
 import { getAuth } from "@clerk/nextjs/server";
 import { getStripeCustomerIdStrict, saveStripeCustomerId, supabase } from "../../lib/pro";
-import { createProSubscriptionCheckout } from "../../lib/stripe-subscription";
-import { getStripeBaseUrl, stripeSecretMatchesEnvironment } from "../../lib/stripe-mode";
+import { getStripePublishableKey, stripeSecretMatchesEnvironment } from "../../lib/stripe-mode";
 import { assertAccountNotDeleting } from "../../lib/account-deletion";
+import { createServerFinalizedPrepaymentDraft } from "../../lib/server-finalized-prepayment";
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Only POST allowed" });
-  }
-
+  if (req.method !== "POST") return res.status(405).json({ error: "METHOD_NOT_ALLOWED" });
   try {
     const { userId } = getAuth(req);
-
-    if (!userId) {
-      return res.status(401).json({
-        error: "You must be logged in to upgrade",
-      });
-    }
-
+    if (!userId) return res.status(401).json({ error: "AUTH_REQUIRED" });
     await assertAccountNotDeleting(supabase, userId, process.env);
-
-    if (!stripeSecretMatchesEnvironment(process.env)) {
-      return res.status(503).json({ error: "STRIPE_MODE_MISMATCH" });
-    }
+    if (!stripeSecretMatchesEnvironment(process.env)) return res.status(503).json({ error: "STRIPE_MODE_MISMATCH" });
+    const publishableKey = getStripePublishableKey(process.env);
+    if (!publishableKey) return res.status(503).json({ error: "STRIPE_PUBLISHABLE_KEY_UNAVAILABLE" });
 
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-    const result = await createProSubscriptionCheckout({
-      env: process.env,
+    const draft = await createServerFinalizedPrepaymentDraft({
+      serviceType: "pro",
       userId,
-      stripe,
+      requestBody: req.body || {},
+      env: process.env,
       supabase,
+      stripe,
       getCustomerId: getStripeCustomerIdStrict,
-      createCustomer: (id) => stripe.customers.create({
-        metadata: { clerkUserId: id },
-      }, { idempotencyKey: `premivate-customer-${id}` }),
+      createCustomer: (id) => stripe.customers.create({ metadata: { clerkUserId: id } }, {
+        idempotencyKey: `premivate-customer-${id}`,
+      }),
       saveCustomerId: saveStripeCustomerId,
-      baseUrl: getStripeBaseUrl(process.env),
     });
-    return res.status(200).json(result);
+    return res.status(200).json({ ...draft, publishableKey });
   } catch (error) {
     const status = Number.isInteger(error?.status) ? error.status : 500;
-    const code = error?.safeCode;
-    console.error("Pro Checkout failed", { code: typeof code === "string" ? code : "CHECKOUT_FAILED" });
-    return res.status(status).json({ error: typeof code === "string" ? code : "CHECKOUT_FAILED" });
+    const code = typeof error?.safeCode === "string" ? error.safeCode : "CHECKOUT_DRAFT_FAILED";
+    if (status >= 500) console.error("Pro prepayment draft failed", { code });
+    return res.status(status).json({ error: code });
   }
 }

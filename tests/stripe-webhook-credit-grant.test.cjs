@@ -65,7 +65,7 @@ function createHarness({
   };
   class StripeMock { constructor() { return stripe; } }
   const source = fs.readFileSync(endpointPath, "utf8")
-    .replace(/^import .*;\s*$/gm, "")
+    .replace(/^import\s+[\s\S]*?\s+from\s+["'][^"']+["'];\s*/gm, "")
     .replace("export default async function handler", "async function handler")
     .replace(/^export\s+/gm, "");
   const { handler } = vm.runInNewContext(`${source}\n({ handler });`, {
@@ -83,6 +83,13 @@ function createHarness({
     processPaidCreditTopup: async () => ({ status: "granted" }),
     processStripeChargeRefund: async () => ({ status: "refunded" }),
     isAccountDeletionMarked: async () => false,
+    validateCompletedCheckoutEligibility: () => ({ status: "eligible" }),
+    SERVER_FINALIZED_CHECKOUT_FLOW: "r2-server-finalized-v1",
+    validateServerFinalizedEligibilityMetadata: () => ({ status: "refund_review" }),
+    markContractConfirmationExpired: async () => {},
+    markContractConfirmationRefundReview: async () => ({ status: "refund_review" }),
+    recordPaidContractConfirmation: async () => ({ state: "paid_pending_transfer" }),
+    recordPaidServerFinalizedContractConfirmation: async () => ({ state: "paid_pending_transfer" }),
     stripeEventMatchesEnvironment: matchesStripeMode,
     process: { env: { STRIPE_SECRET_KEY: "sk_test_offline", STRIPE_WEBHOOK_SECRET: "whsec_offline", VERCEL_ENV: "preview", ...env } },
     Buffer,
