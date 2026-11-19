@@ -15,16 +15,7 @@ export default async function handler(req, res) {
 
       line_items: [
         {
-          price_data: {
-            currency: "chf",
-            product_data: {
-              name: "FrameLab Pro",
-            },
-            unit_amount: 1900,
-            recurring: {
-              interval: "month",
-            },
-          },
+          price: process.env.STRIPE_PRO_PRICE_ID,
           quantity: 1,
         },
       ],
