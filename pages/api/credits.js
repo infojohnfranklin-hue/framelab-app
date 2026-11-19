@@ -7,6 +7,11 @@ import { getEffectiveUserPlan, isPremivateOwner, supabase } from "../../lib/pro"
 import { isCreditLedgerEnabled, readCreditBalance } from "../../lib/credit-balance";
 import { isTopupSalesEnabled } from "../../lib/credit-topup";
 import { assertAccountNotDeleting } from "../../lib/account-deletion";
+import { hasAnyActivatedPrepaymentMarket } from "../../lib/prepayment-eligibility";
+
+function isTopupSalesAvailable(env = process.env) {
+  return hasAnyActivatedPrepaymentMarket() && isTopupSalesEnabled(env);
+}
 
 export default async function handler(req, res) {
   try {
@@ -31,7 +36,7 @@ export default async function handler(req, res) {
         unlimited: true,
         ownerUnlimited: true,
         ledgerEnabled: isCreditLedgerEnabled(process.env),
-        topupSalesEnabled: isTopupSalesEnabled(process.env),
+        topupSalesEnabled: isTopupSalesAvailable(process.env),
       });
     }
 
@@ -58,7 +63,7 @@ export default async function handler(req, res) {
             ...balance,
             plan: "pro",
             ledgerEnabled: true,
-            topupSalesEnabled: isTopupSalesEnabled(process.env),
+            topupSalesEnabled: isTopupSalesAvailable(process.env),
           });
         }
         const snapshot = await getCreditSnapshot(userId);

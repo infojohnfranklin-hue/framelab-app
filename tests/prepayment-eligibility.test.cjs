@@ -8,7 +8,7 @@ const sourcePath = path.join(__dirname, "../lib/prepayment-eligibility.js");
 
 function load() {
   const source = fs.readFileSync(sourcePath, "utf8").replace(/^export\s+/gm, "") +
-    "\n({ RELEASE_1_PREPAYMENT_MARKETS, PREPAYMENT_MARKET_ALLOWLIST, normalizeBuyerType, evaluatePrepaymentEligibility, validateCompletedCheckoutEligibility, getPrepaymentEligibilityMetadata });";
+    "\n({ RELEASE_1_PREPAYMENT_MARKETS, PREPAYMENT_MARKET_ALLOWLIST, hasAnyActivatedPrepaymentMarket, normalizeBuyerType, evaluatePrepaymentEligibility, validateCompletedCheckoutEligibility, getPrepaymentEligibilityMetadata });";
   return vm.runInNewContext(source, { process: { env: {} }, Date }, { timeout: 1000 });
 }
 
@@ -25,6 +25,7 @@ test("empty server-controlled allowlist rejects eligibility even when environmen
     now: () => new Date("2026-11-18T10:00:00.125Z"),
   });
   assert.deepEqual(Array.from(api.PREPAYMENT_MARKET_ALLOWLIST), []);
+  assert.equal(api.hasAnyActivatedPrepaymentMarket(), false);
   assert.equal(decision.status, "review");
   assert.equal(decision.code, "MARKET_NOT_ACTIVATED");
   assert.throws(() => api.getPrepaymentEligibilityMetadata(decision), (error) => error.safeCode === "PREPAYMENT_ELIGIBILITY_REQUIRED");

@@ -5,6 +5,7 @@ import { clearLocalContentCopies } from "../lib/browser-content-retention";
 import CheckoutTermsDialog from "../components/CheckoutTermsDialog";
 import StripePrepaymentDialog from "../components/StripePrepaymentDialog";
 import PendingContractConfirmations from "../components/PendingContractConfirmations";
+import { hasAnyActivatedPrepaymentMarket } from "../lib/prepayment-eligibility";
 
 export default function SettingsPage({
   language,
@@ -23,6 +24,7 @@ export default function SettingsPage({
   const [checkoutSession, setCheckoutSession] = useState(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [earlyStartRequested, setEarlyStartRequested] = useState(false);
+  const prepaymentMarketsOpen = hasAnyActivatedPrepaymentMarket();
 
   useEffect(() => {
     if (!planStatusLoaded || !["pro", "free"].includes(userPlan)) {
@@ -45,7 +47,7 @@ export default function SettingsPage({
   }, [planStatusLoaded, userPlan]);
 
   function requestTopup(packageId) {
-    if (topupBusy || creditState?.topupSalesEnabled !== true) return;
+    if (!prepaymentMarketsOpen || topupBusy || creditState?.topupSalesEnabled !== true) return;
     setTermsAccepted(false);
     setEarlyStartRequested(false);
     setTopupError("");
@@ -73,7 +75,7 @@ export default function SettingsPage({
 
   async function startTopup(disclosure = {}) {
     const packageId = pendingTopupPackage;
-    if (!packageId || !termsAccepted || topupBusy || creditState?.topupSalesEnabled !== true) return;
+    if (!prepaymentMarketsOpen || !packageId || !termsAccepted || topupBusy || creditState?.topupSalesEnabled !== true) return;
     const requestEarlyStart = earlyStartRequested === true;
     setPendingTopupPackage("");
     setTermsAccepted(false);
@@ -237,7 +239,7 @@ export default function SettingsPage({
                     {userPlan === "pro" ? (
                       <>
                         <h3 style={{ margin: "0 0 12px", fontSize: "16px" }}>{ui.settings.topupsTitle}</h3>
-                        {creditState.topupSalesEnabled && !creditState.creditAccessBlocked ? (
+                        {prepaymentMarketsOpen && creditState.topupSalesEnabled && !creditState.creditAccessBlocked ? (
                           <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
                             <button type="button" disabled={Boolean(topupBusy)} onClick={() => requestTopup("credits_25")} style={topupButtonStyle}>{topupBusy === "credits_25" ? ui.settings.creditsLoading : ui.settings.topup25}</button>
                             <button type="button" disabled={Boolean(topupBusy)} onClick={() => requestTopup("credits_50")} style={topupButtonStyle}>{topupBusy === "credits_50" ? ui.settings.creditsLoading : ui.settings.topup50}</button>

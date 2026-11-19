@@ -4,9 +4,13 @@ import { getStripeCustomerIdStrict, saveStripeCustomerId, supabase } from "../..
 import { getStripePublishableKey, stripeSecretMatchesEnvironment } from "../../lib/stripe-mode";
 import { assertAccountNotDeleting } from "../../lib/account-deletion";
 import { createServerFinalizedPrepaymentDraft } from "../../lib/server-finalized-prepayment";
+import { isPrepaymentMarketActivated } from "../../lib/prepayment-eligibility";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "METHOD_NOT_ALLOWED" });
+  if (!isPrepaymentMarketActivated(req.body?.marketCountryScope)) {
+    return res.status(403).json({ error: "MARKET_NOT_ACTIVATED" });
+  }
   try {
     const { userId } = getAuth(req);
     if (!userId) return res.status(401).json({ error: "AUTH_REQUIRED" });

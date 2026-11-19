@@ -65,6 +65,7 @@ function loadModule(file, bindings = {}) {
     persistCheckoutMarketData: async () => ({ status: "not_collected" }),
     handler: undefined, isCreditLedgerEnabled: undefined, parseCreditBalance: undefined,
     readCreditBalance: undefined, isTopupSalesEnabled: undefined,
+    isPrepaymentMarketActivated: () => true,
     getCreditTopupPackage: undefined, validateTopupBalance: undefined,
     createCreditTopupCheckout: undefined, processPaidCreditTopup: undefined,
     assertAccountNotDeleting: async () => true,

@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import CheckoutTermsDialog from "../components/CheckoutTermsDialog";
 import StripePrepaymentDialog from "../components/StripePrepaymentDialog";
+import { hasAnyActivatedPrepaymentMarket } from "../lib/prepayment-eligibility";
 
 export default function PricingPage({ ui, language }) {
+  const prepaymentMarketsOpen = hasAnyActivatedPrepaymentMarket();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [checkoutDialogOpen, setCheckoutDialogOpen] = useState(false);
@@ -33,7 +35,7 @@ export default function PricingPage({ ui, language }) {
   }, [loading]);
 
   function requestCheckout() {
-    if (loading || checkoutStartedRef.current) return;
+    if (!prepaymentMarketsOpen || loading || checkoutStartedRef.current) return;
 
     restoreTriggerFocusRef.current = false;
     focusCheckoutStatusRef.current = false;
@@ -216,20 +218,20 @@ export default function PricingPage({ ui, language }) {
             <button
               ref={checkoutTriggerRef}
               onClick={requestCheckout}
-              disabled={loading}
+              disabled={loading || !prepaymentMarketsOpen}
               style={{
                 width: "100%",
                 padding: "16px 18px",
                 borderRadius: "16px",
                 border: "1px solid rgba(var(--premivate-gold-rgb),0.28)",
-                background: loading
+                background: loading || !prepaymentMarketsOpen
                   ? "rgba(var(--premivate-gold-rgb),0.20)"
                   : "rgb(var(--premivate-gold-rgb))",
                 color: "#17130C",
                 fontWeight: 900,
                 fontSize: "15px",
-                cursor: loading ? "not-allowed" : "pointer",
-                boxShadow: "0 18px 40px rgba(var(--premivate-gold-rgb),0.28)",
+                cursor: loading || !prepaymentMarketsOpen ? "not-allowed" : "pointer",
+                boxShadow: prepaymentMarketsOpen ? "0 18px 40px rgba(var(--premivate-gold-rgb),0.28)" : "none",
               }}
             >
               {loading ? "Opening Checkout..." : "Start Pro Checkout"}
@@ -257,8 +259,9 @@ export default function PricingPage({ ui, language }) {
             <h2 style={cardTitle}>Checkout Preview</h2>
 
             <p style={cardText}>
-              Billing is currently being verified before public launch. Continue
-              only if you intentionally want to test the checkout flow.
+              {prepaymentMarketsOpen
+                ? "Billing is currently being verified before public launch. Continue only if you intentionally want to test the checkout flow."
+                : "Pro checkout is currently unavailable while launch markets are being verified."}
             </p>
 
             <Link href="/" style={secondaryButtonStyle}>
