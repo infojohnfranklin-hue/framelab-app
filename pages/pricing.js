@@ -4,8 +4,16 @@ import CheckoutTermsDialog from "../components/CheckoutTermsDialog";
 import StripePrepaymentDialog from "../components/StripePrepaymentDialog";
 import { hasAnyActivatedPrepaymentMarket } from "../lib/prepayment-eligibility";
 
-export default function PricingPage({ ui, language }) {
-  const prepaymentMarketsOpen = hasAnyActivatedPrepaymentMarket();
+export async function getServerSideProps() {
+  return {
+    props: {
+      prepaymentMarketsOpen: hasAnyActivatedPrepaymentMarket(),
+    },
+  };
+}
+
+export default function PricingPage({ ui, language, prepaymentMarketsOpen: marketSalesEnabled }) {
+  const prepaymentMarketsOpen = marketSalesEnabled === true;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [checkoutDialogOpen, setCheckoutDialogOpen] = useState(false);
