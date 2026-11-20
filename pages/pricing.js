@@ -264,11 +264,13 @@ export default function PricingPage({ ui, language, prepaymentMarketsOpen: marke
           </section>
 
           <section style={sideCardStyle}>
-            <h2 style={cardTitle}>Checkout Preview</h2>
+            <h2 style={cardTitle}>
+              {prepaymentMarketsOpen ? "Checkout" : "Checkout Preview"}
+            </h2>
 
             <p style={cardText}>
               {prepaymentMarketsOpen
-                ? "Billing is currently being verified before public launch. Continue only if you intentionally want to test the checkout flow."
+                ? "Continue to Stripe Checkout to subscribe to PREMIVATE Pro for CHF 24.00 per month."
                 : "Pro checkout is currently unavailable while launch markets are being verified."}
             </p>
 
