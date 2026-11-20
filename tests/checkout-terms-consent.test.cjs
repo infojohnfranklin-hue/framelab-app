@@ -7,7 +7,7 @@ const vm = require("node:vm");
 const sourcePath = path.join(__dirname, "../lib/checkout-terms-consent.js");
 const eligibilityPath = path.join(__dirname, "../lib/prepayment-eligibility.js");
 const terms = Object.fromEntries(["en", "de", "fr"].map((locale) => [locale, {
-  terms: { version: "Working draft · test", sections: [] },
+  terms: { version: "v5 · test", sections: [] },
 }]));
 const copy = Object.fromEntries(["en", "de", "fr"].map((locale) => [locale, {
   seller: `seller-${locale}`,
@@ -54,9 +54,9 @@ function validInput(overrides = {}) {
   };
 }
 
-test("environment configuration cannot open a paid market while the server capture gate is incomplete", () => {
+test("CH is enabled, but environment configuration cannot activate other markets", () => {
   const api = load();
-  for (const marketCountryScope of ["CH", "SG", "AU", "NZ"]) {
+  for (const marketCountryScope of ["SG", "AU", "NZ"]) {
     assert.throws(
       () => api.createCheckoutTermsConsent(validInput({
         marketCountryScope,
@@ -66,6 +66,19 @@ test("environment configuration cannot open a paid market while the server captu
       `Expected ${marketCountryScope} to stay closed despite environment configuration`,
     );
   }
+  assert.throws(
+    () => api.createCheckoutTermsConsent(validInput({
+      marketCountryScope: "CH",
+      env: { VERCEL_ENV: "preview", PREMIVATE_PREPAYMENT_ELIGIBILITY_MARKETS: "CH" },
+    })),
+    (error) => error.status === 403 && error.safeCode === "MARKET_NOT_ACTIVATED",
+  );
+  const consent = api.createCheckoutTermsConsent(validInput({
+    marketCountryScope: "CH",
+    env: { VERCEL_ENV: "production", PREMIVATE_PREPAYMENT_ELIGIBILITY_MARKETS: "CH,SG,AU,NZ" },
+  }));
+  assert.equal(consent.accepted, true);
+  assert.equal(consent.precontractDisclosure.marketCountryScope, "CH");
 });
 
 test("all Canadian provinces and territories are unavailable before checkout", () => {
@@ -84,10 +97,11 @@ test("all Canadian provinces and territories are unavailable before checkout", (
   }
 });
 
-test("empty allowlist blocks Checkout Sessions in preview and production", () => {
+test("inactive markets block Checkout Sessions in preview and production", () => {
   const api = load();
   assert.throws(
     () => api.createCheckoutTermsConsent(validInput({
+      marketCountryScope: "SG",
       env: { VERCEL_ENV: "preview", PREMIVATE_PREPAYMENT_ELIGIBILITY_MARKETS: "" },
     })),
     (error) => error.status === 403 && error.safeCode === "MARKET_NOT_ACTIVATED",
@@ -104,7 +118,7 @@ test("empty allowlist blocks Checkout Sessions in preview and production", () =>
 test("closed markets stay unavailable and Canadian declarations reject invalid regions", () => {
   const api = load();
   assert.throws(
-    () => api.createCheckoutTermsConsent(validInput({ marketCountryScope: "CH", marketRegion: "", frenchVersionPresented: true })),
+    () => api.createCheckoutTermsConsent(validInput({ marketCountryScope: "SG", marketRegion: "", frenchVersionPresented: true })),
     (error) => error.safeCode === "MARKET_NOT_ACTIVATED",
   );
   assert.throws(
@@ -113,19 +127,27 @@ test("closed markets stay unavailable and Canadian declarations reject invalid r
   );
 });
 
-test("production environment cannot bypass the empty market allowlist", () => {
+test("production environment cannot activate SG, AU, or NZ", () => {
   const api = load();
-  for (const locale of ["en", "de", "fr"]) {
+  for (const marketCountryScope of ["SG", "AU", "NZ"]) {
     assert.throws(
       () => api.createCheckoutTermsConsent(validInput({
-        locale,
-        marketCountryScope: "CH",
+        marketCountryScope,
         marketRegion: "",
         frenchVersionPresented: false,
         alternativeLanguageChoice: false,
-        env: { VERCEL_ENV: "production", PREMIVATE_PREPAYMENT_ELIGIBILITY_MARKETS: "CH,SG,AU" },
+        env: { VERCEL_ENV: "production", PREMIVATE_PREPAYMENT_ELIGIBILITY_MARKETS: "CH,SG,AU,NZ" },
       })),
       (error) => error.status === 403 && error.safeCode === "MARKET_NOT_ACTIVATED",
     );
   }
+  const swissConsent = api.createCheckoutTermsConsent(validInput({
+    locale: "en",
+    marketCountryScope: "CH",
+    marketRegion: "",
+    frenchVersionPresented: false,
+    alternativeLanguageChoice: false,
+    env: { VERCEL_ENV: "production", PREMIVATE_PREPAYMENT_ELIGIBILITY_MARKETS: "SG,AU,NZ" },
+  }));
+  assert.equal(swissConsent.precontractDisclosure.marketCountryScope, "CH");
 });
